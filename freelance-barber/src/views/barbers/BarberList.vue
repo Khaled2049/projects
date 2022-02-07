@@ -1,6 +1,6 @@
 <template>
     <section>
-        <barber-filter @change="setFilters"></barber-filter>
+        <barber-filter @change-filter="setFilters"></barber-filter>
     </section>
     <section>
         <base-card>
@@ -34,9 +34,10 @@ export default {
     data() {
         return {
             activeFilters: {
-                frontend: true,
-                backend: true,
-                career: true,
+                North: true,
+                South: true,
+                East: true,
+                West: true,
             },
         }
     },
@@ -47,13 +48,16 @@ export default {
         filteredBarbers() {
             const barbers = this.$store.getters['barbers/barbers'];
             return barbers.filter(barber => {
-                if(this.activeFilters.frontend && barber.areas.includes('frontend')) {
+                if(this.activeFilters.North && barber.areas.includes('North')) {
                     return true; 
                 }
-                if(this.activeFilters.backend && barber.areas.includes('backend')) {
+                if(this.activeFilters.South && barber.areas.includes('South')) {
                     return true; 
                 }
-                if(this.activeFilters.career && barber.areas.includes('career')) {
+                if(this.activeFilters.East && barber.areas.includes('East')) {
+                    return true; 
+                }
+                if(this.activeFilters.West && barber.areas.includes('West')) {
                     return true; 
                 }
                 return false;
@@ -65,6 +69,7 @@ export default {
     },
     methods: { 
         setFilters(updatedFilters) {
+            console.log(updatedFilters);
             this.activeFilters = updatedFilters;
         }
     }

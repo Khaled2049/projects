@@ -1,11 +1,12 @@
 import { createStore } from 'vuex'
 
 import barbersModule from './modules/barbers/index.js';
+import requestsModule from './modules/requests/index.js';
 
 export default createStore({
   state() {
     return {
-      userId: 'b3',
+      userId: 'b1',
     }
   },
   getters: {
@@ -18,6 +19,7 @@ export default createStore({
   actions: {
   },
   modules: {
-    barbers: barbersModule
+    barbers: barbersModule,
+    requests: requestsModule
   }
 })

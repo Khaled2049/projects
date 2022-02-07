@@ -17,18 +17,22 @@
             <input type="number" v-model.number="rate" rows="5" id="rate"> 
         </div>
         <div class="form-control">
-            <h3>Areas of Expertise</h3>
+            <h3>Location</h3>
             <div>
-                <input type="checkbox" id="frontend" v-model="areas" value="frontend">
-                <label for="frontend">frontend development</label>
+                <input type="checkbox" id="North" v-model="areas" value="North">
+                <label for="North">North</label>
             </div>
             <div>
-                <input type="checkbox" id="backend" v-model="areas" value="backend">
-                <label for="frontend">backend development</label>
+                <input type="checkbox" id="South" v-model="areas" value="South">
+                <label for="South">South</label>
             </div>
             <div>
-                <input type="checkbox" id="career" v-model="areas" value="career">
-                <label for="career">Career development</label>
+                <input type="checkbox" id="East" v-model="areas" value="East">
+                <label for="East">East</label>
+            </div>
+            <div>
+                <input type="checkbox" id="West" v-model="areas" value="West">
+                <label for="West">West</label>
             </div>
         </div>
         <base-button>Register</base-button>

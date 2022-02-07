@@ -11,7 +11,7 @@ export default {
                     id: 'b1',
                     firstName: 'Liton',
                     lastName: "Dash",
-                    areas: ['frontend', 'backend', 'career'],
+                    areas: ['West', 'East', 'North'],
                     description: 'I am the best barber in the world',
                     hourlyRate: 30, 
                 },
@@ -19,7 +19,7 @@ export default {
                     id: 'b2',
                     firstName: 'Komol',
                     lastName: "nunu",
-                    areas: ['frontend', 'career'],
+                    areas: ['South', 'West'],
                     description: 'I am the 2nd best barber in the world',
                     hourlyRate: 30, 
                 }

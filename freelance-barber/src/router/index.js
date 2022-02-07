@@ -20,6 +20,7 @@ const routes = [
   },
   {
     path: '/barbers/:id',
+    props: true, 
     name: 'bid',
     children: 
     [
