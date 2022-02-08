@@ -4,6 +4,7 @@
             <div class="d-flex">
                 <b-form-input v-on:keyup.enter="getNews(params)" v-model="params.q" placeholder="Search For News"></b-form-input>
                 <b-button class="btn-success mx-2" @click="getNews(params)">Search</b-button>
+                <b-button class="btn-primary mx-2" @click="clearNews">Clear</b-button>
             </div> 
             <div class="news-section" v-if="showNews">
                 <news-card :searchedNews="news"/>
@@ -43,6 +44,9 @@ export default {
                 this.showNews = true;
             })
         },
+        clearNews() {
+            this.news = [];
+        }
     }
 }
 </script>
