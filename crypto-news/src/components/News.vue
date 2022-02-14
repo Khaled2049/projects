@@ -9,7 +9,6 @@
             <div class="news-section" v-if="showNews">
                 <news-card :searchedNews="news"/>
             </div>
-            
         </div>
     </div>
 </template>
@@ -39,6 +38,7 @@ export default {
     methods: {
         getNews(params) {
             let url = 'https://newsapi.org/v2/everything?' + 'from=2022-01-25&' + 'sortBy=popularity';
+            console.log(params.apiKey);
             this.axios.get(url, { params }).then((res) => {
                 this.news = res.data.articles.slice(0,5);
                 this.showNews = true;
