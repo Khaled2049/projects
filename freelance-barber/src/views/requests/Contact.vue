@@ -32,9 +32,8 @@ export default {
             if (this.email === '' || !this.email.includes('@') || this.message === '') {
                 this.formIsValid = false;
                 return;
-            }
-            console.log('here');
-            this.$store.dispatch('contactBarber', {
+            }            
+            this.$store.dispatch('requests/contactBarber', {
                 email: this.email,
                 message: this.message,
                 barberId: this.$route.params.id

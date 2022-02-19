@@ -17,13 +17,13 @@ export default {
     props: ['id', 'firstName', 'lastName', 'rate', 'areas'],
     computed: {
         fullName() {
-            return this.firstName + ' ' + this.lastName;
+          return this.firstName + ' ' + this.lastName;
         },
         barberContactLink() {
-            return this.$route.path + '/' + this.id + '/contact';
+          return this.$route.path + '/' + this.id + '/contact';
         },
         barberDetailsLink() {
-            return this.$route.path + '/' + this.id;
+          return this.$route.path + '/' + this.id;
         }
     }    
 }

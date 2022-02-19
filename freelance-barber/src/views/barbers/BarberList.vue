@@ -1,14 +1,20 @@
 <template>
+    <base-dialog :show="!!error" title="An error Occured" @close="handleError">
+        <p>{{ error }}</p>
+    </base-dialog>
     <section>
         <barber-filter @change-filter="setFilters"></barber-filter>
     </section>
     <section>
         <base-card>
             <div class="controls">
-                <base-button mode="outline">Refresh</base-button>
-                <base-button v-if="!isBarber" link to="/register">Register</base-button>
+                <base-button mode="outline" @click="loadBarbers(true)">Refresh</base-button>
+                <base-button v-if="!isBarber && !isLoading" link to="/register">Register</base-button>
             </div>
-            <ul v-if="hasBarbers"> 
+            <div v-if="isLoading">
+                <base-spinner></base-spinner>
+            </div>
+            <ul v-else-if="hasBarbers"> 
                 <barber-item v-for="barber in filteredBarbers" :key="barber.id" 
                     :id="barber.id" 
                     :first-name="barber.firstName" 
@@ -33,6 +39,8 @@ export default {
     },
     data() {
         return {
+            isLoading: false,
+            error: null,
             activeFilters: {
                 North: true,
                 South: true,
@@ -64,14 +72,30 @@ export default {
             });
         },
         hasBarbers() {
-            return this.$store.getters['barbers/hasBarbers'];
+            return !this.isLoading && this.$store.getters['barbers/hasBarbers'];
         }
     },
     methods: { 
         setFilters(updatedFilters) {
             console.log(updatedFilters);
             this.activeFilters = updatedFilters;
+        },
+        async loadBarbers(refresh = false) {
+            this.isLoading = true;
+            try {
+                await this.$store.dispatch('barbers/loadBarbers', {forceRefresh: refresh});
+            } catch (err) {
+                this.error = err.message || 'Oopise something is broken';
+            }
+            
+            this.isLoading = false;
+        },
+        handleError() {
+            this.error = null;
         }
+    },
+    created() {
+        this.loadBarbers();
     }
 }
 </script>
