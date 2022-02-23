@@ -2,24 +2,16 @@ import { createStore } from 'vuex'
 
 import barbersModule from './modules/barbers/index.js';
 import requestsModule from './modules/requests/index.js';
+import authModule from './modules/auth/index.js'
 
 export default createStore({
-  state() {
-    return {
-      userId: 'b1',
-    }
-  },
-  getters: {
-    userId(state) {
-      return state.userId;
-    }
-  },
   mutations: {
   },
   actions: {
   },
   modules: {
     barbers: barbersModule,
-    requests: requestsModule
+    requests: requestsModule,
+    auth: authModule
   }
 })

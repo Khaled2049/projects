@@ -11,7 +11,9 @@ export default {
             areas: data.areas
         };
         
-        const response = await fetch(`${process.env.VUE_APP_FIREBASE}/barbers/${userId}.json`, {
+        const token = context.rootGetters.token;
+
+        const response = await fetch(`${process.env.VUE_APP_FIREBASE}/barbers/${userId}.json?auth=${token}`, {
             method: 'PUT',
             body: JSON.stringify(barberData)
         });

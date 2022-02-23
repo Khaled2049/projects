@@ -7,9 +7,13 @@
     </section>
     <section>
         <base-card>
+            Hello, {{barberFullName}}
+        </base-card>
+        <base-card>
             <div class="controls">
                 <base-button mode="outline" @click="loadBarbers(true)">Refresh</base-button>
-                <base-button v-if="!isBarber && !isLoading" link to="/register">Register</base-button>
+                <base-button v-if="!isLoggedIn" link to="/auth?redirect=register">Register</base-button>
+                <base-button v-if="isLoggedIn && !isBarber && !isLoading" link to="/register">Become a Barber</base-button>
             </div>
             <div v-if="isLoading">
                 <base-spinner></base-spinner>
@@ -50,6 +54,20 @@ export default {
         }
     },
     computed: {
+        barberFullName() {
+            if (this.isLoggedIn && this.isBarber) {
+                const barbers = this.$store.getters['barbers/barbers'];
+                const loggedInUserId = this.$store.getters.getLoggedInUserId;
+                const barber = barbers.filter((barber) => barber.id === loggedInUserId);
+                const fullName = barber[0].firstName + ' ' + barber[0].lastName;
+                return fullName;
+            } else {
+                return 'Sir!'
+            }
+        },
+        isLoggedIn() {
+            return this.$store.getters.isAuthenticated;
+        },
         isBarber() {
             return this.$store.getters['barbers/isBarber'];
         },
