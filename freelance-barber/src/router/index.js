@@ -7,6 +7,9 @@ import Contact from '../views/requests/Contact.vue';
 import Requests from '../views/requests/Requests.vue';
 import NotFound from '../views/NotFound.vue';
 import About from '../views/About.vue';
+import UserAuth from '../views/auth/UserAuth.vue'
+
+import store from '../store/index.js';
 
 const routes = [
   {
@@ -33,13 +36,21 @@ const routes = [
   },
   {
     path: '/register',
+    meta: { requiresAuth: true},
     name: 'register',
     component: BarberRegistration
   },
   {
     path: '/requests',
+    meta: { requiresAuth: true},
     name: 'requests',
     component: Requests
+  },
+  {
+    name: 'Auth',
+    meta: { requiresUnauth: true},
+    path: '/auth',
+    component: UserAuth
   },
   {
     path: '/:notFound(.*)',
@@ -56,6 +67,16 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, _, next) => {
+  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
+    next('/auth');
+  } else if(to.meta.requiresUnauth && store.getters.isAuthenticated) {
+    next('/barbers');
+  } else {
+    next();
+  }
 })
 
 export default router

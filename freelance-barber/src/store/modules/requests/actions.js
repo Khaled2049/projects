@@ -25,7 +25,9 @@ export default {
 
     async fetchRequests(context) {
         const barberId = context.rootGetters.userId;
-        const response = await fetch(`${process.env.VUE_APP_FIREBASE}/requests/${barberId}.json`);
+        const token = context.rootGetters.token;
+        console.log(token);
+        const response = await fetch(`${process.env.VUE_APP_FIREBASE}/requests/${barberId}.json?auth=${token}`);
         const responseData = await response.json();
 
         if(!response.ok) {

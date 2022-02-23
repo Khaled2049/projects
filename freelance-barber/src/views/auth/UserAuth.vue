@@ -1,4 +1,13 @@
 <template>
+  <div>
+    <base-dialog :show="!!error" title="An error occurred" @close="handleError"> 
+      <p>
+        {{ error }}
+      </p>
+    </base-dialog>
+    <base-dialog :show="isLoading" title="Authenticating..." fixed>
+      <base-spinner></base-spinner>
+    </base-dialog>
     <base-card>
         <form @submit.prevent="submitForm">
             <div class="form-control">
@@ -7,7 +16,7 @@
             </div>
             <div class="form-control">
                 <label for="password">Password: </label>
-                <input type="password" v-model.trim="password" id="password">
+                <input autocomplete="off" type="password" v-model.trim="password" id="password">
             </div>
             <p v-if="!formIsValid">
               Please enter a valid email and password
@@ -18,6 +27,7 @@
             </div>
         </form>
     </base-card>
+  </div>
 </template>
 <script>
 
@@ -28,6 +38,8 @@ export default {
       password: '',
       formIsValid: true,
       mode: 'login',
+      isLoading: false,
+      error: null,
     }
   },
   computed: {
@@ -47,12 +59,35 @@ export default {
     }
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       this.formIsValid = true;
       if (this.email === '' || !this.email.includes('@') || this.password.length < 6) {
         this.formIsValid = false;
         return;
       }
+
+      this.isLoading = true;
+      try {
+        if (this.mode === 'login') {
+          await this.$store.dispatch('login', {
+            email: this.email, 
+            password: this.password
+          })
+        } else {
+          await this.$store.dispatch('signup', {
+            email: this.email, 
+            password: this.password
+          });
+        }
+        const redirectUrl = `/${(this.$route.query.redirect || 'barbers')}`
+        this.$router.replace(redirectUrl);
+      } catch (err) {
+        this.error = err.message || 'Failed to authenticate';
+      }
+      this.isLoading = false;
+    },
+    handleError() {
+      this.error = null;
     },
     switchAuthMode() {
       if(this.mode === 'login') {

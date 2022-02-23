@@ -15,6 +15,14 @@
     </section>
     <section>
         <base-card>
+            <p>
+                {{ description }}
+            </p>
+        </base-card>
+    </section>
+    <section>
+        <base-card>
+            <h1>My saloons are on situated here: </h1>
             <base-badge v-for="area in areas" :key="area" :type="area" :title="area"></base-badge>
             <router-view></router-view>
             <!-- <router-link to="/barbers/b1/contact">Contact</router-link> -->
@@ -41,7 +49,8 @@ export default {
             return this.selectedBarber.firstName + ' ' + this.selectedBarber.lastName;
         },
         contactLink() {
-            return this.$store.path + '/' + this.id + '/barber';
+            console.log(this.id)
+            return '/barbers/' + this.id + '/contact';
         },
         areas() {
             return this.selectedBarber.areas;
