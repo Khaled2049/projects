@@ -3,8 +3,19 @@ import moment from 'moment';
 import Link from 'next/link';
 import { getRecentPosts, getSimilarPosts } from '../services';
 
-const PostWidget = ({ categories, slug }) => {
-  const [relatedPosts, setRelatedPosts] = useState([]);
+interface IPostWidget {
+  categories: string[];
+  slug: string;
+}
+
+interface relatedPosts {
+  title: string;
+  createdAt: string;
+  slug: string;
+}
+
+const PostWidget = ({ categories, slug }:IPostWidget) => {
+  const [relatedPosts , setRelatedPosts] = useState<relatedPosts[]>([]);
 
   useEffect(() => {
     if (slug) {

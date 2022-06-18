@@ -2,20 +2,14 @@
 import Head from 'next/head'
 import { PostCard, PostWidget, Categories } from '../components'
 import { getPosts } from '../services'
+import { IPost, Post } from '../types'
 
-interface AppProps {
-  posts: any
-}
-
-type Props = {
-  posts: any
-}
-
-const Home: React.FC<Props>  = ({ posts }: AppProps): JSX.Element => {
+const Home = ( {posts}: Post): JSX.Element => {
   return (
+    <>
     <div className="container mx-auto px-10 mb-8">
       <Head>
-        <title>Create Next App</title>
+        <title>Kozicode</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-12'>
@@ -32,11 +26,12 @@ const Home: React.FC<Props>  = ({ posts }: AppProps): JSX.Element => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
 export async function getStaticProps() {
-  const posts = (await getPosts()) || [];
+  const posts: IPost = (await getPosts()) || [];
   return {props: {posts}};
 }
 

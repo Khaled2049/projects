@@ -3,9 +3,14 @@ import moment from 'moment';
 import parse from 'html-react-parser';
 
 import { getComments } from '../services';
+import { IComment } from '../types';
 
-const Comments = ({ slug }) => {
-  const [comments, setComments] = useState([]);
+interface Comments {
+  slug: string;
+}
+
+const Comments = ({ slug }: Comments) => {
+  const [comments, setComments] = useState<IComment[]>([]);
 
   useEffect(() => {
     getComments(slug).then((result) => {

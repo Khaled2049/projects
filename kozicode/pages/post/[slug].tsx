@@ -1,18 +1,15 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 
-import {
-  PostDetail,
-  Categories,
-  PostWidget,
-  Author,
-  Comments,
-  CommentsForm,
-  Loader,
-} from '../../components';
+import { PostDetail, Categories, PostWidget, Author, Comments, CommentsForm, Loader } from '../../components';
 import { getPosts, getPostDetails } from '../../services';
+import { IPost } from '../../types';
 
-const PostDetails = ({ post }) => {
+interface Post {
+  post: IPost
+}
+
+const PostDetails = ({ post }: Post) => {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -31,10 +28,7 @@ const PostDetails = ({ post }) => {
           </div>
           <div className="col-span-1 lg:col-span-4">
             <div className="relative lg:sticky top-8">
-              <PostWidget
-                slug={post.slug}
-                categories={post.categories.map((category) => category.slug)}
-              />
+              <PostWidget slug={post.slug} categories={post.categories.map((category) => category.slug)} />
               <Categories />
             </div>
           </div>
@@ -46,7 +40,7 @@ const PostDetails = ({ post }) => {
 export default PostDetails;
 
 // Fetch data at build time
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params }: any) {
   const data = await getPostDetails(params.slug);
   return {
     props: {
@@ -60,7 +54,7 @@ export async function getStaticProps({ params }) {
 export async function getStaticPaths() {
   const posts = await getPosts();
   return {
-    paths: posts.map(({ node: { slug } }) => ({ params: { slug } })),
+    paths: posts.map(({ node: { slug } }: any) => ({ params: { slug } })),
     fallback: true,
   };
 }

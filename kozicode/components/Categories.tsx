@@ -3,8 +3,13 @@ import Link from 'next/link';
 
 import { getCategories } from '../services';
 
+export interface ICategory {
+  name: string;
+  slug: string;
+}
+
 const Categories = () => {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
   useEffect(() => {
     getCategories().then((newCategories) => {

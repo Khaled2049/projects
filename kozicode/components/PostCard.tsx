@@ -1,8 +1,13 @@
 import React from 'react';
 import moment from 'moment';
 import Link from 'next/link';
+import { IPost } from '../types';
 
-const PostCard = ({ post }) => {
+interface Post {
+  post: IPost;
+}
+
+const PostCard = ({ post }: Post) => {
   return (
     <div className="bg-white shadow-lg p-0 lg:p-8 pb-12 mb-8">
       <div className="relative overflow-hidden shadow-md pb-80 mb-6">

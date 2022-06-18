@@ -1,6 +1,6 @@
 import React from 'react';
-import { Header } from './';
-const Layout = ({ children }) => {
+import { Header } from '.';
+const Layout = ({ children }: any) => {
   return (
     <>
       <Header />
