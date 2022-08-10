@@ -4,16 +4,12 @@ import Link from 'next/link';
 
 const Navbar = () => {
   return (
-    <div className="container mx-auto px-10 mb-8 content-center">
-      <div className="border-b  w-full border-blue-400 py-8">
-        <Link href="/">
-          <div className="text-center">
-            <span className="cursor-pointer font-bold text-4xl text-white">
-              Suppity Sup
-            </span>
-          </div>
-        </Link>
-      </div>
+    <div className="h-[4rem] py-4 flex justify-center items-center bg-blue-900 w-full content-center">
+      <Link href="/">
+        <div className="text-center text-sky-100">
+          <span className="cursor-pointer font-bold text-4xl">Suppity Sup</span>
+        </div>
+      </Link>
     </div>
   );
 };

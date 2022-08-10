@@ -11,7 +11,7 @@ export default function Layout({ children }: ILayoutProps) {
     <>
       <Navbar />
       <main>{children}</main>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 }

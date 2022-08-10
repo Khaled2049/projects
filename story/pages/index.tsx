@@ -1,50 +1,24 @@
-import type { NextPage } from 'next';
-import Post from '../components/Post';
-import { getData } from '../services';
+import React from 'react';
+import Link from 'next/link';
 
-interface HomeProps {
-  posts: IPost[];
-}
-
-const Home = (props: HomeProps) => {
+const home = () => {
   return (
-    <div className="flex items-center justify-center">
-      <Post posts={props.posts} />
-    </div>
+    <header className="h-[88vh] w-full bg-gradient-to-r from-indigo-600 to-emerald-100 bg-cover bg-center flex justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
+        <h1 className=" text-center text-5xl text-white font-bold drop-shadow-lg">
+          WELCOME TO KOZICODE
+        </h1>
+        <p className="mt-5 text-center text-lg text-white opacity-70">
+          This webiste is about programming and other stuff.
+        </p>
+        <Link href={`/allPosts`}>
+          <span className="cursor-pointer text-sky-50 bg-emerald-600 inline-block rounded-full px-4 py-2 mt-3">
+            All Posts
+          </span>
+        </Link>
+      </div>
+    </header>
   );
 };
 
-export const getStaticProps = async () => {
-  const posts = (await getData()) || [];
-  // const posts = [
-  //   {
-  //     id: 'cl5zeifh2593b0dk1i23f3xci',
-  //     author: { name: 'Khaled Hossain', id: 'cl5zeg848e7aa0bj0gfqas2zl' },
-  //     content: {
-  //       text: "Lorem Ipsum\\n is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  //     },
-  //     coverImage: null,
-  //     title: 'Test Blog',
-  //     slug: 'post-1',
-  //     excerpt: 'This is a test.',
-  //   },
-  //   {
-  //     id: 'asd',
-  //     author: { name: 'Khaled Hossain', id: 'cl5zeg848e7aa0bj0gfqas2zl' },
-  //     content: {
-  //       text: "Lorem Ipsum\\n is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-  //     },
-  //     coverImage: null,
-  //     title: 'Test Blog',
-  //     slug: 'post-2',
-  //     excerpt: 'This is a test.',
-  //   },
-  // ];
-  return {
-    props: {
-      posts,
-    },
-  };
-};
-
-export default Home;
+export default home;
