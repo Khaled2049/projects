@@ -9,7 +9,7 @@ interface IPostProps {
 const Post = (props: IPostProps) => {
   const { posts } = props;
   return (
-    <div className="mb-8">
+    <div>
       {posts.map((post: IPost) => {
         return (
           <div
