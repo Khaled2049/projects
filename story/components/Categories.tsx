@@ -4,10 +4,10 @@ import Link from 'next/link';
 const Categories = () => {
   const [categories, setCategories] = useState<any[]>([]);
   useEffect(() => {
-    // getCategories().then((newCategories) => {
-    //   setCategories(newCategories);
-    // });
-    setCategories([{ name: 'test', slug: 'test' }]);
+    getCategories().then((newCategories) => {
+      setCategories(newCategories);
+    });
+    // setCategories([{ name: 'test', slug: 'test' }]);
   }, []);
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 mb-8 pb-12 mt-8 ">
@@ -17,7 +17,7 @@ const Categories = () => {
           return (
             <Link href={`/category/${category.slug}`} key={category.slug}>
               <span className="cursor-pointer block pb-3 mb-3">
-                {category.name}
+                {category.category}
               </span>
             </Link>
           );
