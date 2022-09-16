@@ -1,10 +1,13 @@
 import Lecture from "./components/Lecture";
-// import "./App.css";
+import Header from "./components/Header";
+import About from "./pages/About";
+import Pages from "./pages";
 
 function App() {
   return (
     <div className="App">
-      <Lecture />
+      <Header />
+      <Pages />
     </div>
   );
 }
