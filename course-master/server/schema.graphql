@@ -2,6 +2,14 @@
 ### Do not make changes to this file directly
 
 
+type Course {
+  body: String!
+  heading: String!
+  id: Int!
+  title: String!
+  url: String!
+}
+
 type Mutation {
   createPost(body: String!, title: String!): Post!
 }
@@ -13,5 +21,6 @@ type Post {
 }
 
 type Query {
+  courses: [Course!]!
   posts: [Post!]!
 }

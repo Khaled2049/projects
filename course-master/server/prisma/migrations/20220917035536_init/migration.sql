@@ -5,3 +5,12 @@ CREATE TABLE "Post" (
     "body" TEXT NOT NULL,
     "title" TEXT NOT NULL
 );
+
+-- CreateTable
+CREATE TABLE "Course" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "title" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "heading" TEXT NOT NULL,
+    "body" TEXT NOT NULL
+);

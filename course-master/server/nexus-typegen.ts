@@ -28,6 +28,13 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
+  Course: { // root type
+    body: string; // String!
+    heading: string; // String!
+    id: number; // Int!
+    title: string; // String!
+    url: string; // String!
+  }
   Mutation: {};
   Post: { // root type
     body: string; // String!
@@ -48,6 +55,13 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
+  Course: { // field return type
+    body: string; // String!
+    heading: string; // String!
+    id: number; // Int!
+    title: string; // String!
+    url: string; // String!
+  }
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
   }
@@ -57,11 +71,19 @@ export interface NexusGenFieldTypes {
     title: string; // String!
   }
   Query: { // field return type
+    courses: NexusGenRootTypes['Course'][]; // [Course!]!
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
 }
 
 export interface NexusGenFieldTypeNames {
+  Course: { // field return type name
+    body: 'String'
+    heading: 'String'
+    id: 'Int'
+    title: 'String'
+    url: 'String'
+  }
   Mutation: { // field return type name
     createPost: 'Post'
   }
@@ -71,6 +93,7 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
   }
   Query: { // field return type name
+    courses: 'Course'
     posts: 'Post'
   }
 }

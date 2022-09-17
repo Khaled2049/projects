@@ -16,3 +16,11 @@ model Post {
   body      String
   title     String
 }
+
+model Course {
+  id      Int    @id @default(autoincrement())
+  title   String
+  url     String
+  heading String
+  body    String
+}
