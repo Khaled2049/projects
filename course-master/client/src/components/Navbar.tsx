@@ -11,7 +11,7 @@ export default function NavBar() {
         <div>
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
             <Link className="text-2xl font-bold" to="/">
-              জ্ঞান অর্জন
+              Notes
             </Link>
             <div className="md:hidden">
               <button
@@ -62,7 +62,7 @@ export default function NavBar() {
                 <Link to="/">Home</Link>
               </li>
               <li className="text-gray-600 hover:text-blue-600">
-                <Link to="/courses">Courses</Link>
+                <Link to="/courses">CU Courses</Link>
               </li>
               <li className="text-gray-600 hover:text-blue-600">
                 <Link to="/about">About</Link>

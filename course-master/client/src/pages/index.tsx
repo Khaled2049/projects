@@ -8,6 +8,7 @@ import Home from "./Home";
 import Error from "./Error";
 import Navbar from "../components/Navbar";
 import Course from "../pages/Course";
+import ClassDetails from "./ClassDetails";
 
 export default function Pages() {
   return (
@@ -26,6 +27,9 @@ export default function Pages() {
         </Route>
         <Route element={<Course />} path="/courses/:id">
           Course
+        </Route>
+        <Route element={<ClassDetails />} path="/courses/:id/:cid">
+          Class Details
         </Route>
         <Route path="*" element={<Error />}></Route>
       </Routes>
