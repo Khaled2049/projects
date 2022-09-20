@@ -65,9 +65,6 @@ export default function NavBar() {
                 <Link to="/courses">CU Courses</Link>
               </li>
               <li className="text-gray-600 hover:text-blue-600">
-                <Link to="/about">About</Link>
-              </li>
-              <li className="text-gray-600 hover:text-blue-600">
                 <Link to="/contact">Contact</Link>
               </li>
             </ul>

@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 
 const Courses = () => {
   return (
-    <div className="container mx-[4rem] sm:mx-[8rem] md:mx-[14rem]">
-      <h1 className="underline text-2xl my-2">Course List</h1>
-      <div className="flex flex-col sm:w-full md:w-2/5">
+    <div className="container">
+      <div className="mx-[4rem] sm:mx-[8rem] md:mx-[14rem] flex flex-col sm:w-screen md:w-2/5">
+        <h1 className="underline text-2xl my-2">Course List</h1>
         <h1 className="text-lg font-bold">Semester - 1 Spring 2022</h1>
         <Link
           className="text-blue-600 hover:text-blue-700 transition duration-300 ease-in-out mb-4"

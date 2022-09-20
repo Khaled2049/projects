@@ -4,44 +4,14 @@ const ClassDetails = () => {
   return (
     <div>
       <h1 className="text-3xl text-center m-5">Title</h1>
-      <div className="flex justify-center items-center p-5">
-        <iframe
-          width="800"
-          height="515"
-          src="https://www.youtube.com/embed/tgbNymZ7vqY"
-        ></iframe>
-      </div>
-      <div className="container mx-auto">
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Earum
-          quaerat modi enim illo corrupti itaque fugit voluptate magni
-          molestiae! Nemo corrupti voluptatibus possimus. Molestiae optio odio
-          harum consectetur a porro velit temporibus similique soluta
-          voluptatibus magnam suscipit recusandae ullam, nam eum, delectus quod
-          doloribus nesciunt assumenda nulla modi. Cumque velit officiis
-          deserunt commodi quod voluptatibus, tempore reiciendis saepe
-          laudantium!
-        </p>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Earum
-          quaerat modi enim illo corrupti itaque fugit voluptate magni
-          molestiae! Nemo corrupti voluptatibus possimus. Molestiae optio odio
-          harum consectetur a porro velit temporibus similique soluta
-          voluptatibus magnam suscipit recusandae ullam, nam eum, delectus quod
-          doloribus nesciunt assumenda nulla modi. Cumque velit officiis
-          deserunt commodi quod voluptatibus, tempore reiciendis saepe
-          laudantium!
-        </p>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Earum
-          quaerat modi enim illo corrupti itaque fugit voluptate magni
-          molestiae! Nemo corrupti voluptatibus possimus. Molestiae optio odio
-          harum consectetur a porro velit temporibus similique soluta
-          voluptatibus magnam suscipit recusandae ullam, nam eum, delectus quod
-          doloribus nesciunt assumenda nulla modi. Cumque velit officiis
-          deserunt commodi quod voluptatibus, tempore reiciendis saepe
-          laudantium!
-        </p>
+      <div className="flex flex-col max-w-6xl mx-auto space-y-4 ">
+        <div className="w-full h-[40rem] border">Video</div>
+        <div className="flex justify-between space-x-5">
+          <div className="bg-yellow-500 rounded-lg sm:h-[70vh] py-6 w-full h-[80vh] p-3">
+            card 2
+          </div>
+          <div className="bg-red-500 rounded-lg py-6 w-96 p-3">card 3</div>
+        </div>
       </div>
     </div>
   );
