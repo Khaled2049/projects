@@ -1,0 +1,84 @@
+.App{
+  display: flex;
+  text-align: center;
+  background-color: #202123;
+  color: white;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.side-menu {
+  width: 260px;
+  padding: 10px;
+  
+}
+
+.chat-box {
+  flex: 1;  
+  background-color: #343541;
+  position: relative;
+}
+
+.side-menu-button {
+  padding: 15px;
+  border: 1px solid white;
+  border-radius: 5px;
+  text-align: left;
+}
+.side-menu-button:hover {
+  background-color: rgba(0, 0, 0, 0.808);
+  transition: ease 0.2s all;
+}
+
+.plus {
+  padding-left: 6px;
+  padding-right: 12px;
+}
+
+.chat-input-holder {
+  padding: 12px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.chat-input-text-area {
+  background-color: #40414f;
+  width: 80%;
+  border-radius: 5px;
+  padding: 12px;
+  color: white;
+  border: none;
+  margin: 12px;
+  box-shadow: 0 0px 8px 0 black;
+  outline: none;
+  
+}
+.chat-message {
+  padding: 24px;
+
+  display: flex;
+}
+
+.message {
+  display: flex;
+  padding-left: 40px; 
+  padding-right: 40px;
+}
+
+.avatar {
+  background-color: wheat;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.chat-log {
+  padding: 24px;
+  text-align: left;
+  display: flex;
+}
