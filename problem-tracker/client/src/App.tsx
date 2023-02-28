@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
 import "./App.css";
 import axios from "axios";
+import MyNav from "./components/MyNav";
+import ProblemRow from "./components/ProblemRow";
 
 type msg = {
   message: String;
@@ -14,7 +15,12 @@ function App() {
       setdata(response.data);
     });
   }, []);
-  return <div className="App">{data.message}</div>;
+  return (
+    <div className="App">
+      <MyNav />
+      <ProblemRow />
+    </div>
+  );
 }
 
 export default App;
