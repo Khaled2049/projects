@@ -1,2 +1,5 @@
 .env
-*.exe
+
+problem-tracker.exe
+
+problem-tracker.exe~

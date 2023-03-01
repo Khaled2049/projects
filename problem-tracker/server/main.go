@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/khaled2049/problem-tracker/controllers"
 	"github.com/khaled2049/problem-tracker/initializers"
 )
 
@@ -14,10 +15,21 @@ func init() {
 func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+
+	// Create Code
+	r.POST("/code", controllers.CodesCreate)
+
+	// View all Code
+	r.GET("/code", controllers.CodesView)
+
+	// View single Code by ID
+	r.GET("/code/:id", controllers.CodesSingle)
+
+	// Updates Code by ID
+	r.PUT("/code/:id", controllers.CodesUpdate)
+
+	// Deletes Code by ID
+	r.DELETE("/code/:id", controllers.CodesDelete)
+
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
