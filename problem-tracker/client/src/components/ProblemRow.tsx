@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Col, Row, Button } from "react-bootstrap";
 import ProblemList from "./ProblemList";
 import ProblemDetails from "./ProblemDetails";
+import { Link } from "react-router-dom";
 const ProblemRow = () => {
   return (
     <Container>
@@ -9,7 +10,7 @@ const ProblemRow = () => {
         <Col>
           <h1>Problems Solved</h1>
           <ProblemList />
-          <Button variant="primary">Add</Button>{" "}
+          <Link to={"add"}>Add</Link>
         </Col>
         <Col>
           <ProblemDetails />

@@ -17,7 +17,6 @@ function App() {
   }, []);
   return (
     <div className="App">
-      <MyNav />
       <ProblemRow />
     </div>
   );
