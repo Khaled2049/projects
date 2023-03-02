@@ -4,7 +4,7 @@ type ID = {
   id: String;
 };
 
-const ProblemDetails = () => {
+const ProblemDetails = ({ data }: any) => {
   const { id } = useContext(CodesContext);
 
   return (
