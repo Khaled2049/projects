@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { useState } from "react";
 
 type Context = {
-  id: string;
+  id: Number;
   selectProblem: any;
   problems?: any;
 };
@@ -10,7 +10,7 @@ type Context = {
 const CodesContext = createContext({} as Context);
 
 function Provider({ children }: any) {
-  const [id, setId] = useState("");
+  const [id, setId] = useState(0);
 
   const valueToShare = {
     id,

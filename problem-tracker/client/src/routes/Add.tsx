@@ -30,7 +30,9 @@ const Add = () => {
     <div className="container mt-5">
       <Form>
         <Form.Group className="mb-3" controlId="title">
-          <Form.Label>Title</Form.Label>
+          <Form.Label>
+            <h2>Title</h2>
+          </Form.Label>
           <Form.Control
             value={title}
             onChange={handleChange}
@@ -42,7 +44,9 @@ const Add = () => {
         <Form.Group className="mb-3" controlId="desc">
           {/* <Editor /> */}
           <Form.Group className="mb-3" controlId="desc">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>
+              <h2>Description</h2>
+            </Form.Label>
             <Form.Control
               value={desc}
               onChange={handleChange}
@@ -55,7 +59,9 @@ const Add = () => {
         <Form.Group className="mb-3" controlId="problemCode">
           {/* <Editor /> */}
           <Form.Group className="mb-3" controlId="problemCode">
-            <Form.Label>Code</Form.Label>
+            <Form.Label>
+              <h2>Code</h2>
+            </Form.Label>
             <Form.Control
               value={code}
               onChange={handleChange}
@@ -67,7 +73,9 @@ const Add = () => {
 
         <Form.Group className="mb-3" controlId="discussion">
           <Form.Group className="mb-3" controlId="discussion">
-            <Form.Label>Discussion</Form.Label>
+            <Form.Label>
+              <h2>Discussion</h2>
+            </Form.Label>
             <Form.Control
               value={discussion}
               onChange={handleChange}
@@ -77,11 +85,9 @@ const Add = () => {
           </Form.Group>
         </Form.Group>
 
-        <Button onClick={handleSubmit}>
-          <Link style={{ textDecoration: "none" }} to={"/"}>
-            Submit
-          </Link>
-        </Button>
+        <Link style={{ textDecoration: "none" }} to={"/"}>
+          <Button onClick={handleSubmit}>Submit</Button>
+        </Link>
       </Form>
     </div>
   );

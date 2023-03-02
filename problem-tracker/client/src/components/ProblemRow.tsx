@@ -3,23 +3,26 @@ import { Container, Col, Row, Button } from "react-bootstrap";
 import ProblemList from "./ProblemList";
 import ProblemDetails from "./ProblemDetails";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { GetCodes } from "../api";
 
 const ProblemRow = () => {
   const [data, setdata] = useState<any>([]);
   useEffect(() => {
-    axios.get("http://localhost:3000/code").then((response) => {
+    GetCodes().then((response) => {
       setdata(response.data.codes);
     });
   }, []);
 
   return (
     <Container>
-      <Row>
+      <Row className="mt-5">
         <Col>
-          <h1>Problems Solved</h1>
           <ProblemList data={data} />
-          <Link to={"add"}>Add</Link>
+          <Link to={"add"}>
+            <Button size="lg" variant="primary">
+              Add
+            </Button>
+          </Link>
         </Col>
         <Col>
           <ProblemDetails />
