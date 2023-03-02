@@ -18,10 +18,7 @@ const ProblemDetails = () => {
   const { id } = useContext(CodesContext);
   const [data, setdata] = useState<CodeType>();
   useEffect(() => {
-    console.log("ID", id);
     GetCode(id).then((response) => {
-      console.log(response);
-
       setdata(response.data.codes);
     });
   }, [id]);

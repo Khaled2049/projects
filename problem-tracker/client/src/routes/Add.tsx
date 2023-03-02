@@ -3,7 +3,17 @@ import Form from "react-bootstrap/Form";
 import Editor from "../components/Editor";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { AddCode } from "../api";
+
 const Add = () => {
+  type AddType = {
+    Title: String;
+    ProblemDesc: String;
+    CreatedBy: Number;
+    CodeBody: String;
+    CodeComment: String;
+  };
+
   const [title, setTitle] = useState("");
   const [code, setCode] = useState("");
   const [desc, setDesc] = useState("");
@@ -23,7 +33,21 @@ const Add = () => {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    console.log(title, code, desc, discussion);
+    const data: AddType = {
+      Title: title,
+      ProblemDesc: desc,
+      CreatedBy: 0,
+      CodeBody: code,
+      CodeComment: discussion,
+    };
+
+    try {
+      if (data.Title !== "") {
+        AddCode(data);
+      }
+    } catch (err: any) {
+      return err;
+    }
   };
 
   return (
