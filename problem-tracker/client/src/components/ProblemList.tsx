@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import CodesContext from "../context/Codes";
 import ListGroup from "react-bootstrap/ListGroup";
+import Button from "react-bootstrap/Button";
 
 type Data = {
   Title: String;
@@ -23,7 +24,13 @@ const ProblemList = ({ data }: any) => {
             style={{ cursor: "pointer" }}
             className="my-1"
           >
-            <span>{p.Title}</span>
+            <div style={{ display: "flex" }}>
+              <span className="fs-3">{p.Title}</span>
+              <div style={{ marginLeft: "auto" }}>
+                <Button variant="outline-primary">EDIT</Button>{" "}
+                <Button variant="outline-danger">DELETE</Button>{" "}
+              </div>
+            </div>
           </ListGroup.Item>
         ))}
       </ListGroup>

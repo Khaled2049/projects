@@ -16,7 +16,6 @@ type CodeType = {
 
 const ProblemDetails = () => {
   const { id } = useContext(CodesContext);
-  const showData = true;
   const [data, setdata] = useState<CodeType>();
   useEffect(() => {
     console.log("ID", id);
