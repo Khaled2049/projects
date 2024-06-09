@@ -35,7 +35,7 @@ const ColonoscopyPrepForm: React.FC = () => {
             Name
           </label>
           <input
-            {...register("name", { required: true })}
+            {...register("name")}
             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
               errors.name ? "border-red-500" : ""
             }`}
@@ -56,7 +56,7 @@ const ColonoscopyPrepForm: React.FC = () => {
             Date of Birth
           </label>
           <input
-            {...register("dob", { required: true })}
+            {...register("dob")}
             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
               errors.dob ? "border-red-500" : ""
             } appearance-none`}
@@ -120,7 +120,7 @@ const ColonoscopyPrepForm: React.FC = () => {
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Submit
+            Next
           </button>
         </div>
       </form>
