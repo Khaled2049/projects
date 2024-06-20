@@ -31,27 +31,27 @@ const routes: RouteObject[] = [
   },
   {
     errorElement: <ErrorPage />,
-    path: "Plenvu",
+    path: "options/plenvu",
     element: <Plenvu />,
   },
   {
     errorElement: <ErrorPage />,
-    path: "MiralaxG",
+    path: "options/miralaxg",
     element: <MiralaxGatorade />,
   },
   {
     errorElement: <ErrorPage />,
-    path: "Sutab",
+    path: "options/sutab",
     element: <Sutab />,
   },
   {
     errorElement: <ErrorPage />,
-    path: "Golytely",
+    path: "options/golytely",
     element: <Golytely />,
   },
   {
     errorElement: <ErrorPage />,
-    path: "GolytelyTwoDayPrep",
+    path: "options/golytelytwodayprep",
     element: <Golytely2DayPrep />,
   },
 ];

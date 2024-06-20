@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Outlet, useNavigate, Form } from "react-router-dom";
+import DropdownComponent from "../components/DropDownComponent";
 
 const Plenvu: React.FC = () => {
   const navigate = useNavigate();
@@ -31,11 +32,11 @@ const Plenvu: React.FC = () => {
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Next
+            Select Plenvu Colonoscopy Procedure date
           </button>
 
           <button
-            className="text-red-500 hover:underline focus:outline-none"
+            className="text-red-500 hover:underline focus:outline-none border-2 px-4 py-2 rounded-lg"
             type="button"
             onClick={() => {
               navigate(-1);
@@ -45,6 +46,15 @@ const Plenvu: React.FC = () => {
           </button>
         </div>
       </div>
+      {/* <div className="max-w-lg mx-auto p-6 mt-6 bg-white shadow-md rounded-lg">
+        <div className="mb-8 ">
+          <h1 className="text-3xl font-bold">FAQ</h1>
+          <p className="text-lg mt-2">
+            <strong>Q:</strong> How long does it take for Plenvu to start
+            working?
+          </p>
+        </div>
+      </div> */}
     </div>
   );
 };
