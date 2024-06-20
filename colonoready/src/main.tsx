@@ -20,33 +20,31 @@ const routes: RouteObject[] = [
     path: "/",
     element: <Root />,
     errorElement: <ErrorPage />,
-    children: [
-      {
-        errorElement: <ErrorPage />,
-        path: "Plenvu",
-        element: <Plenvu />,
-      },
-      {
-        errorElement: <ErrorPage />,
-        path: "MiralaxG",
-        element: <MiralaxGatorade />,
-      },
-      {
-        errorElement: <ErrorPage />,
-        path: "Sutab",
-        element: <Sutab />,
-      },
-      {
-        errorElement: <ErrorPage />,
-        path: "Golytely",
-        element: <Golytely />,
-      },
-      {
-        errorElement: <ErrorPage />,
-        path: "GolytelyTwoDayPrep",
-        element: <Golytely2DayPrep />,
-      },
-    ],
+  },
+  {
+    errorElement: <ErrorPage />,
+    path: "Plenvu",
+    element: <Plenvu />,
+  },
+  {
+    errorElement: <ErrorPage />,
+    path: "MiralaxG",
+    element: <MiralaxGatorade />,
+  },
+  {
+    errorElement: <ErrorPage />,
+    path: "Sutab",
+    element: <Sutab />,
+  },
+  {
+    errorElement: <ErrorPage />,
+    path: "Golytely",
+    element: <Golytely />,
+  },
+  {
+    errorElement: <ErrorPage />,
+    path: "GolytelyTwoDayPrep",
+    element: <Golytely2DayPrep />,
   },
 ];
 
