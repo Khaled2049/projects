@@ -14,12 +14,20 @@ import Sutab from "./routes/Sutab.tsx";
 import MiralaxGatorade from "./routes/MiralaxGatorade.tsx";
 import Golytely from "./routes/Golytely.tsx";
 import Golytely2DayPrep from "./routes/GolytelyTwoDay.tsx";
+import Options from "./routes/Options.tsx";
 
 const routes: RouteObject[] = [
   {
     path: "/",
     element: <Root />,
     errorElement: <ErrorPage />,
+    children: [
+      {
+        errorElement: <ErrorPage />,
+        path: "options",
+        element: <Options />,
+      },
+    ],
   },
   {
     errorElement: <ErrorPage />,

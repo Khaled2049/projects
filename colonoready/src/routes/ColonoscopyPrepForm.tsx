@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface ColonoscopyPrepFormInputs {
   name: string;
@@ -16,16 +16,17 @@ const ColonoscopyPrepForm: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<ColonoscopyPrepFormInputs>();
-  const { nextStep } = useOutletContext<{
-    nextStep: (data: ColonoscopyPrepFormInputs) => void;
-  }>();
+
+  const navigate = useNavigate();
+
   const onSubmit: SubmitHandler<ColonoscopyPrepFormInputs> = (data) => {
-    nextStep(data);
+    console.log(data);
+    navigate("/options");
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6">Colonoscopy Preparation Form</h2>
+    <div className="w-96 mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-bold mb-6">Enter your information</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label

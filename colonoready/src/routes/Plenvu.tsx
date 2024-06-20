@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, Form } from "react-router-dom";
 
 const Plenvu: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
       <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
@@ -30,6 +32,16 @@ const Plenvu: React.FC = () => {
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Next
+          </button>
+
+          <button
+            className="text-red-500 hover:underline focus:outline-none"
+            type="button"
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
+            Cancel
           </button>
         </div>
       </div>
