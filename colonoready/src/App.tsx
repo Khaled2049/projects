@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import "./index.css";
 
-import ProgressIndicator from "./components/ProgressIndicator";
+import ProgressIndicator from "./routes/ProgressIndicator";
 
 const App: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);

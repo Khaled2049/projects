@@ -1,32 +1,53 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
 import "./index.css";
 import {
   createBrowserRouter,
   RouterProvider,
   RouteObject,
 } from "react-router-dom";
+import ErrorPage from "./error-page.tsx";
 
-import HomePage from "./components/HomePage.tsx";
-import FormStep1 from "./components/forms/Form1";
-import ColonoscopyPrepForm from "./components/forms/ColonoscopyPrepForm.tsx";
+import Root from "./routes/Root.tsx";
+import Plenvu from "./routes/Plenvu.tsx";
+import Sutab from "./routes/Sutab.tsx";
+import MiralaxGatorade from "./routes/MiralaxGatorade.tsx";
+import Golytely from "./routes/Golytely.tsx";
+import Golytely2DayPrep from "./routes/GolytelyTwoDay.tsx";
 
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/form",
-    element: <App />,
+    element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
-      { path: "step1", element: <ColonoscopyPrepForm /> },
-      { path: "step2", element: <FormStep1 /> },
+      {
+        errorElement: <ErrorPage />,
+        path: "Plenvu",
+        element: <Plenvu />,
+      },
+      {
+        errorElement: <ErrorPage />,
+        path: "MiralaxG",
+        element: <MiralaxGatorade />,
+      },
+      {
+        errorElement: <ErrorPage />,
+        path: "Sutab",
+        element: <Sutab />,
+      },
+      {
+        errorElement: <ErrorPage />,
+        path: "Golytely",
+        element: <Golytely />,
+      },
+      {
+        errorElement: <ErrorPage />,
+        path: "GolytelyTwoDayPrep",
+        element: <Golytely2DayPrep />,
+      },
     ],
   },
-  // Add more steps if needed
-  // { path: "*", element: <Navigate to="/" replace /> },
 ];
 
 const router = createBrowserRouter(routes);
