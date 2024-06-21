@@ -15,6 +15,7 @@ import MiralaxGatorade from "./routes/MiralaxGatorade.tsx";
 import Golytely from "./routes/Golytely.tsx";
 import Golytely2DayPrep from "./routes/GolytelyTwoDay.tsx";
 import Options from "./routes/Options.tsx";
+import Schedule from "./routes/Schedule.tsx";
 
 const routes: RouteObject[] = [
   {
@@ -33,6 +34,13 @@ const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     path: "options/plenvu",
     element: <Plenvu />,
+    children: [
+      {
+        errorElement: <ErrorPage />,
+        path: "schedule",
+        element: <Schedule />,
+      },
+    ],
   },
   {
     errorElement: <ErrorPage />,
