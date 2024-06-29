@@ -26,7 +26,7 @@ A versatile web application designed to empower users to share and access a weal
    ![10%](https://progress-bar.dev/10?title=NovelSync)
 
 2. ColonoReady
-   ![70%](https://progress-bar.dev/10?title=ColonoReady)
+   ![70%](https://progress-bar.dev/70?title=ColonoReady)
 
 3. EcomDesigner
    ![10%](https://progress-bar.dev/10?title=EcomDesigner)
