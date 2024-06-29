@@ -10,17 +10,22 @@ const FormComponent = () => {
   const [sendToEmail, setSendToEmail] = useState(false);
   const onSubmit = (data: any) => {
     const { date, time, option, email } = data;
-    const formattedDate = date ? date.toISOString() : null;
-    const formattedTime = time ? time.toISOString() : null;
 
-    if (option === "Trilyte") {
-      navigate("/trilyte", {
-        state: { date: formattedDate, time: formattedTime, option, email },
-      });
-    } else if (option === "Gatorade/Miralax") {
-      navigate("/gatorade-miralax", {
-        state: { date: formattedDate, time: formattedTime, option, email },
-      });
+    if (date && time) {
+      const formattedDate = date ? date.toISOString() : null;
+      const formattedTime = time ? time.toISOString() : null;
+
+      if (option === "Trilyte") {
+        navigate("/trilyte", {
+          state: { date: formattedDate, time: formattedTime, option, email },
+        });
+      } else if (option === "Gatorade/Miralax") {
+        navigate("/gatorade-miralax", {
+          state: { date: formattedDate, time: formattedTime, option, email },
+        });
+      }
+    } else {
+      alert("Please select a date and time");
     }
   };
 
@@ -31,7 +36,7 @@ const FormComponent = () => {
       </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mx-w-md max-w-lg mx-auto my-8 p-6 bg-lavender rounded-lg"
+        className=" mx-auto my-8 p-6 bg-lavender rounded-lg"
       >
         <div className="mb-4">
           <label
