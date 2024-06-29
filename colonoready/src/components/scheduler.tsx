@@ -1,20 +1,26 @@
-import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form";
 
-const Scheduler = () => {
+const FormComponent = () => {
   const { control, handleSubmit } = useForm();
-  const [checked, setChecked] = useState(true);
   const navigate = useNavigate();
 
-  const toggleChecked = () => {
-    setChecked(!checked);
-  };
-
   const onSubmit = (data: any) => {
-    console.log(data);
+    const { date, time, option } = data;
+    const formattedDate = date ? date.toISOString() : null;
+    const formattedTime = time ? time.toISOString() : null;
+
+    if (option === "Trilyte") {
+      navigate("/trilyte", {
+        state: { date: formattedDate, time: formattedTime, option },
+      });
+    } else if (option === "Gatorade/Miralax") {
+      navigate("/gatorade-miralax", {
+        state: { date: formattedDate, time: formattedTime, option },
+      });
+    }
   };
 
   return (
@@ -116,28 +122,6 @@ const Scheduler = () => {
           />
         </div>
       </div>
-      {/* <div className="mb-4">
-        <Controller
-          control={control}
-          name="emailReminders"
-          defaultValue={true}
-          render={({ field }) => (
-            <div className="flex items-center">
-              <input
-                {...field}
-                type="checkbox"
-                checked={field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-                id="emailReminders"
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="emailReminders" className="text-gray-700">
-                Email Reminders
-              </label>
-            </div>
-          )}
-        />
-      </div> */}
       <div className="flex items-center justify-between">
         <button
           type="submit"
@@ -145,18 +129,9 @@ const Scheduler = () => {
         >
           Generate Schedule
         </button>
-        {/* <button
-          className="text-red-500 hover:underline focus:outline-none border-2 px-4 py-2 rounded-lg"
-          type="button"
-          onClick={() => {
-            navigate(-1);
-          }}
-        >
-          Cancel
-        </button> */}
       </div>
     </form>
   );
 };
 
-export default Scheduler;
+export default FormComponent;
