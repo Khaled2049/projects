@@ -10,6 +10,8 @@ This project aims to bring together writers from around the world to collaborati
 
 This app is designed to help users prepare effectively for their colonoscopy procedure by providing comprehensive guidance, personalized plans, and supportive features.
 
+Website: [https://funny-cendol-99e679.netlify.app](https://funny-cendol-99e679.netlify.app)
+
 ## [EcomDesigner](ecomdesigner/README.md)
 
 EcomDesigner is a robust e-commerce platform that empowers users to create personalized products, ensuring a tailored shopping experience. With customizable product options, seamless authentication, and secure payment processing, EcomDesigner delivers a user-friendly interface that prioritizes convenience and customization.
@@ -24,7 +26,7 @@ A versatile web application designed to empower users to share and access a weal
    ![10%](https://progress-bar.dev/10?title=NovelSync)
 
 2. ColonoReady
-   ![10%](https://progress-bar.dev/10?title=ColonoReady)
+   ![70%](https://progress-bar.dev/10?title=ColonoReady)
 
 3. EcomDesigner
    ![10%](https://progress-bar.dev/10?title=EcomDesigner)
