@@ -61,17 +61,17 @@ const GatoradeMiralax = () => {
       <h1 className="text-2xl font-bold mb-4">Gatorade/ Miralax Schedule</h1>
       <button
         onClick={() => exportToICS(dates)}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="mt-4 bg-indigo-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         Export to Calendar
       </button>
 
       <div className="space-y-2">
         {dates?.twoWeeksPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               <strong>2 Weeks Prior</strong> <br />
-              {dates.twoWeeksPrior}
+              <span className="text-sm">{dates.twoWeeksPrior}</span>
             </h1>
             <p>
               Read all instructions at-least 2 weeks prior to your procedure.
@@ -82,10 +82,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.sevenDaysPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               <strong>7 Days Prior</strong> <br />
-              {dates.sevenDaysPrior}
+              <span className="text-sm">{dates.sevenDaysPrior}</span>
             </h1>
 
             <ul className="list-disc list-inside space-y-2">
@@ -105,10 +105,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.fiveDaysPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               <strong>5 Days Prior</strong> <br />
-              {dates.fiveDaysPrior}
+              <span className="text-sm">{dates.fiveDaysPrior}</span>
             </h1>
             <p>
               Please get approval from prescribing provider to stop below
@@ -128,10 +128,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.threeDaysPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               <strong>3 Days Prior</strong> <br />
-              {dates.threeDaysPrior}
+              <span className="text-sm">{dates.threeDaysPrior}</span>
             </h1>
             <p>
               <ul className="list-disc list-inside space-y-2">
@@ -146,10 +146,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.sixHoursPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               <strong>6 Hours Prior</strong> <br />
-              {dates.sixHoursPrior}
+              <span className="text-sm">{dates.sixHoursPrior}</span>
             </h1>
             <ul className="list-disc list-inside space-y-2">
               <li>
@@ -165,10 +165,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.fortyEightHoursPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               <strong>48 Hours Prior</strong> <br />{" "}
-              {dates.fortyEightHoursPrior}
+              <span className="text-sm">{dates.fortyEightHoursPrior}</span>
             </h1>
 
             <ul className="list-disc list-inside space-y-2">
@@ -180,9 +180,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.oneDayPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
-              <strong>Day Before Procedure:</strong> <br /> {dates.oneDayPrior}
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
+              <strong>Day Before Procedure:</strong> <br />{" "}
+              <span className="text-sm">{dates.oneDayPrior}</span>
             </h1>
             <ul className="list-disc list-inside space-y-2">
               <li>All day - Clear liquid diet</li>
@@ -210,9 +211,10 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.dayOfProcedure && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
-              Day of Procedure <br /> {dates.dayOfProcedure}
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
+              Day of Procedure <br />{" "}
+              <span className="text-sm">{dates.dayOfProcedure}</span>
             </h1>
             <ul className="list-disc list-inside space-y-2">
               <li>Continue clear liquid diet</li>
@@ -231,14 +233,14 @@ const GatoradeMiralax = () => {
         )}
 
         {dates?.fourHoursPrior && (
-          <div className="max-w-lg mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4 text-center">
+          <div className="max-w-lg mx-auto my-8 p-4 bg-lavender text-center shadow-lg rounded-lg">
+            <h1 className="text-2xl font-bold mb-4">
               4 hours prior to procedure <br />
-              {dates.fourHoursPrior}
+              <span className="text-sm">{dates.fourHoursPrior}</span>
             </h1>
-            <span className="text-sm text-red-600">DO NOT drink anything</span>
+            <span className="text-md text-red-600">DO NOT drink anything</span>
             <br />
-            <span className="text-sm text-red-600">Nothing by mouth</span>
+            <span className="text-md text-red-600">Nothing by mouth</span>
           </div>
         )}
       </div>
