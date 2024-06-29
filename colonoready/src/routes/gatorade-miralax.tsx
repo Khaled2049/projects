@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { format, subWeeks, subHours, subDays } from "date-fns";
+import { exportToICS } from "../utils";
 
 interface Dates {
   twoWeeksPrior: string;
@@ -58,6 +59,12 @@ const GatoradeMiralax = () => {
   return (
     <div className="max-w-md mx-auto my-8 p-6 ">
       <h1 className="text-2xl font-bold mb-4">Gatorade/ Miralax Schedule</h1>
+      <button
+        onClick={() => exportToICS(dates)}
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Export to Calendar
+      </button>
 
       <div className="space-y-2">
         {dates?.twoWeeksPrior && (
