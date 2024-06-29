@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -6,19 +7,19 @@ import "react-datepicker/dist/react-datepicker.css";
 const FormComponent = () => {
   const { control, handleSubmit } = useForm();
   const navigate = useNavigate();
-
+  const [sendToEmail, setSendToEmail] = useState(false);
   const onSubmit = (data: any) => {
-    const { date, time, option } = data;
+    const { date, time, option, email } = data;
     const formattedDate = date ? date.toISOString() : null;
     const formattedTime = time ? time.toISOString() : null;
 
     if (option === "Trilyte") {
       navigate("/trilyte", {
-        state: { date: formattedDate, time: formattedTime, option },
+        state: { date: formattedDate, time: formattedTime, option, email },
       });
     } else if (option === "Gatorade/Miralax") {
       navigate("/gatorade-miralax", {
-        state: { date: formattedDate, time: formattedTime, option },
+        state: { date: formattedDate, time: formattedTime, option, email },
       });
     }
   };
@@ -26,7 +27,7 @@ const FormComponent = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-md mx-auto my-8 p-6 bg-white rounded-lg"
+      className="mx-w-md max-w-lg mx-auto my-8 p-6 bg-white rounded-lg"
     >
       <div className="mb-4">
         <label htmlFor="date" className="block text-gray-700 font-medium mb-2">
@@ -43,7 +44,7 @@ const FormComponent = () => {
               placeholderText="MM/DD/YYYY"
               dateFormat="MM/dd/yyyy"
               id="date"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           )}
         />
@@ -121,6 +122,40 @@ const FormComponent = () => {
             )}
           />
         </div>
+        <div className="flex items-center mt-4">
+          <input
+            type="checkbox"
+            id="sendToEmail"
+            checked={sendToEmail}
+            onChange={() => setSendToEmail(!sendToEmail)}
+            className="mr-2"
+          />
+          <label htmlFor="sendToEmail" className="text-gray-700">
+            Send to email address
+          </label>
+        </div>
+        {sendToEmail && (
+          <div className="mt-4">
+            <Controller
+              control={control}
+              name="email"
+              rules={{ required: sendToEmail }}
+              render={({ field }) => (
+                <>
+                  <label htmlFor="email" className="text-gray-700">
+                    Email Address
+                  </label>
+                  <input
+                    {...field}
+                    type="email"
+                    id="email"
+                    className="border border-gray-300 rounded p-2 mt-2 w-full"
+                  />
+                </>
+              )}
+            />
+          </div>
+        )}
       </div>
       <div className="flex items-center justify-between">
         <button

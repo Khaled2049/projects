@@ -33,7 +33,7 @@ const calculateDates = (procedureDate: Date): Dates => {
 
 const Trilyte = () => {
   const { state } = useLocation();
-  const { date, time } = state || {};
+  const { date, time, email } = state || {};
   const [dates, setDates] = useState<Dates | null>(null);
 
   useEffect(() => {
