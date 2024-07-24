@@ -12,6 +12,7 @@
     "@floating-ui/react-dom": "^2.1.1",
     "@lexical/react": "^0.16.1",
     "@lexical/rich-text": "^0.16.1",
+    "@liveblocks/node": "^2.3.0",
     "@liveblocks/react-lexical": "^2.3.0",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",

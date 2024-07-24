@@ -4,6 +4,7 @@ import { Metadata } from "next";
 
 import { cn } from "../lib/utils";
 import React from "react";
+import Provider from "./Provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -26,7 +27,7 @@ export default function RootLayout({
       <body
         className={cn("min-h-screen font-sans antialiased", fontSans.variable)}
       >
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
