@@ -7,7 +7,7 @@ const CollaborativeRoom = ({ roomId }: any) => {
   const currentUserType = "editor";
 
   return (
-    <RoomProvider id="my-room">
+    <RoomProvider id={roomId}>
       <ClientSideSuspense fallback={<div>Loading…</div>}>
         <div className="collaborative-room">
           <Editor roomId={roomId} currentUserType={currentUserType} />
