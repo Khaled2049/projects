@@ -1,23 +1,36 @@
+"use client";
 import CollaborativeRoom from "@/components/CollaborativeRoom";
 import { getDocument } from "@/lib/actions/room.actions";
 import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "@/lib/firebase/auth";
 
-// TODO getUser data
 const Document = async ({ params: { id } }: SearchParamProps) => {
-  // const user = {
-  //   uid: "123",
-  //   displayName: "John Doe",
-  //   email: "1@2.com",
-  //   photoURL: "https://example.com/avatar.png",
-  // };
-  // if (!user) redirect("/sign-in");
+  const [user, setUser] = useState<User | null>(null);
 
-  // const room = await getDocument({
-  //   roomId: id,
-  //   userId: user.email,
-  // });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged((user: User | null) => {
+      if (user) {
+        // User is signed in
+        console.log("Logged in", user.id);
+        setUser(user);
+      } else {
+        // User is signed out
+        setUser(null);
+        redirect("/sign-in");
+      }
+    });
 
-  // if (!room) redirect("/");
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
+
+  const room = await getDocument({
+    roomId: id,
+    userId: user?.email || "",
+  });
+
+  if (!room) redirect("/");
 
   // const userIds = Object.keys(room.usersAccesses);
   // const users = [user];
