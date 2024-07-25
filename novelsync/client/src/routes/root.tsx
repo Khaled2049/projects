@@ -1,4 +1,4 @@
-import "../components/style.css";
+// import "../components/style.css";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";

@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import classNames from "classnames";
+import { useCallback, useState } from "react";
+import "./style.css";
 // => Tiptap packages
 import { useEditor, EditorContent, Editor, BubbleMenu } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
@@ -166,66 +166,64 @@ export function SimpleEditor() {
   }
 
   return (
-    <div className="editor">
-      <div className="menu">
+    <div className="max-w-4xl mx-auto p-4 relative">
+      <div className="flex flex-wrap gap-2 mb-4 p-2 bg-gray-100 rounded-lg">
         <button
-          className="menu-button"
+          className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
         >
           <Icons.RotateLeft />
         </button>
         <button
-          className="menu-button"
+          className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
         >
           <Icons.RotateRight />
         </button>
         <button
-          className={classNames("menu-button", {
-            "is-active": editor.isActive("link"),
-          })}
+          className="p-2 rounded-md hover:bg-gray-200 transition-colors"
           onClick={openModal}
         >
           <Icons.Link />
         </button>
         <button
-          className={classNames("menu-button", {
-            "is-active": editor.isActive("bold"),
-          })}
+          className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+            editor.isActive("bold") ? "bg-gray-300" : ""
+          }`}
           onClick={toggleBold}
         >
           <Icons.Bold />
         </button>
         <button
-          className={classNames("menu-button", {
-            "is-active": editor.isActive("underline"),
-          })}
+          className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+            editor.isActive("underline") ? "bg-gray-300" : ""
+          }`}
           onClick={toggleUnderline}
         >
           <Icons.Underline />
         </button>
         <button
-          className={classNames("menu-button", {
-            "is-active": editor.isActive("intalic"),
-          })}
+          className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+            editor.isActive("underline") ? "bg-gray-300" : ""
+          }`}
           onClick={toggleItalic}
         >
           <Icons.Italic />
         </button>
         <button
-          className={classNames("menu-button", {
-            "is-active": editor.isActive("strike"),
-          })}
+          className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+            editor.isActive("underline") ? "bg-gray-300" : ""
+          }`}
           onClick={toggleStrike}
         >
           <Icons.Strikethrough />
         </button>
         <button
-          className={classNames("menu-button", {
-            "is-active": editor.isActive("code"),
-          })}
+          className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+            editor.isActive("underline") ? "bg-gray-300" : ""
+          }`}
           onClick={toggleCode}
         >
           <Icons.Code />
@@ -233,7 +231,7 @@ export function SimpleEditor() {
       </div>
 
       <BubbleMenu
-        className="bubble-menu-dark"
+        className="flex bg-white border rounded-md shadow-lg"
         tippyOptions={{ duration: 150 }}
         editor={editor}
         shouldShow={({ editor, view, state, oldState, from, to }) => {
@@ -241,15 +239,26 @@ export function SimpleEditor() {
           return from === to && editor.isActive("link");
         }}
       >
-        <button className="button" onClick={openModal}>
+        <button
+          className="px-3 py-1 text-blue-600 hover:bg-blue-100 transition-colors"
+          onClick={openModal}
+        >
           Edit
         </button>
-        <button className="button-remove" onClick={removeLink}>
+        <button
+          className="px-3 py-1 text-red-600 hover:bg-red-100 transition-colors"
+          onClick={removeLink}
+        >
           Remove
         </button>
       </BubbleMenu>
 
-      <EditorContent editor={editor} />
+      <div className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y">
+        <EditorContent
+          className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
+          editor={editor}
+        />
+      </div>
 
       <LinkModal
         url={url}
