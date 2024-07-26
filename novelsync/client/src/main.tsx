@@ -7,6 +7,7 @@ import {
   Signup,
   ProtectedRoute,
   CreateDocument,
+  NovelDetail,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/create",
     element: <CreateDocument />,
+  },
+  {
+    path: "/novel/:id",
+    element: <NovelDetail />, // Add the route for the novel detail
   },
 ]);
 ReactDOM.createRoot(document.getElementById("root")!).render(

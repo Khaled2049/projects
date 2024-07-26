@@ -41,7 +41,7 @@ const Root: React.FC = () => {
                 to={`/novel/${novel.id}`}
                 className="text-blue-500 hover:underline"
               >
-                Read More
+                Read
               </Link>
             </div>
           ))}
