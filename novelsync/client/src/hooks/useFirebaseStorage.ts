@@ -27,6 +27,8 @@ export const useFirebaseStorage = () => {
     setLoading(true);
     setError(null);
 
+    console.log("Creating novel:", title);
+
     try {
       // Create a new document in the novels collection
       const novelsCollection = collection(firestore, "novels");
@@ -38,7 +40,7 @@ export const useFirebaseStorage = () => {
       });
 
       // Save content to Firebase Storage
-      const storageRef = ref(storage, `novels/${newNovelRef.id}/content.txt`);
+      const storageRef = ref(storage, `novels/${newNovelRef.id}/${title}.txt`);
       await uploadString(storageRef, content);
 
       // Get the download URL

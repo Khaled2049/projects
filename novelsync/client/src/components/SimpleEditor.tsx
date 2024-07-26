@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
 import "./style.css";
-// => Tiptap packages
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useEditor, EditorContent, Editor, BubbleMenu } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -22,6 +23,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export function SimpleEditor() {
   const [title, setTitle] = useState("");
+
+  const navigate = useNavigate();
 
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
 
@@ -67,11 +70,12 @@ export function SimpleEditor() {
     }
   }
 
-  const handleCreate = async () => {
-    const novelId = await createNovel(title, "");
+  const handleCreate = async (text: string) => {
+    const novelId = await createNovel(title, text);
     if (novelId) {
-      // Navigate to the novel edit page or do something with the novelId
+      console.log("Novel created:", novelId);
     }
+    navigate("/");
   };
 
   const LiteralTab = Extension.create({
@@ -293,7 +297,7 @@ export function SimpleEditor() {
         onRemoveLink={removeLink}
       />
       <button
-        onClick={handleCreate}
+        onClick={() => handleCreate(editor.getText())}
         disabled={loading}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
       >
