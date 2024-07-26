@@ -3,16 +3,33 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, firestore } from "../config/firebase";
 
 export const useFirebaseAuth = () => {
   const [error, setError] = useState<string | null>(null);
 
-  const signup = async (email: string, password: string) => {
-    console.log(email, password);
+  const signup = async (email: string, password: string, username: string) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Update the user's profile with the username
+      await updateProfile(user, { displayName: username });
+
+      // Store additional user data in Firestore
+      await setDoc(doc(firestore, "users", user.uid), {
+        username: username,
+        email: email,
+        createdAt: new Date().toISOString(),
+      });
+
       setError(null);
     } catch (err) {
       setError((err as Error).message);
@@ -21,7 +38,6 @@ export const useFirebaseAuth = () => {
 
   const signin = async (email: string, password: string) => {
     try {
-      console.log(email, password);
       await signInWithEmailAndPassword(auth, email, password);
       setError(null);
     } catch (err) {
