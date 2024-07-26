@@ -253,7 +253,10 @@ export function SimpleEditor() {
         </button>
       </BubbleMenu>
 
-      <div className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y">
+      <div
+        onClick={() => editor.chain().focus().run()}
+        className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y"
+      >
         <EditorContent
           className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
           editor={editor}

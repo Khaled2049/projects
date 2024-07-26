@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Signup: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -97,6 +98,11 @@ const Signup: React.FC = () => {
           >
             Sign Up
           </button>
+          <div className="text-center mt-4">
+            <Link to="/sign-in" className="text-blue-600 hover:text-blue-800">
+              Already have an account? Sign In
+            </Link>
+          </div>
         </form>
       </div>
     </div>
