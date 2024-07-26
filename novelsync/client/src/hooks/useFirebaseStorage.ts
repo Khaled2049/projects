@@ -35,7 +35,7 @@ export const useFirebaseStorage = () => {
       const newNovelRef = await addDoc(novelsCollection, {
         title,
         authorId: user.uid,
-        author: user.email,
+        author: user.username,
         lastUpdated: new Date().toISOString(),
       });
 
@@ -44,10 +44,15 @@ export const useFirebaseStorage = () => {
       await uploadString(storageRef, content);
 
       // Get the download URL
-      const contentURL = await getDownloadURL(storageRef);
+      // const contentURL = await getDownloadURL(storageRef);
 
       // Update the Firestore document with the content URL
-      await setDoc(newNovelRef, { contentURL }, { merge: true });
+      // await setDoc(newNovelRef, { contentURL }, { merge: true });
+      await setDoc(
+        newNovelRef,
+        { contentPath: storageRef.fullPath },
+        { merge: true }
+      );
 
       setLoading(false);
       return newNovelRef.id;

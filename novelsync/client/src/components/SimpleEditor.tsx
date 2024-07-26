@@ -30,7 +30,7 @@ export function SimpleEditor() {
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const { saveContent, createNovel, loading, error } = useFirebaseStorage();
+  const { createNovel, loading, error } = useFirebaseStorage();
 
   const history = [
     {
