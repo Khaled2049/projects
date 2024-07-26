@@ -1,8 +1,10 @@
 import { useAuth } from "../contexts/AuthContext";
 import { FaArrowRight } from "react-icons/fa";
-import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import { useNovels } from "../hooks/useNovels";
+
+import Navbar from "../components/Navbar";
+import UserNovels from "../components/UserNovels";
 
 const Root: React.FC = () => {
   const { user } = useAuth();
@@ -24,27 +26,33 @@ const Root: React.FC = () => {
           </div>
         )}
 
-        <h2 className="text-xl font-semibold mb-4">Recent Novels</h2>
+        <div className="flex flex-wrap">
+          <UserNovels />
+          <div className="w-full lg:w-3/4 p-4">
+            <h2 className="text-xl font-semibold mb-4">Recent Novels</h2>
 
-        {loading && <p>Loading novels...</p>}
-        {error && <p className="text-red-500">Error: {error}</p>}
+            {loading && <p>Loading novels...</p>}
+            {error && <p className="text-red-500">Error: {error}</p>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {novels.map((novel) => (
-            <div key={novel.id} className="border p-4 rounded shadow">
-              <h3 className="font-semibold">{novel.title}</h3>
-              <p>Author: {novel.author}</p>
-              <p>
-                Last Updated: {new Date(novel.lastUpdated).toLocaleDateString()}
-              </p>
-              <Link
-                to={`/novel/${novel.id}`}
-                className="text-blue-500 hover:underline"
-              >
-                Read
-              </Link>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {novels.map((novel) => (
+                <div key={novel.id} className="border p-4 rounded shadow">
+                  <h3 className="font-semibold">{novel.title}</h3>
+                  <p>Author: {novel.author}</p>
+                  <p>
+                    Last Updated:{" "}
+                    {new Date(novel.lastUpdated).toLocaleDateString()}
+                  </p>
+                  <Link
+                    to={`/novel/${novel.id}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Read
+                  </Link>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </>

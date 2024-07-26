@@ -43,11 +43,6 @@ export const useFirebaseStorage = () => {
       const storageRef = ref(storage, `novels/${newNovelRef.id}/${title}.txt`);
       await uploadString(storageRef, content);
 
-      // Get the download URL
-      // const contentURL = await getDownloadURL(storageRef);
-
-      // Update the Firestore document with the content URL
-      // await setDoc(newNovelRef, { contentURL }, { merge: true });
       await setDoc(
         newNovelRef,
         { contentPath: storageRef.fullPath },
