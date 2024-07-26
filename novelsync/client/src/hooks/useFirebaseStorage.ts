@@ -35,7 +35,7 @@ export const useFirebaseStorage = () => {
       const newNovelRef = await addDoc(novelsCollection, {
         title,
         authorId: user.uid,
-        author: user.email,
+        author: user.username,
         lastUpdated: new Date().toISOString(),
       });
 
