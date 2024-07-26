@@ -6,13 +6,15 @@ import Navbar from "../components/Navbar";
 const Root: React.FC = () => {
   const { user } = useAuth();
   return (
-    <div className="app">
+    <div>
       <Navbar />
-      {user && (
-        <p className="mb-4">Hi! {user?.email} Start your novel today 😊</p>
-      )}
+      <div className="container mx-auto px-4">
+        {user && (
+          <p className="mb-4">Hi! {user?.email} Start your novel today 😊</p>
+        )}
 
-      <SimpleEditor />
+        <SimpleEditor />
+      </div>
     </div>
   );
 };

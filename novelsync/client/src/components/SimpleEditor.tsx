@@ -13,6 +13,7 @@ import Strike from "@tiptap/extension-strike";
 import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import { Extension } from "@tiptap/core";
+import { useFirebaseStorage } from "../hooks/useFirebaseStorage";
 
 // Custom
 import * as Icons from "./Icons";
@@ -23,6 +24,8 @@ export function SimpleEditor() {
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const { saveContent, loadContent, loading, error } = useFirebaseStorage();
 
   const history = [
     {
@@ -45,8 +48,6 @@ export function SimpleEditor() {
   async function generateLine(prevText: string) {
     history.push({ role: "user", parts: [{ text: prevText }] });
 
-    console.log("prevText:", prevText);
-
     try {
       const result = await chat.sendMessageStream(prevText);
 
@@ -63,6 +64,12 @@ export function SimpleEditor() {
       console.error("Error:", error);
     }
   }
+
+  const handleSave = () => {
+    if (editor) {
+      saveContent(editor.getHTML());
+    }
+  };
 
   const LiteralTab = Extension.create({
     name: "literalTab",
@@ -273,6 +280,14 @@ export function SimpleEditor() {
         onSaveLink={saveLink}
         onRemoveLink={removeLink}
       />
+      <button
+        onClick={handleSave}
+        disabled={loading}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+      >
+        {loading ? "Saving..." : "Save"}
+      </button>
+      {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );
 }
