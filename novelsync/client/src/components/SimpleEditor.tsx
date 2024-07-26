@@ -21,11 +21,13 @@ import { LinkModal } from "./LinkModal";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export function SimpleEditor() {
+  const [title, setTitle] = useState("");
+
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const { saveContent, loadContent, loading, error } = useFirebaseStorage();
+  const { saveContent, createNovel, loading, error } = useFirebaseStorage();
 
   const history = [
     {
@@ -65,9 +67,10 @@ export function SimpleEditor() {
     }
   }
 
-  const handleSave = () => {
-    if (editor) {
-      saveContent(editor.getHTML());
+  const handleCreate = async () => {
+    const novelId = await createNovel(title, "");
+    if (novelId) {
+      // Navigate to the novel edit page or do something with the novelId
     }
   };
 
@@ -236,6 +239,15 @@ export function SimpleEditor() {
           <Icons.Code />
         </button>
       </div>
+      <div className="mb-4">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter title here"
+          className="w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
       <BubbleMenu
         className="flex bg-white border rounded-md shadow-lg"
@@ -281,11 +293,11 @@ export function SimpleEditor() {
         onRemoveLink={removeLink}
       />
       <button
-        onClick={handleSave}
+        onClick={handleCreate}
         disabled={loading}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
       >
-        {loading ? "Saving..." : "Save"}
+        {loading ? "Creating..." : "Create"}
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
