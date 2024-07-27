@@ -1,5 +1,5 @@
 import "./style.css";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useEditor, EditorContent, Editor, BubbleMenu } from "@tiptap/react";
@@ -15,16 +15,44 @@ import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
 import { Extension } from "@tiptap/core";
 import { useFirebaseStorage } from "../hooks/useFirebaseStorage";
+import { useUpdateNovel } from "../hooks/useUpdateNovel";
 
 // Custom
 import * as Icons from "./Icons";
 import { LinkModal } from "./LinkModal";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export function SimpleEditor() {
+interface SimpleEditorProps {
+  oldTitle?: string;
+  content?: string;
+  edit?: boolean;
+  novelId?: string;
+}
+
+export function SimpleEditor({
+  oldTitle,
+  content,
+  edit,
+  novelId,
+}: SimpleEditorProps) {
   const [title, setTitle] = useState("");
+  const { updateNovel } = useUpdateNovel();
 
   const navigate = useNavigate();
+
+  const handleUpdate = async (newContent: string) => {
+    if (!novelId) return;
+    console.log("Updating novel:", novelId);
+    updateNovel({ id: novelId, title, newContent });
+    navigate("/");
+  };
+
+  useEffect(() => {
+    if (content) {
+      editor.commands.setContent(content);
+      setTitle(oldTitle || "");
+    }
+  }, [content]);
 
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
 
@@ -249,7 +277,7 @@ export function SimpleEditor() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter title here"
-          className="w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -296,13 +324,24 @@ export function SimpleEditor() {
         onSaveLink={saveLink}
         onRemoveLink={removeLink}
       />
-      <button
-        onClick={() => handleCreate(editor.getText())}
-        disabled={loading}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-      >
-        {loading ? "Creating..." : "Create"}
-      </button>
+      {edit ? (
+        <button
+          onClick={() => handleUpdate(editor.getText())}
+          disabled={loading}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+        >
+          {loading ? "Updating..." : "Update"}
+        </button>
+      ) : (
+        <button
+          onClick={() => handleCreate(editor.getText())}
+          disabled={loading}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+        >
+          {loading ? "Creating..." : "Create"}
+        </button>
+      )}
+
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );

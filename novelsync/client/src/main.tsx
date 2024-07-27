@@ -8,6 +8,8 @@ import {
   ProtectedRoute,
   CreateDocument,
   NovelDetail,
+  ProtectedEditRoute,
+  Edit,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -32,6 +34,14 @@ const router = createBrowserRouter([
   {
     path: "/create",
     element: <CreateDocument />,
+  },
+  {
+    path: "/edit/:id",
+    element: (
+      <ProtectedEditRoute>
+        <Edit />
+      </ProtectedEditRoute>
+    ),
   },
   {
     path: "/novel/:id",

@@ -1,19 +1,44 @@
 import { useUserNovels } from "../hooks/useUserNovels";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import useDeleteNovel from "../hooks/useDeleteNovel";
+
+export interface Novel {
+  id: string;
+  title: string;
+  authorId: string;
+  author: string;
+  lastUpdated: string;
+  contentPath: string;
+}
+
 const UserNovels = () => {
+  const navigate = useNavigate();
   const {
     userNovels,
     loading: userNovelsLoading,
     error: userNovelsError,
   } = useUserNovels();
 
+  const { deleteNovel, loading, error } = useDeleteNovel();
+
   const handleEdit = (novelId: string) => {
     console.log(`Edit novel with id: ${novelId}`);
+    navigate(`/edit/${novelId}`);
   };
 
-  const handleDelete = async (novelId: string) => {
+  const handleDelete = async (novel: Novel) => {
     // Handle delete logic
-    console.log(`Delete novel with id: ${novelId}`);
+    console.log(`Delete novel with id: ${novel.id}`);
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this novel?"
+    );
+    if (confirmed) {
+      const success = await deleteNovel(novel.id, novel.contentPath);
+      if (success) {
+        console.log("Bug here, you need to reload the page to see the changes");
+      }
+    }
   };
 
   return (
@@ -42,7 +67,7 @@ const UserNovels = () => {
                   <FaEdit className="mr-1" /> Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(novel.id)}
+                  onClick={() => handleDelete(novel)}
                   className="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors"
                 >
                   <FaTrashAlt className="mr-1" /> Delete
