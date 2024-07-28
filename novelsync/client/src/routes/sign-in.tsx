@@ -23,7 +23,7 @@ const Signin: React.FC = () => {
     e.preventDefault();
     await signin(formData.email, formData.password);
     if (!error) {
-      navigate("/");
+      navigate("/home");
     }
   };
 

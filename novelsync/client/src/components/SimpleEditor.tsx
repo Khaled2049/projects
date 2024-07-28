@@ -103,7 +103,7 @@ export function SimpleEditor({
     if (novelId) {
       console.log("Novel created:", novelId);
     }
-    navigate("/");
+    navigate("/home");
   };
 
   const LiteralTab = Extension.create({

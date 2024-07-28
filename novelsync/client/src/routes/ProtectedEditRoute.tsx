@@ -14,12 +14,12 @@ const ProtectedRoute: React.FC<ProtectedEditRouteProps> = ({ children }) => {
 
   if (!id || !user) {
     alert("Invalid novel or user ✌️");
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
   const { novel } = useNovel(id);
 
   if (novel && novel.authorId !== user.uid) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <>{children}</>;

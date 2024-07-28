@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useNovel } from "../hooks/useNovel";
 import { SimpleEditor } from "../components/SimpleEditor";
-import Navbar from "../components/Navbar";
 
 const Edit = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +16,6 @@ const Edit = () => {
 
   return (
     <div>
-      <Navbar />
       <SimpleEditor
         oldTitle={novel.title}
         content={content}

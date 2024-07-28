@@ -2,6 +2,8 @@ import { useUserNovels } from "../hooks/useUserNovels";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import useDeleteNovel from "../hooks/useDeleteNovel";
+import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 export interface Novel {
   id: string;
@@ -14,6 +16,9 @@ export interface Novel {
 
 const UserNovels = () => {
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+
   const {
     userNovels,
     loading: userNovelsLoading,
@@ -44,7 +49,19 @@ const UserNovels = () => {
   return (
     <>
       <div className="w-full lg:w-1/4 p-4 border-r">
-        <h2 className="text-xl font-semibold mb-4">Your Work</h2>
+        {user ? (
+          <h2 className="text-xl font-semibold mb-4">Your Work</h2>
+        ) : (
+          <h2 className="text-lg  mb-4">
+            <Link
+              className="font-semibold text-blue-500 underline hover:text-blue-700"
+              to="/sign-in"
+            >
+              Sign in
+            </Link>{" "}
+            to see your work
+          </h2>
+        )}
 
         {userNovelsLoading && <p>Loading your novels...</p>}
         {userNovelsError && (

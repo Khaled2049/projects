@@ -1,23 +1,15 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // You can replace this with a spinner or loading indicator
   }
 
-  if (!user) {
-    return <Navigate to="/sign-in" replace />;
-  }
-
-  return <>{children}</>;
+  return user ? <Outlet /> : <Navigate to="/sign-in" />;
 };
 
 export default ProtectedRoute;

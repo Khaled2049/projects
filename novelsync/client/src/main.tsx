@@ -5,7 +5,6 @@ import {
   Root,
   Signin,
   Signup,
-  ProtectedRoute,
   CreateDocument,
   NovelDetail,
   ProtectedEditRoute,
@@ -13,39 +12,42 @@ import {
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { NavbarWrapper } from "./NavbarWrapper";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <ProtectedRoute>
-        <Root />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/sign-in",
-    element: <Signin />,
-  },
-  {
-    path: "/sign-up",
-    element: <Signup />,
-  },
-  {
-    path: "/create",
-    element: <CreateDocument />,
-  },
-  {
-    path: "/edit/:id",
-    element: (
-      <ProtectedEditRoute>
-        <Edit />
-      </ProtectedEditRoute>
-    ),
-  },
-  {
-    path: "/novel/:id",
-    element: <NovelDetail />, // Add the route for the novel detail
+    element: <NavbarWrapper />,
+    children: [
+      {
+        path: "/home",
+        element: <Root />,
+      },
+      {
+        path: "/sign-in",
+        element: <Signin />,
+      },
+      {
+        path: "/sign-up",
+        element: <Signup />,
+      },
+      {
+        path: "/create",
+        element: <CreateDocument />,
+      },
+      {
+        path: "/edit/:id",
+        element: (
+          <ProtectedEditRoute>
+            <Edit />
+          </ProtectedEditRoute>
+        ),
+      },
+      {
+        path: "/novel/:id",
+        element: <NovelDetail />, // Add the route for the novel detail
+      },
+    ],
   },
 ]);
 ReactDOM.createRoot(document.getElementById("root")!).render(
