@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
 import { collection, query, getDocs, orderBy, limit } from "firebase/firestore";
 import { firestore } from "../config/firebase";
-
-interface Novel {
-  id: string;
-  title: string;
-  author: string;
-  lastUpdated: string;
-}
+import { INovel } from "../types/INovel";
 
 export const useNovels = (limitCount: number = 10) => {
-  const [novels, setNovels] = useState<Novel[]>([]);
+  const [novels, setNovels] = useState<INovel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +23,7 @@ export const useNovels = (limitCount: number = 10) => {
             ({
               id: doc.id,
               ...doc.data(),
-            } as Novel)
+            } as INovel)
         );
         setNovels(fetchedNovels);
       } catch (err) {
@@ -42,5 +36,5 @@ export const useNovels = (limitCount: number = 10) => {
     fetchNovels();
   }, [limitCount]);
 
-  return { novels, loading, error };
+  return { novels, loading, error, setNovels };
 };

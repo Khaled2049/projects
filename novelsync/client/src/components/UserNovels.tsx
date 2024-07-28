@@ -1,49 +1,28 @@
-import { useUserNovels } from "../hooks/useUserNovels";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import useDeleteNovel from "../hooks/useDeleteNovel";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { INovel } from "../types/INovel";
 
-export interface Novel {
-  id: string;
-  title: string;
-  authorId: string;
-  author: string;
-  lastUpdated: string;
-  contentPath: string;
+interface UserNovelsProps {
+  novels: INovel[];
+  loading: boolean;
+  error: string | null;
+  onDelete: (novel: INovel) => void;
 }
 
-const UserNovels = () => {
+const UserNovels: React.FC<UserNovelsProps> = ({
+  novels,
+  loading,
+  error,
+  onDelete,
+}) => {
   const navigate = useNavigate();
-
   const { user } = useAuth();
-
-  const {
-    userNovels,
-    loading: userNovelsLoading,
-    error: userNovelsError,
-  } = useUserNovels();
-
-  const { deleteNovel, loading, error } = useDeleteNovel();
 
   const handleEdit = (novelId: string) => {
     console.log(`Edit novel with id: ${novelId}`);
     navigate(`/edit/${novelId}`);
-  };
-
-  const handleDelete = async (novel: Novel) => {
-    // Handle delete logic
-    console.log(`Delete novel with id: ${novel.id}`);
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this novel?"
-    );
-    if (confirmed) {
-      const success = await deleteNovel(novel.id, novel.contentPath);
-      if (success) {
-        console.log("Bug here, you need to reload the page to see the changes");
-      }
-    }
   };
 
   return (
@@ -52,7 +31,7 @@ const UserNovels = () => {
         {user ? (
           <h2 className="text-xl font-semibold mb-4">Your Work</h2>
         ) : (
-          <h2 className="text-lg  mb-4">
+          <h2 className="text-lg mb-4">
             <Link
               className="font-semibold text-blue-500 underline hover:text-blue-700"
               to="/sign-in"
@@ -63,13 +42,11 @@ const UserNovels = () => {
           </h2>
         )}
 
-        {userNovelsLoading && <p>Loading your novels...</p>}
-        {userNovelsError && (
-          <p className="text-red-500">Error: {userNovelsError}</p>
-        )}
+        {loading && <p>Loading your novels...</p>}
+        {error && <p className="text-red-500">Error: {error}</p>}
 
         <div className="space-y-4">
-          {userNovels.map((novel) => (
+          {novels.map((novel) => (
             <div key={novel.id} className="border p-4 rounded shadow">
               <h3 className="font-semibold">{novel.title}</h3>
               <p>Author: {novel.author}</p>
@@ -84,7 +61,7 @@ const UserNovels = () => {
                   <FaEdit className="mr-1" /> Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(novel)}
+                  onClick={() => onDelete(novel)}
                   className="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors"
                 >
                   <FaTrashAlt className="mr-1" /> Delete

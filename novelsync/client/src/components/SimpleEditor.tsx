@@ -44,7 +44,7 @@ export function SimpleEditor({
     if (!novelId) return;
     console.log("Updating novel:", novelId);
     updateNovel({ id: novelId, title, newContent });
-    navigate("/");
+    navigate("/home");
   };
 
   useEffect(() => {

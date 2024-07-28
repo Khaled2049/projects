@@ -1,17 +1,8 @@
 import { useState } from "react";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, getDoc, addDoc, collection } from "firebase/firestore";
+import { doc, setDoc, addDoc, collection } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { storage, firestore } from "../config/firebase";
-
-interface Novel {
-  id: string;
-  title: string;
-  contentURL: string;
-  authorId: string;
-  author: string;
-  lastUpdated: string;
-}
 
 export const useFirebaseStorage = () => {
   const [loading, setLoading] = useState(false);
@@ -93,30 +84,30 @@ export const useFirebaseStorage = () => {
     }
   };
 
-  const loadContent = async (novelId: string) => {
-    setLoading(true);
-    setError(null);
+  // const loadContent = async (novelId: string) => {
+  //   setLoading(true);
+  //   setError(null);
 
-    try {
-      const novelRef = doc(firestore, "novels", novelId);
-      const novelDoc = await getDoc(novelRef);
+  //   try {
+  //     const novelRef = doc(firestore, "novels", novelId);
+  //     const novelDoc = await getDoc(novelRef);
 
-      if (novelDoc.exists()) {
-        const { contentURL } = novelDoc.data() as Novel;
-        const response = await fetch(contentURL);
-        const content = await response.text();
-        setLoading(false);
-        return content;
-      } else {
-        setLoading(false);
-        return null;
-      }
-    } catch (err) {
-      setError((err as Error).message);
-      setLoading(false);
-      return null;
-    }
-  };
+  //     if (novelDoc.exists()) {
+  //       const { contentURL } = novelDoc.data() as INovel;
+  //       const response = await fetch(contentURL);
+  //       const content = await response.text();
+  //       setLoading(false);
+  //       return content;
+  //     } else {
+  //       setLoading(false);
+  //       return null;
+  //     }
+  //   } catch (err) {
+  //     setError((err as Error).message);
+  //     setLoading(false);
+  //     return null;
+  //   }
+  // };
 
-  return { createNovel, saveContent, loadContent, loading, error };
+  return { createNovel, saveContent, loading, error };
 };
