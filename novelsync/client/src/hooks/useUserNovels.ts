@@ -2,19 +2,11 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { firestore } from "../config/firebase";
-
-export interface Novel {
-  id: string;
-  title: string;
-  authorId: string;
-  author: string;
-  lastUpdated: string;
-  contentPath: string;
-}
+import { INovel } from "../types/INovel";
 
 export const useUserNovels = () => {
   const { user } = useAuth();
-  const [userNovels, setUserNovels] = useState<Novel[]>([]);
+  const [userNovels, setUserNovels] = useState<INovel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +24,7 @@ export const useUserNovels = () => {
         );
         const querySnapshot = await getDocs(q);
         const novelsData = querySnapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as Novel)
+          (doc) => ({ id: doc.id, ...doc.data() } as INovel)
         );
         setUserNovels(novelsData);
       } catch (err) {
