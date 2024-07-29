@@ -3,12 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { INovel } from "../types/INovel";
+import { useContext, useEffect } from "react";
+import NovelsContext from "../contexts/NovelsContext";
+import { AuthUser } from "../types/IUser";
 
 interface UserNovelsProps {
   novels: INovel[];
   loading: boolean;
   error: string | null;
   onDelete: (novel: INovel) => void;
+  user: AuthUser;
 }
 
 const UserNovels: React.FC<UserNovelsProps> = ({
@@ -16,9 +20,23 @@ const UserNovels: React.FC<UserNovelsProps> = ({
   loading,
   error,
   onDelete,
+  user,
 }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+
+  const novelsContext = useContext(NovelsContext);
+
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+
+  const { userNovels, fetchNovelsByUserId } = novelsContext;
+
+  useEffect(() => {
+    if (user) {
+      fetchNovelsByUserId(user.uid);
+    }
+  }, [user]);
 
   const handleEdit = (novelId: string) => {
     console.log(`Edit novel with id: ${novelId}`);
@@ -46,7 +64,7 @@ const UserNovels: React.FC<UserNovelsProps> = ({
         {error && <p className="text-red-500">Error: {error}</p>}
 
         <div className="space-y-4">
-          {novels.map((novel) => (
+          {userNovels.map((novel) => (
             <div key={novel.id} className="border p-4 rounded shadow">
               <h3 className="font-semibold">{novel.title}</h3>
               <p>Author: {novel.author}</p>

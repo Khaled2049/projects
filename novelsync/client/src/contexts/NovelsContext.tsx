@@ -9,6 +9,7 @@ import {
   updateDoc,
   addDoc,
   setDoc,
+  where,
   DocumentData,
 } from "firebase/firestore";
 import {
@@ -39,6 +40,8 @@ interface NovelsContextValue {
   }: CreateNovelParams) => Promise<string | null>;
   fetchNovels: (limitCount?: number) => void;
   fetchNovelById: (id: string) => void;
+  fetchNovelsByUserId: (userId: string) => void;
+  userNovels: INovel[];
   novelLoading: boolean;
   novelError: string | null;
   deleteLoading: boolean;
@@ -74,6 +77,29 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [fetchNovelByIdError, setFetchNovelByIdError] = useState<string | null>(
     null
   );
+
+  const [userNovels, setUserNovels] = useState<INovel[]>([]);
+  const [userNovelsLoading, setUserNovelsLoading] = useState(true);
+  const [userNovelsError, setUserNovelsError] = useState<string | null>(null);
+
+  const fetchNovelsByUserId = async (userId: string) => {
+    console.log("fetching novels by user id", userId);
+    try {
+      const q = query(
+        collection(firestore, "novels"),
+        where("authorId", "==", userId)
+      );
+      const querySnapshot = await getDocs(q);
+      const novelsData = querySnapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as INovel)
+      );
+      setUserNovels(novelsData);
+    } catch (err) {
+      setUserNovelsError((err as Error).message);
+    } finally {
+      setUserNovelsLoading(false);
+    }
+  };
 
   const fetchNovelById = async (id: string) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -254,6 +280,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     createNovel,
     fetchNovels,
     fetchNovelById,
+    fetchNovelsByUserId,
+    userNovels,
     novelLoading,
     novelError,
     deleteLoading,

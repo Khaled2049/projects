@@ -57,12 +57,15 @@ const Root: React.FC = () => {
         )}
 
         <div className="flex flex-wrap">
-          <UserNovels
-            novels={novels}
-            loading={novelLoading}
-            error={novelError}
-            onDelete={handleDelete}
-          />
+          {user && (
+            <UserNovels
+              novels={novels}
+              loading={novelLoading}
+              error={novelError}
+              onDelete={handleDelete}
+              user={user}
+            />
+          )}{" "}
           <div className="w-full lg:w-3/4 p-4">
             <h2 className="text-xl font-semibold mb-4">Recent Novels</h2>
 
