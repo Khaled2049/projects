@@ -44,7 +44,7 @@ export function SimpleEditor({
     updateLoading,
     createError,
     createLoading,
-    editNovelById,
+    updateNovelById,
     createNovel,
   } = novelsContext;
 
@@ -68,7 +68,7 @@ export function SimpleEditor({
   const handleUpdate = async (newContent: string) => {
     if (!novelId) return;
     console.log("Updating novel:", novelId);
-    editNovelById({ id: novelId, title, newContent });
+    updateNovelById({ id: novelId, title, newContent });
     navigate("/home");
   };
 

@@ -31,7 +31,11 @@ import { doc, deleteDoc } from "firebase/firestore";
 interface NovelsContextValue {
   novels: INovel[];
   setNovels: React.Dispatch<React.SetStateAction<INovel[]>>;
-  editNovelById: ({ id, title, newContent }: UpdateNovelParams) => void;
+  updateNovelById: ({
+    id,
+    title,
+    newContent,
+  }: UpdateNovelParams) => Promise<boolean>;
   deleteNovelById: (novel: INovel) => Promise<boolean>;
   createNovel: ({
     user,
@@ -128,7 +132,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const editNovelById = async ({
+  const updateNovelById = async ({
     id,
     title,
     newContent,
@@ -178,6 +182,19 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         await updateDoc(novelRef, updateData);
       }
 
+      // Update the state
+      setNovels((prevNovels) =>
+        prevNovels.map((novel) =>
+          novel.id === id ? { ...novel, ...updateData } : novel
+        )
+      );
+
+      setUserNovels((prevNovels) =>
+        prevNovels.map((novel) =>
+          novel.id === id ? { ...novel, ...updateData } : novel
+        )
+      );
+
       setUpdateLoading(false);
       return true;
     } catch (err) {
@@ -192,7 +209,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       const contentRef = ref(storage, novel.contentPath);
       await deleteObject(contentRef);
       await deleteDoc(doc(firestore, "novels", novel.id));
-
+      setNovels(novels.filter((n) => n.id !== novel.id));
+      setUserNovels(userNovels.filter((n) => n.id !== novel.id));
       setdeleteLoading(false);
       return true;
     } catch (err) {
@@ -270,7 +288,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const valuesToshare: NovelsContextValue = {
     novels,
     setNovels,
-    editNovelById,
+    updateNovelById,
     deleteNovelById,
     createNovel,
     fetchNovels,

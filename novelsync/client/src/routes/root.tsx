@@ -17,14 +17,8 @@ const Root: React.FC = () => {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
 
-  const {
-    deleteNovelById,
-    fetchNovels,
-    novels,
-    novelLoading,
-    novelError,
-    setNovels,
-  } = novelsContext;
+  const { deleteNovelById, fetchNovels, novels, novelLoading, novelError } =
+    novelsContext;
 
   useEffect(() => {
     fetchNovels();
@@ -35,10 +29,7 @@ const Root: React.FC = () => {
       "Are you sure you want to delete this novel?"
     );
     if (confirmed) {
-      const success = await deleteNovelById(novel);
-      if (success) {
-        setNovels(novels.filter((n) => n.id !== novel.id));
-      }
+      await deleteNovelById(novel);
     }
   };
 
