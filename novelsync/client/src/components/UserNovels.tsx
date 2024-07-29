@@ -1,6 +1,5 @@
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { INovel } from "../types/INovel";
 import { useContext, useEffect } from "react";

@@ -102,17 +102,15 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const fetchNovelById = async (id: string) => {
-    const [isLoading, setIsLoading] = useState(false);
     try {
-      // Fetch novel document from Firestore
+      setFetchNovelByIdLoading(true);
+      setFetchNovelByIdError(null);
+
       const novelDoc = await getDoc(doc(firestore, "novels", id));
 
       if (!novelDoc.exists()) {
         throw new Error("Novel not found");
       }
-
-      if (isLoading) return; // Prevent multiple simultaneous loads
-      setIsLoading(true);
 
       const novelData = novelDoc.data() as ICurrentNovel;
 
@@ -122,14 +120,11 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       const contentResponse = await fetch(contentURL);
       const novelContent = await contentResponse.text();
 
-      console.log("setting selected novel");
-
       setSelectedNovel({ novelData, novelContent });
     } catch (err) {
       setFetchNovelByIdError((err as Error).message);
     } finally {
       setFetchNovelByIdLoading(false);
-      setIsLoading(false);
     }
   };
 

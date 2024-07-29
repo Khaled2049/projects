@@ -1,24 +1,42 @@
+import { useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { useNovel } from "../hooks/useNovel";
+import NovelsContext from "../contexts/NovelsContext";
 import { SimpleEditor } from "../components/SimpleEditor";
 
 const Edit = () => {
   const { id } = useParams<{ id: string }>();
 
+  const novelsContext = useContext(NovelsContext);
+
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+
+  const {
+    selectedNovel,
+    fetchNovelById,
+    fetchNovelByIdError,
+    fetchNovelByIdLoading,
+  } = novelsContext;
+
+  useEffect(() => {
+    if (id) {
+      fetchNovelById(id);
+    }
+  }, []);
+
   if (!id) return <div>Invalid novel</div>;
+  if (fetchNovelByIdLoading) return <div>Loading...</div>;
+  if (fetchNovelByIdError) return <div>Error: {fetchNovelByIdError}</div>;
+  if (!selectedNovel) return <div>Novel not found</div>;
 
-  const { novel, content, loading, error } = useNovel(id);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
-  if (!novel || !content) return <div>Novel not found</div>;
+  const { novelData, novelContent } = selectedNovel;
 
   return (
     <div>
       <SimpleEditor
-        oldTitle={novel.title}
-        content={content}
+        oldTitle={novelData.title}
+        content={novelContent}
         edit={true}
         novelId={id}
       />

@@ -1,8 +1,9 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useNovel } from "../hooks/useNovel";
+import { useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
+import NovelsContext from "../contexts/NovelsContext";
 
 interface ProtectedEditRouteProps {
   children: React.ReactNode;
@@ -11,14 +12,25 @@ interface ProtectedEditRouteProps {
 const ProtectedRoute: React.FC<ProtectedEditRouteProps> = ({ children }) => {
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
+  const novelsContext = useContext(NovelsContext);
+
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+
+  const { selectedNovel, fetchNovelById } = novelsContext;
 
   if (!id || !user) {
     alert("Invalid novel or user ✌️");
     return <Navigate to="/home" replace />;
   }
-  const { novel } = useNovel(id);
+  useEffect(() => {
+    if (id) {
+      fetchNovelById(id);
+    }
+  }, []);
 
-  if (novel && novel.authorId !== user.uid) {
+  if (selectedNovel && selectedNovel.novelData.authorId !== user.uid) {
     return <Navigate to="/home" replace />;
   }
 
