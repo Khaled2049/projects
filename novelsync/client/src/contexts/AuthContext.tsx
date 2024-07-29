@@ -2,15 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
-
-interface AuthUser extends User {
-  username?: string;
-}
-
-interface AuthContextType {
-  user: AuthUser | null;
-  loading: boolean;
-}
+import { AuthUser, AuthContextType } from "../types/IUser";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,

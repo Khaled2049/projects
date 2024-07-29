@@ -13,6 +13,7 @@ import {
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
+import { NovelsProvider } from "./contexts/NovelsContext";
 
 const router = createBrowserRouter([
   {
@@ -53,7 +54,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <NovelsProvider>
+        <RouterProvider router={router} />
+      </NovelsProvider>
     </AuthProvider>
   </React.StrictMode>
 );
