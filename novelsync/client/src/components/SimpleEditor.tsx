@@ -1,7 +1,7 @@
 import "./style.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../contexts/AuthContext";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -12,8 +12,8 @@ import Italic from "@tiptap/extension-italic";
 
 import History from "@tiptap/extension-history";
 import { Extension } from "@tiptap/core";
-import { useFirebaseStorage } from "../hooks/useFirebaseStorage";
-import { useUpdateNovel } from "../hooks/useUpdateNovel";
+
+import NovelsContext from "../contexts/NovelsContext";
 
 // Custom
 import { generateLine } from "./gemin";
@@ -33,10 +33,22 @@ export function SimpleEditor({
   novelId,
 }: SimpleEditorProps) {
   const [title, setTitle] = useState("");
-  const { updateNovel } = useUpdateNovel();
+  const { user } = useAuth();
+  const novelsContext = useContext(NovelsContext);
+
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+  const {
+    updateError,
+    updateLoading,
+    createError,
+    createLoading,
+    editNovelById,
+    createNovel,
+  } = novelsContext;
 
   const navigate = useNavigate();
-  const { createNovel, loading, error } = useFirebaseStorage();
 
   useEffect(() => {
     if (content) {
@@ -45,8 +57,8 @@ export function SimpleEditor({
     }
   }, [content]);
 
-  const handleCreate = async (text: string) => {
-    const novelId = await createNovel(title, text);
+  const handleCreate = async (content: string) => {
+    const novelId = await createNovel({ user, title, content });
     if (novelId) {
       console.log("Novel created:", novelId);
     }
@@ -56,7 +68,7 @@ export function SimpleEditor({
   const handleUpdate = async (newContent: string) => {
     if (!novelId) return;
     console.log("Updating novel:", novelId);
-    updateNovel({ id: novelId, title, newContent });
+    editNovelById({ id: novelId, title, newContent });
     navigate("/home");
   };
 
@@ -129,22 +141,22 @@ export function SimpleEditor({
       {edit ? (
         <button
           onClick={() => handleUpdate(editor.getText())}
-          disabled={loading}
+          disabled={updateLoading}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {loading ? "Updating..." : "Update"}
+          {updateError ? "Updating..." : "Update"}
         </button>
       ) : (
         <button
           onClick={() => handleCreate(editor.getText())}
-          disabled={loading}
+          disabled={createLoading}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {loading ? "Creating..." : "Create"}
+          {createLoading ? "Creating..." : "Create"}
         </button>
       )}
 
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {createError && <p className="text-red-500 mt-2">{createError}</p>}
     </div>
   );
 }
