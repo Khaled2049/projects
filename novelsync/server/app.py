@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
 from diffusers import StableDiffusionPipeline
 import torch
 from io import BytesIO
+import base64
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -31,6 +33,7 @@ except Exception as e:
 
 # Create the Flask app
 app = Flask(__name__)
+CORS(app, resources={r"/generate": {"origins": "http://localhost:5173"}})
 
 @app.route('/generate', methods=['POST'])
 def generate_image():
@@ -51,8 +54,9 @@ def generate_image():
         img_io = BytesIO()
         image.save(img_io, 'PNG')
         img_io.seek(0)
-
-        return send_file(img_io, mimetype='image/png')
+        img_data_base64 = base64.b64encode(img_io.read()).decode('utf-8')
+        # return send_file(img_io, mimetype='image/png')
+        return jsonify({"image": img_data_base64}) 
     except Exception as e:
         return jsonify({"error": f"Image generation failed: {e}"}), 500
 
