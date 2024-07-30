@@ -9,6 +9,7 @@ import Text from "@tiptap/extension-text";
 import Bold from "@tiptap/extension-bold";
 import Underline from "@tiptap/extension-underline";
 import Italic from "@tiptap/extension-italic";
+import Image from "@tiptap/extension-image";
 
 import History from "@tiptap/extension-history";
 import { Extension } from "@tiptap/core";
@@ -18,6 +19,7 @@ import NovelsContext from "../contexts/NovelsContext";
 // Custom
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
+import GenerateImage from "./GenerateImage";
 
 interface SimpleEditorProps {
   oldTitle?: string;
@@ -107,6 +109,7 @@ export function SimpleEditor({
       Bold,
       Underline,
       Italic,
+      Image,
       LiteralTab,
     ],
   }) as Editor;
@@ -117,6 +120,7 @@ export function SimpleEditor({
 
   return (
     <div className="max-w-4xl mx-auto p-4 relative">
+      <GenerateImage />
       <EditorHeader editor={editor} />
       <div className="mb-4">
         <input
