@@ -9,6 +9,7 @@ import Text from "@tiptap/extension-text";
 import Bold from "@tiptap/extension-bold";
 import Underline from "@tiptap/extension-underline";
 import Italic from "@tiptap/extension-italic";
+import Image from "@tiptap/extension-image";
 
 import History from "@tiptap/extension-history";
 import { Extension } from "@tiptap/core";
@@ -107,6 +108,7 @@ export function SimpleEditor({
       Bold,
       Underline,
       Italic,
+      Image,
       LiteralTab,
     ],
   }) as Editor;
@@ -140,7 +142,7 @@ export function SimpleEditor({
 
       {edit ? (
         <button
-          onClick={() => handleUpdate(editor.getText())}
+          onClick={() => handleUpdate(editor.getHTML())}
           disabled={updateLoading}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
@@ -148,7 +150,7 @@ export function SimpleEditor({
         </button>
       ) : (
         <button
-          onClick={() => handleCreate(editor.getText())}
+          onClick={() => handleCreate(editor.getHTML())}
           disabled={createLoading}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >

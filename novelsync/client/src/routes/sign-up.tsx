@@ -8,7 +8,6 @@ const Signup: React.FC = () => {
     userName: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
   const { signup, error } = useFirebaseAuth();
@@ -23,13 +22,9 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
     await signup(formData.email, formData.password, formData.userName);
     if (!error) {
-      navigate("/");
+      navigate("/home");
     }
   };
 
@@ -86,24 +81,6 @@ const Signup: React.FC = () => {
               id="password"
               name="password"
               value={formData.password}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-600"
-            >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
               onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"

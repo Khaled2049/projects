@@ -55,6 +55,23 @@ const NovelDetail = () => {
     );
   }
 
+  const renderContent = (content: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const elements = Array.from(doc.body.childNodes);
+
+    return elements.map((el, index) => {
+      if (el.nodeName === "P") {
+        return <p key={index}>{el.textContent}</p>;
+      } else if (el.nodeName === "IMG") {
+        const src = (el as HTMLImageElement).src;
+        return <img key={index} src={src} alt="" />;
+      } else {
+        return null;
+      }
+    });
+  };
+
   return (
     selectedNovel && (
       <div className="max-w-3xl mx-auto p-6 bg-slate-50 shadow-md rounded-lg mt-8">
@@ -69,13 +86,7 @@ const NovelDetail = () => {
           {new Date(selectedNovel.novelData.lastUpdated).toLocaleDateString()}
         </p>
         <div className="prose prose-lg max-w-none bg-gray-50 p-4 rounded-md leading-relaxed">
-          {selectedNovel.novelContent
-            .split("\n")
-            .map((paragraph: string, index: number) => (
-              <p key={index} className="mb-4">
-                {paragraph}
-              </p>
-            ))}
+          {renderContent(selectedNovel.novelContent)}
         </div>
         <div className="flex justify-center gap-4 mt-6">
           <button

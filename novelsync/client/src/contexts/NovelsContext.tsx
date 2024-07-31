@@ -207,10 +207,19 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const deleteNovelById = async (novel: INovel) => {
     try {
       const contentRef = ref(storage, novel.contentPath);
+
       await deleteObject(contentRef);
+
       await deleteDoc(doc(firestore, "novels", novel.id));
-      setNovels(novels.filter((n) => n.id !== novel.id));
-      setUserNovels(userNovels.filter((n) => n.id !== novel.id));
+
+      // Update the state
+      setNovels((prevNovels) =>
+        prevNovels.filter((novel) => novel.id !== novel.id)
+      );
+      setUserNovels((prevNovels) =>
+        prevNovels.filter((novel) => novel.id !== novel.id)
+      );
+
       setdeleteLoading(false);
       return true;
     } catch (err) {
@@ -241,15 +250,53 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         lastUpdated: new Date().toISOString(),
       });
 
+      // Parse the content to find images
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "text/html");
+      const images = doc.querySelectorAll("img");
+
+      // Upload images and replace URLs
+      for (let img of images) {
+        const imgSrc = img.getAttribute("src");
+        if (imgSrc && imgSrc.startsWith("data:image")) {
+          // It's a base64 image, need to upload
+          const imgRef = ref(
+            storage,
+            `novels/${newNovelRef.id}/images/${Date.now()}.png`
+          );
+          await uploadString(imgRef, imgSrc, "data_url");
+          const newUrl = await getDownloadURL(imgRef);
+          img.setAttribute("src", newUrl);
+        }
+      }
+
+      // Get the updated content with new image URLs
+      const updatedContent = doc.body.innerHTML;
+
+      console.log("Updated content:", updatedContent);
+
       // Save content to Firebase Storage
       const storageRef = ref(storage, `novels/${newNovelRef.id}/${title}.txt`);
-      await uploadString(storageRef, content);
+      await uploadString(storageRef, updatedContent);
 
       await setDoc(
         newNovelRef,
         { contentPath: storageRef.fullPath },
         { merge: true }
       );
+
+      // Update the state
+      setNovels((prevNovels) => [
+        {
+          id: newNovelRef.id,
+          title,
+          authorId: user.uid!,
+          author: user.username!,
+          lastUpdated: new Date().toISOString(),
+          contentPath: storageRef.fullPath,
+        },
+        ...prevNovels,
+      ]);
 
       setCreateLoading(false);
       return newNovelRef.id;
