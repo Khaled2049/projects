@@ -69,7 +69,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   }, [editor, closeModal]);
 
   return (
-    <div className="flex flex-wrap gap-2 mb-4 p-2 bg-gray-100 rounded-lg">
+    <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded-lg fixed bottom-0 left-0 right-0 w-full">
       <button
         className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         onClick={() => editor.chain().focus().undo().run()}
@@ -103,7 +103,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
       </button>
       <button
         className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
-          editor.isActive("underline") ? "bg-gray-300" : ""
+          editor.isActive("italic") ? "bg-gray-300" : ""
         }`}
         onClick={toggleItalic}
       >

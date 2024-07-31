@@ -19,6 +19,7 @@ import NovelsContext from "../contexts/NovelsContext";
 // Custom
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
+import DigitalTimer from "./Timer";
 
 interface SimpleEditorProps {
   oldTitle?: string;
@@ -118,8 +119,7 @@ export function SimpleEditor({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 relative">
-      <EditorHeader editor={editor} />
+    <div className=" mx-auto p-4 relative">
       <div className="mb-4">
         <input
           type="text"
@@ -130,35 +130,137 @@ export function SimpleEditor({
         />
       </div>
 
-      <div
-        onClick={() => editor.chain().focus().run()}
-        className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y"
-      >
-        <EditorContent
-          className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
-          editor={editor}
-        />
+      <div className="flex">
+        <div className="w-2/3 pr-4">
+          <div
+            onClick={() => editor.chain().focus().run()}
+            className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y"
+          >
+            <EditorContent
+              className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
+              editor={editor}
+            />
+          </div>
+
+          {edit ? (
+            <button
+              onClick={() => handleUpdate(editor.getHTML())}
+              disabled={updateLoading}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+            >
+              {updateError ? "Updating..." : "Update"}
+            </button>
+          ) : (
+            <button
+              onClick={() => handleCreate(editor.getHTML())}
+              disabled={createLoading}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+            >
+              {createLoading ? "Creating..." : "Create"}
+            </button>
+          )}
+
+          {createError && <p className="text-red-500 mt-2">{createError}</p>}
+          <EditorHeader editor={editor} />
+        </div>
+
+        <div className="w-1/3 px-4 ">
+          <h2 className="text-lg font-bold mb-4">Suggestions</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className="p-4 bg-white rounded-lg shadow-md hover:bg-gray-100 cursor-pointer transition-colors"
+                onClick={() => {
+                  console.log("clicked");
+                }}
+              >
+                <h3 className="text-md font-semibold">
+                  Suggestion {index + 1}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Description for suggestion {index + 1}.
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-1/3 pl-4 ">
+          <h2 className="text-lg font-bold mb-4">Set Goals</h2>
+          <DigitalTimer />
+          <div className="mb-6">
+            <h3 className="text-md font-semibold"></h3>
+            <p className="text-sm text-gray-600">
+              Get tailored writing suggestions based on your goals and audience.
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-md font-semibold">Genre</h3>
+            <div className="space-y-2">
+              <label className="block">
+                <input
+                  type="radio"
+                  name="domain"
+                  value="academic"
+                  className="mr-2"
+                />{" "}
+                Academic
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="domain"
+                  value="business"
+                  className="mr-2"
+                />{" "}
+                Business
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="domain"
+                  value="general"
+                  className="mr-2"
+                />{" "}
+                General
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="domain"
+                  value="email"
+                  className="mr-2"
+                />{" "}
+                Email
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="domain"
+                  value="casual"
+                  className="mr-2"
+                />{" "}
+                Casual
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="domain"
+                  value="creative"
+                  className="mr-2"
+                />{" "}
+                Creative
+              </label>
+              <p className="text-sm text-gray-600 mt-2">
+                Get customized suggestions for business writing, academic
+                assignments, and more.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {edit ? (
-        <button
-          onClick={() => handleUpdate(editor.getHTML())}
-          disabled={updateLoading}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          {updateError ? "Updating..." : "Update"}
-        </button>
-      ) : (
-        <button
-          onClick={() => handleCreate(editor.getHTML())}
-          disabled={createLoading}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          {createLoading ? "Creating..." : "Create"}
-        </button>
-      )}
-
-      {createError && <p className="text-red-500 mt-2">{createError}</p>}
     </div>
   );
 }
