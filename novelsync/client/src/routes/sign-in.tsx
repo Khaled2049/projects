@@ -8,8 +8,9 @@ const Signin: React.FC = () => {
     email: "",
     password: "",
   });
-
-  const { signin, error } = useFirebaseAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { signin } = useFirebaseAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,11 +20,18 @@ const Signin: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await signin(formData.email, formData.password);
-    if (!error) {
+    setError(null);
+    setIsLoading(true);
+
+    const res = await signin(formData.email, formData.password);
+    if (res.status === 200) {
       navigate("/home");
+    } else {
+      setFormData({ email: "", password: "" });
+      setIsLoading(false);
+      setError("Invalid username or password");
     }
   };
 
@@ -49,7 +57,6 @@ const Signin: React.FC = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
-
           <div>
             <label
               htmlFor="password"
@@ -67,12 +74,15 @@ const Signin: React.FC = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
-
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={isLoading}
+            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
           <div className="text-center mt-4">
             <Link to="/sign-up" className="text-blue-600 hover:text-blue-800">

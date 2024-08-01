@@ -42,9 +42,13 @@ export const useFirebaseAuth = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setError(null);
+      return { status: 200 };
     } catch (err) {
+      console.log("err", err);
       setError((err as Error).message);
+      return { status: "error" };
     }
+    return {};
   };
 
   const signout = async () => {

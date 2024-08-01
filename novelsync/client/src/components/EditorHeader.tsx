@@ -6,12 +6,17 @@ import axiosInstance from "../api";
 import { RiAiGenerate } from "react-icons/ri";
 interface EditorHeaderProps {
   editor: Editor;
+  wordLimit: number;
 }
 
-const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
+const EditorHeader: React.FC<EditorHeaderProps> = ({ editor, wordLimit }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [genImage, setGenImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [limit, setlimit] = useState(wordLimit);
+  const percentage = editor
+    ? Math.round((100 / limit) * editor.storage.characterCount.characters())
+    : 0;
 
   const generateImage = async (prompt: string) => {
     setIsLoading(true);
@@ -69,7 +74,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   }, [editor, closeModal]);
 
   return (
-    <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded-lg fixed bottom-0 left-0 right-0 w-full">
+    <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded-lg">
       <button
         className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         onClick={() => editor.chain().focus().undo().run()}
@@ -117,6 +122,48 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
       >
         {isLoading ? <h1>Loading...</h1> : <RiAiGenerate />}
       </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+          editor.isActive("heading", { level: 1 }) ? "bg-gray-300 " : ""
+        }`}
+      >
+        H1
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+          editor.isActive("heading", { level: 2 }) ? "bg-gray-300 " : ""
+        }`}
+      >
+        H2
+      </button>
+
+      <div
+        className={`flex items-center p-2 rounded-md ${
+          editor.storage.characterCount.characters() === limit
+            ? "bg-yellow-100 text-yellow-800"
+            : " text-gray-700"
+        }`}
+      >
+        <svg className="w-5 h-5 mr-2" viewBox="0 0 20 20">
+          <circle r="10" cx="10" cy="10" fill="#e9ecef" />
+          <circle
+            r="5"
+            cx="10"
+            cy="10"
+            fill="transparent"
+            stroke="currentColor"
+            strokeWidth="10"
+            strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
+            transform="rotate(-90) translate(-20)"
+          />
+          <circle r="6" cx="10" cy="10" fill="white" />
+        </svg>
+
+        {editor.storage.characterCount.words()}
+      </div>
 
       <LinkModal
         url={genImage}

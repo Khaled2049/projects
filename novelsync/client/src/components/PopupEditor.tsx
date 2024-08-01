@@ -12,6 +12,7 @@ import Italic from "@tiptap/extension-italic";
 import Strike from "@tiptap/extension-strike";
 import Code from "@tiptap/extension-code";
 import History from "@tiptap/extension-history";
+
 // Custom
 import * as Icons from "./Icons";
 import { LinkModal } from "./LinkModal";

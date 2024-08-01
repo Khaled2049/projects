@@ -41,3 +41,27 @@ export async function generateLine(prevText: string) {
     console.error("Error:", error);
   }
 }
+export async function generateSuggestions(desire: string): Promise<string[]> {
+  try {
+    const prompt = `Given the desire "${desire}", provide 5 specific suggestions or topics to write about. Return only the numbered list of suggestions, with no additional text.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // Split the text into an array of suggestions
+    const suggestions = text
+      .split("\n")
+      .map((line) => line.replace(/^\d+\.\s*/, "").trim())
+      .filter((line) => line.length > 0);
+
+    // Ensure we have exactly 5 suggestions
+    if (suggestions.length < 5) {
+      throw new Error("Not enough suggestions generated");
+    }
+    return suggestions.slice(0, 5);
+  } catch (error) {
+    console.error("Error generating suggestions:", error);
+    throw error;
+  }
+}

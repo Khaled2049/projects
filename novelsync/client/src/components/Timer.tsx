@@ -50,7 +50,7 @@ const DigitalTimer: React.FC = () => {
 
   return (
     <div className="max-w-sm mx-auto p-4 mb-4 bg-white shadow-md rounded-lg text-center">
-      <h2 className="text-2xl font-bold mb-4">Digital Timer</h2>
+      <h2 className="text-2xl font-bold mb-4">Timer</h2>
       <div className="mb-4">
         <input
           type="number"

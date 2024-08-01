@@ -87,7 +87,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [userNovelsError, setUserNovelsError] = useState<string | null>(null);
 
   const fetchNovelsByUserId = async (userId: string) => {
-    console.log("fetching novels by user id", userId);
     try {
       const q = query(
         collection(firestore, "novels"),
