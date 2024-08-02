@@ -22,6 +22,7 @@ import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
 import DigitalTimer from "./Timer";
 import Suggestions from "./Suggestions";
+import Chapters from "./Chapters";
 
 interface SimpleEditorProps {
   oldTitle?: string;
@@ -150,9 +151,8 @@ export function SimpleEditor({
               className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
               editor={editor}
             />
-
-            <EditorHeader editor={editor} wordLimit={500} />
           </div>
+          <EditorHeader editor={editor} />
 
           {edit ? (
             <button
@@ -175,7 +175,9 @@ export function SimpleEditor({
           {createError && <p className="text-red-500 mt-2">{createError}</p>}
         </div>
 
-        <div className="w-1/3 px-4 ">Outline</div>
+        <div className="w-1/3 px-4 ">
+          <Chapters title={title} setTitle={setTitle} />
+        </div>
 
         <div className="w-1/3 pl-4 ">
           <DigitalTimer />

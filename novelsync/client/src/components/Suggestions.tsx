@@ -34,7 +34,7 @@ const Suggestions = () => {
       <div className="grid grid-cols-1 gap-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <label htmlFor="desire" className="block text-lg font-bold mb-4">
-            What do you want to write about?
+            Need some help generating ideas?
           </label>
           <input
             id="desire"

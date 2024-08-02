@@ -6,14 +6,13 @@ import axiosInstance from "../api";
 import { RiAiGenerate } from "react-icons/ri";
 interface EditorHeaderProps {
   editor: Editor;
-  wordLimit: number;
 }
 
-const EditorHeader: React.FC<EditorHeaderProps> = ({ editor, wordLimit }) => {
+const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [genImage, setGenImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [limit, setlimit] = useState(wordLimit);
+  const [limit, setlimit] = useState(300);
   const percentage = editor
     ? Math.round((100 / limit) * editor.storage.characterCount.characters())
     : 0;
@@ -74,7 +73,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor, wordLimit }) => {
   }, [editor, closeModal]);
 
   return (
-    <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded-lg">
+    <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded-lg mt-4">
       <button
         className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         onClick={() => editor.chain().focus().undo().run()}
