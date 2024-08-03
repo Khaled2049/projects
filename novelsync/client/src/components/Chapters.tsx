@@ -1,56 +1,110 @@
-import React, { useState } from "react";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import React, { useState, useContext } from "react";
+import { SimpleEditor } from "./SimpleEditor";
+import { useAuth } from "../contexts/AuthContext";
+import NovelsContext from "../contexts/NovelsContext";
+import { useNavigate } from "react-router-dom";
 
-interface ChaptersProps {
-  title: string;
-}
+interface ChaptersProps {}
 
-const Chapters: React.FC<ChaptersProps> = ({ title }) => {
+const Chapters: React.FC<ChaptersProps> = () => {
   const [chapterName, setChapterName] = useState("");
-  const [chapters, setChapters] = useState<string[]>([]);
+  const [chapters, setChapters] = useState<
+    { chapterName: string; content: string }[]
+  >([]);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const novelsContext = useContext(NovelsContext);
+
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+
+  const { createNovel } = novelsContext;
 
   const handleAddChapter = () => {
-    console.log("Adding chapter:", chapterName);
-    // if (chapterName.trim() !== "") {
-    //   setChapters([...chapters, chapterName]);
-    //   setChapterName("");
-    // }
+    if (isEditing) {
+      console.log("here");
+      setChapters(
+        chapters.map((chapter) =>
+          chapter.chapterName === chapterName
+            ? { chapterName, content }
+            : chapter
+        )
+      );
+    } else {
+      setChapters([...chapters, { chapterName, content }]);
+    }
+
+    setChapterName("");
+    setContent("");
+    setIsEditing(false);
   };
-  const handleDeleteChapter = () => {
-    console.log("Delete chapter:", chapterName);
-    // if (chapterName.trim() !== "") {
-    //   setChapters([...chapters, chapterName]);
-    //   setChapterName("");
-    // }
+
+  const handleChapterClick = (chapter: {
+    chapterName: string;
+    content: string;
+  }) => {
+    setChapterName(chapter.chapterName);
+    setContent(chapter.content);
+    setIsEditing(true);
+  };
+
+  const handlePublish = async () => {
+    console.log("Publishing", {
+      user,
+      title,
+      chapters,
+    });
+
+    await createNovel({
+      user,
+      title,
+      chapters,
+    });
+
+    navigate("/home");
   };
 
   return (
-    <div className="p-4 text-center justify-center">
-      <h1 className="text-2xl font-bold mb-4">Chapters</h1>
-      {title.length > 0 && (
-        <h2 className="text-lg mb-4 border-b-2">
-          {title}{" "}
+    <div className="p-4 text-center justify-center flex">
+      <SimpleEditor
+        title={title}
+        chapterName={chapterName}
+        content={content}
+        setTitle={setTitle}
+        setChapterName={setChapterName}
+        setContent={setContent}
+      />
+
+      <div>
+        <div className="mb-4">
+          {chapters.map((chapter, index) => (
+            <div
+              key={index}
+              className="mb-2 p-2 border rounded cursor-pointer"
+              onClick={() => handleChapterClick(chapter)}
+            >
+              {chapter.chapterName}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center">
           <button
-            onClick={handleDeleteChapter}
-            className="text-red px-3 py-2 rounded"
+            onClick={handleAddChapter}
+            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
           >
-            <FaTrashAlt className="mr-1" />
+            {isEditing ? "Update Chapter" : "Add Chapter"}
           </button>
-        </h2>
-      )}
-      <div className="mb-4">
-        {chapters.map((chapter, index) => (
-          <div key={index} className="mb-2 p-2 border rounded">
-            {chapter}
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-center">
+        </div>
+
         <button
-          onClick={handleAddChapter}
+          onClick={handlePublish}
           className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
         >
-          Add Chapter
+          Publish
         </button>
       </div>
     </div>

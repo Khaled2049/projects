@@ -1,12 +1,17 @@
 import { AuthUser } from "./IUser";
 
+export interface IChapter {
+  chapterName: string;
+  content: string;
+}
+
 export interface INovel {
   id: string;
   title: string;
   authorId: string;
   author: string;
   lastUpdated: string;
-  contentPath: string;
+  chapters: IChapter[];
 }
 
 export interface UpdateNovelParams {
@@ -19,11 +24,11 @@ export interface UpdateNovelParams {
 export interface CreateNovelParams {
   user: AuthUser | null;
   title: string;
-  content: string;
-  // Add other fields that can be updated
+  // content: string;
+  chapters: { chapterName: string; content: string }[];
 }
 
 export interface ICurrentNovel extends INovel {
   lastUpdated: string;
-  contentURL: string;
+  chaptersPath: string;
 }

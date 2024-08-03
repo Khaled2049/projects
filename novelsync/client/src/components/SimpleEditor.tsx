@@ -1,7 +1,5 @@
 import "./style.css";
-import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useEffect } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -15,69 +13,27 @@ import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
 import { Extension } from "@tiptap/core";
 
-import NovelsContext from "../contexts/NovelsContext";
-
 // Custom
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
-import DigitalTimer from "./Timer";
-import Suggestions from "./Suggestions";
-import Chapters from "./Chapters";
 
 interface SimpleEditorProps {
-  oldTitle?: string;
-  content?: string;
-  edit?: boolean;
-  novelId?: string;
+  title: string;
+  chapterName: string;
+  content: string;
+  setTitle: (title: string) => void;
+  setChapterName: (chapterName: string) => void;
+  setContent: (content: string) => void;
 }
 
 export function SimpleEditor({
-  oldTitle,
+  title,
+  chapterName,
   content,
-  edit,
-  novelId,
+  setTitle,
+  setChapterName,
+  setContent,
 }: SimpleEditorProps) {
-  const [title, setTitle] = useState("");
-
-  const { user } = useAuth();
-  const novelsContext = useContext(NovelsContext);
-
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
-  const {
-    updateError,
-    updateLoading,
-    createError,
-    createLoading,
-    updateNovelById,
-    createNovel,
-  } = novelsContext;
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (content) {
-      editor.commands.setContent(content);
-      setTitle(oldTitle || "");
-    }
-  }, [content]);
-
-  const handleCreate = async (content: string) => {
-    const novelId = await createNovel({ user, title, content });
-    if (novelId) {
-      console.log("Novel created:", novelId);
-    }
-    navigate("/home");
-  };
-
-  const handleUpdate = async (newContent: string) => {
-    if (!novelId) return;
-    console.log("Updating novel:", novelId);
-    updateNovelById({ id: novelId, title, newContent });
-    navigate("/home");
-  };
-
   const LiteralTab = Extension.create({
     name: "literalTab",
 
@@ -126,64 +82,50 @@ export function SimpleEditor({
         },
       }),
     ],
+    content,
+    onUpdate({ editor }) {
+      setContent(editor.getHTML());
+    },
   }) as Editor;
 
   if (!editor) {
     return null;
   }
 
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
+
   return (
-    <div className=" mx-auto p-4 relative">
-      <div className="flex">
-        <div className="w-2/3 pr-4">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter title here"
-            className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div
-            onClick={() => editor.chain().focus().run()}
-            className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y"
-          >
-            <EditorContent
-              className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
-              editor={editor}
-            />
-          </div>
-          <EditorHeader editor={editor} />
+    <div className="p-4 relative">
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter title here"
+        className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
 
-          {edit ? (
-            <button
-              onClick={() => handleUpdate(editor.getHTML())}
-              disabled={updateLoading}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-            >
-              {updateError ? "Updating..." : "Update"}
-            </button>
-          ) : (
-            <button
-              onClick={() => handleCreate(editor.getHTML())}
-              disabled={createLoading}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-            >
-              {createLoading ? "Creating..." : "Create"}
-            </button>
-          )}
+      <input
+        type="text"
+        value={chapterName}
+        onChange={(e) => setChapterName(e.target.value)}
+        placeholder="Enter Chapter here"
+        className="mt-4 w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
 
-          {createError && <p className="text-red-500 mt-2">{createError}</p>}
-        </div>
-
-        <div className="w-1/3 px-4 ">
-          <Chapters title={title} setTitle={setTitle} />
-        </div>
-
-        <div className="w-1/3 pl-4 ">
-          <DigitalTimer />
-          <Suggestions />
-        </div>
+      <div
+        onClick={() => editor.chain().focus().run()}
+        className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y"
+      >
+        <EditorContent
+          className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
+          editor={editor}
+        />
       </div>
+      <EditorHeader editor={editor} />
     </div>
   );
 }

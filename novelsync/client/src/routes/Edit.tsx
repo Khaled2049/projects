@@ -1,7 +1,7 @@
 import { useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import NovelsContext from "../contexts/NovelsContext";
-import { SimpleEditor } from "../components/SimpleEditor";
+import Chapters from "../components/Chapters";
 
 const Edit = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,12 +34,7 @@ const Edit = () => {
 
   return (
     <div>
-      <SimpleEditor
-        oldTitle={novelData.title}
-        content={novelContent}
-        edit={true}
-        novelId={id}
-      />
+      <Chapters />
     </div>
   );
 };
