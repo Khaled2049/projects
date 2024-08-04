@@ -10,15 +10,13 @@ import {
   addDoc,
   setDoc,
   where,
-  DocumentData,
   doc,
   deleteDoc,
 } from "firebase/firestore";
 import {
-  INovel,
   UpdateNovelParams,
   CreateNovelParams,
-  ICurrentNovel,
+  INovelWithChapters,
   IChapter,
 } from "../types/INovel";
 
@@ -30,23 +28,16 @@ import {
   getDownloadURL,
   listAll,
 } from "firebase/storage";
-interface INovelWithChapters {
-  chaptersPath: string;
-  author: string;
-  authorId: string;
-  lastUpdated: string;
-  title: string;
-  chapters: IChapter[];
-}
+
 interface NovelsContextValue {
-  novels: INovel[];
-  setNovels: React.Dispatch<React.SetStateAction<INovel[]>>;
+  novels: INovelWithChapters[];
+  setNovels: React.Dispatch<React.SetStateAction<INovelWithChapters[]>>;
   updateNovelById: ({
     id,
     title,
     newContent,
   }: UpdateNovelParams) => Promise<boolean>;
-  deleteNovelById: (novel: INovel) => Promise<boolean>;
+  deleteNovelById: (novel: INovelWithChapters) => Promise<boolean>;
   createNovel: ({
     user,
     title,
@@ -55,7 +46,7 @@ interface NovelsContextValue {
   fetchNovels: (limitCount?: number) => void;
   fetchNovelById: (id: string) => void;
   fetchNovelsByUserId: (userId: string) => void;
-  userNovels: INovel[];
+  userNovels: INovelWithChapters[];
   novelLoading: boolean;
   novelError: string | null;
   deleteLoading: boolean;
@@ -72,7 +63,7 @@ interface NovelsContextValue {
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
 
 const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [novels, setNovels] = useState<INovel[]>([]);
+  const [novels, setNovels] = useState<INovelWithChapters[]>([]);
   const [selectedNovel, setSelectedNovel] = useState<INovelWithChapters | null>(
     null
   );
@@ -94,7 +85,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     null
   );
 
-  const [userNovels, setUserNovels] = useState<INovel[]>([]);
+  const [userNovels, setUserNovels] = useState<INovelWithChapters[]>([]);
   const [userNovelsLoading, setUserNovelsLoading] = useState(true);
   const [userNovelsError, setUserNovelsError] = useState<string | null>(null);
 
@@ -106,7 +97,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       );
       const querySnapshot = await getDocs(q);
       const novelsData = querySnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as INovel)
+        (doc) => ({ id: doc.id, ...doc.data() } as INovelWithChapters)
       );
       setUserNovels(novelsData);
     } catch (err) {
@@ -127,9 +118,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         throw new Error("Novel not found");
       }
 
-      const novelData = novelDoc.data() as ICurrentNovel;
-
-      console.log("Fetching novel:", novelData);
+      const novelData = novelDoc.data();
 
       const chaptersPath = `novels/${id}/chapters`;
       const chaptersRef = ref(storage, chaptersPath);
@@ -150,6 +139,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       }
 
       const novelDataWithChapters = {
+        id: id,
         author: novelData.author,
         authorId: novelData.authorId,
         lastUpdated: novelData.lastUpdated,
@@ -238,7 +228,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const deleteNovelById = async (novel: INovel) => {
+  const deleteNovelById = async (novel: INovelWithChapters) => {
     try {
       setdeleteLoading(true);
       setDeleteError(null);
@@ -284,8 +274,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     setCreateLoading(true);
     setCreateError(null);
-
-    console.log("Creating novel:", title);
 
     try {
       // Create a new document in the novels collection
@@ -373,6 +361,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
           lastUpdated: new Date().toISOString(),
           contentPath: `novels/${newNovelRef.id}`,
           chapters: chapterRefs,
+          chaptersPath: `novels/${newNovelRef.id}/chapters`,
         },
         ...prevNovels,
       ]);
@@ -401,7 +390,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
           ({
             id: doc.id,
             ...doc.data(),
-          } as INovel)
+          } as INovelWithChapters)
       );
 
       setNovels(fetchedNovels);

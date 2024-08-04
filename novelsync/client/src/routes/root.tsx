@@ -3,7 +3,7 @@ import { FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
-import { INovel } from "../types/INovel";
+import { INovelWithChapters } from "../types/INovel";
 import UserNovels from "../components/UserNovels";
 import { useContext } from "react";
 import NovelsContext from "../contexts/NovelsContext";
@@ -24,7 +24,7 @@ const Root: React.FC = () => {
     fetchNovels();
   }, []);
 
-  const handleDelete = async (novel: INovel) => {
+  const handleDelete = async (novel: INovelWithChapters) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this novel?"
     );
@@ -50,7 +50,6 @@ const Root: React.FC = () => {
         <div className="flex flex-wrap">
           {user && (
             <UserNovels
-              novels={novels}
               loading={novelLoading}
               error={novelError}
               onDelete={handleDelete}

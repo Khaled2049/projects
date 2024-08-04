@@ -5,15 +5,6 @@ export interface IChapter {
   content: string;
 }
 
-export interface INovel {
-  id: string;
-  title: string;
-  authorId: string;
-  author: string;
-  lastUpdated: string;
-  chapters: IChapter[];
-}
-
 export interface UpdateNovelParams {
   id: string;
   title?: string;
@@ -28,7 +19,17 @@ export interface CreateNovelParams {
   chapters: { chapterName: string; content: string }[];
 }
 
-export interface ICurrentNovel extends INovel {
-  lastUpdated: string;
+export interface INovelWithChapters {
+  id: string;
   chaptersPath: string;
+  author: string;
+  authorId: string;
+  lastUpdated: string;
+  title: string;
+  chapters: IChapter[];
+}
+
+export interface IRenderContent {
+  chapterName: string;
+  content: string;
 }

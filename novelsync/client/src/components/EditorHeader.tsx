@@ -59,7 +59,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   const saveLink = useCallback(async () => {
     // Generate image if a prompt is provided
     if (genImage) {
-      console.log("genImage before calling func", genImage);
       await generateImage(genImage);
     }
 

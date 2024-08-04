@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import NovelsContext from "../contexts/NovelsContext";
 import { FaTwitter, FaEnvelope, FaShareAlt } from "react-icons/fa";
-
+import { IRenderContent } from "../types/INovel";
 const NovelDetail = () => {
   const { id } = useParams<{ id: string }>();
 
@@ -53,11 +53,6 @@ const NovelDetail = () => {
     );
   }
 
-  interface IRenderContent {
-    chapterName: string;
-    content: string;
-  }
-
   const renderContent = (content: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
@@ -79,9 +74,9 @@ const NovelDetail = () => {
     });
   };
 
-  if (selectedNovel) {
-    console.log(selectedNovel.chapters);
-  }
+  // if (selectedNovel) {
+  //   console.log(selectedNovel.chapters);
+  // }
 
   return (
     selectedNovel && (
@@ -98,7 +93,7 @@ const NovelDetail = () => {
         </p>
         <div className="prose prose-lg max-w-none bg-gray-50 p-4 rounded-md leading-relaxed">
           {selectedNovel.chapters.map((chapter: IRenderContent) => (
-            <div>
+            <div key={chapter.chapterName}>
               <h1>{chapter.chapterName}</h1>
               <div>{renderContent(chapter.content)}</div>
             </div>

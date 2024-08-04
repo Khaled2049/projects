@@ -1,21 +1,19 @@
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { INovel } from "../types/INovel";
+import { INovelWithChapters } from "../types/INovel";
 import { useContext, useEffect } from "react";
 import NovelsContext from "../contexts/NovelsContext";
 import { AuthUser } from "../types/IUser";
 
 interface UserNovelsProps {
-  novels: INovel[];
   loading: boolean;
   error: string | null;
-  onDelete: (novel: INovel) => void;
+  onDelete: (novel: INovelWithChapters) => void;
   user: AuthUser;
 }
 
 const UserNovels: React.FC<UserNovelsProps> = ({
-  novels,
   loading,
   error,
   onDelete,
@@ -38,7 +36,6 @@ const UserNovels: React.FC<UserNovelsProps> = ({
   }, [user]);
 
   const handleEdit = (novelId: string) => {
-    console.log(`Edit novel with id: ${novelId}`);
     navigate(`/edit/${novelId}`);
   };
 

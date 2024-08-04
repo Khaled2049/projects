@@ -16,6 +16,7 @@ import { Extension } from "@tiptap/core";
 // Custom
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
+import { INovelWithChapters } from "../types/INovel";
 
 interface IChapter {
   chapterName: string;
@@ -29,7 +30,7 @@ interface INovel {
 
 interface SimpleEditorProps {
   novel: INovel;
-  setNovel: (novel: INovel) => void;
+  setNovel: (novel: INovelWithChapters) => void;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
   handlePublish: () => void;
@@ -120,7 +121,15 @@ export function SimpleEditor({
         )
       : [...novel.chapters, currentChapter];
 
-    setNovel({ ...novel, chapters: updatedChapters });
+    setNovel({
+      ...novel,
+      chapters: updatedChapters,
+      id: "",
+      chaptersPath: "",
+      author: "",
+      authorId: "",
+      lastUpdated: "",
+    });
     setCurrentChapter({ chapterName: "", content: "" });
     setIsEditing(false);
   };
@@ -135,7 +144,17 @@ export function SimpleEditor({
       <input
         type="text"
         value={novel.title}
-        onChange={(e) => setNovel({ ...novel, title: e.target.value })}
+        onChange={(e) =>
+          setNovel({
+            ...novel,
+            title: e.target.value,
+            id: "",
+            chaptersPath: "",
+            author: "",
+            authorId: "",
+            lastUpdated: "",
+          })
+        }
         placeholder="Enter title here"
         className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
