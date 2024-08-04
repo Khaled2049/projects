@@ -17,23 +17,18 @@ import { Extension } from "@tiptap/core";
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
 
-interface SimpleEditorProps {
+interface INovel {
   title: string;
   chapterName: string;
   content: string;
-  setTitle: (title: string) => void;
-  setChapterName: (chapterName: string) => void;
-  setContent: (content: string) => void;
 }
 
-export function SimpleEditor({
-  title,
-  chapterName,
-  content,
-  setTitle,
-  setChapterName,
-  setContent,
-}: SimpleEditorProps) {
+interface SimpleEditorProps {
+  novel: INovel;
+  setNovel: (novel: INovel) => void;
+}
+
+export function SimpleEditor({ novel, setNovel }: SimpleEditorProps) {
   const LiteralTab = Extension.create({
     name: "literalTab",
 
@@ -82,9 +77,9 @@ export function SimpleEditor({
         },
       }),
     ],
-    content,
+    content: novel.content,
     onUpdate({ editor }) {
-      setContent(editor.getHTML());
+      setNovel({ ...novel, content: editor.getHTML() });
     },
   }) as Editor;
 
@@ -93,25 +88,25 @@ export function SimpleEditor({
   }
 
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+    if (editor && novel.content !== editor.getHTML()) {
+      editor.commands.setContent(novel.content);
     }
-  }, [content, editor]);
+  }, [novel.content, editor]);
 
   return (
     <div className="p-4 relative">
       <input
         type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={novel.title}
+        onChange={(e) => setNovel({ ...novel, title: e.target.value })}
         placeholder="Enter title here"
         className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       <input
         type="text"
-        value={chapterName}
-        onChange={(e) => setChapterName(e.target.value)}
+        value={novel.chapterName}
+        onChange={(e) => setNovel({ ...novel, chapterName: e.target.value })}
         placeholder="Enter Chapter here"
         className="mt-4 w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
