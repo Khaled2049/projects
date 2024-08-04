@@ -1,5 +1,5 @@
 import "./style.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -17,18 +17,36 @@ import { Extension } from "@tiptap/core";
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
 
-interface INovel {
-  title: string;
+interface IChapter {
   chapterName: string;
   content: string;
+}
+
+interface INovel {
+  title: string;
+  chapters: IChapter[];
 }
 
 interface SimpleEditorProps {
   novel: INovel;
   setNovel: (novel: INovel) => void;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
+  handlePublish: () => void;
 }
 
-export function SimpleEditor({ novel, setNovel }: SimpleEditorProps) {
+export function SimpleEditor({
+  novel,
+  setNovel,
+  isEditing,
+  setIsEditing,
+  handlePublish,
+}: SimpleEditorProps) {
+  const [currentChapter, setCurrentChapter] = useState<IChapter>({
+    chapterName: "",
+    content: "",
+  });
+
   const LiteralTab = Extension.create({
     name: "literalTab",
 
@@ -77,9 +95,9 @@ export function SimpleEditor({ novel, setNovel }: SimpleEditorProps) {
         },
       }),
     ],
-    content: novel.content,
+    content: currentChapter.content,
     onUpdate({ editor }) {
-      setNovel({ ...novel, content: editor.getHTML() });
+      setCurrentChapter({ ...currentChapter, content: editor.getHTML() });
     },
   }) as Editor;
 
@@ -88,10 +106,29 @@ export function SimpleEditor({ novel, setNovel }: SimpleEditorProps) {
   }
 
   useEffect(() => {
-    if (editor && novel.content !== editor.getHTML()) {
-      editor.commands.setContent(novel.content);
+    if (editor && currentChapter.content !== editor.getHTML()) {
+      editor.commands.setContent(currentChapter.content);
     }
-  }, [novel.content, editor]);
+  }, [currentChapter.content, editor]);
+
+  const handleAddChapter = () => {
+    const updatedChapters = isEditing
+      ? novel.chapters.map((chapter) =>
+          chapter.chapterName === currentChapter.chapterName
+            ? currentChapter
+            : chapter
+        )
+      : [...novel.chapters, currentChapter];
+
+    setNovel({ ...novel, chapters: updatedChapters });
+    setCurrentChapter({ chapterName: "", content: "" });
+    setIsEditing(false);
+  };
+
+  const handleChapterClick = (chapter: IChapter) => {
+    setCurrentChapter(chapter);
+    setIsEditing(true);
+  };
 
   return (
     <div className="p-4 relative">
@@ -105,8 +142,10 @@ export function SimpleEditor({ novel, setNovel }: SimpleEditorProps) {
 
       <input
         type="text"
-        value={novel.chapterName}
-        onChange={(e) => setNovel({ ...novel, chapterName: e.target.value })}
+        value={currentChapter.chapterName}
+        onChange={(e) =>
+          setCurrentChapter({ ...currentChapter, chapterName: e.target.value })
+        }
         placeholder="Enter Chapter here"
         className="mt-4 w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
@@ -121,6 +160,35 @@ export function SimpleEditor({ novel, setNovel }: SimpleEditorProps) {
         />
       </div>
       <EditorHeader editor={editor} />
+
+      <div>
+        <div className="mb-4">
+          {novel.chapters.map((chapter, index) => (
+            <div
+              key={index}
+              className="mb-2 p-2 border rounded cursor-pointer"
+              onClick={() => handleChapterClick(chapter)}
+            >
+              {chapter.chapterName}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center">
+          <button
+            onClick={handleAddChapter}
+            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+          >
+            {isEditing ? "Update Chapter" : "Add Chapter"}
+          </button>
+        </div>
+
+        <button
+          onClick={handlePublish}
+          className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+        >
+          Publish
+        </button>
+      </div>
     </div>
   );
 }

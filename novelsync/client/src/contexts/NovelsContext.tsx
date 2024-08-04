@@ -30,7 +30,14 @@ import {
   getDownloadURL,
   listAll,
 } from "firebase/storage";
-
+interface INovelWithChapters {
+  chaptersPath: string;
+  author: string;
+  authorId: string;
+  lastUpdated: string;
+  title: string;
+  chapters: IChapter[];
+}
 interface NovelsContextValue {
   novels: INovel[];
   setNovels: React.Dispatch<React.SetStateAction<INovel[]>>;
@@ -57,7 +64,7 @@ interface NovelsContextValue {
   updateError: string | null;
   createLoading: boolean;
   createError: string | null;
-  selectedNovel: DocumentData | null;
+  selectedNovel: INovelWithChapters | null;
   fetchNovelByIdLoading: boolean;
   fetchNovelByIdError: string | null;
 }
@@ -66,7 +73,9 @@ const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
 
 const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [novels, setNovels] = useState<INovel[]>([]);
-  const [selectedNovel, setSelectedNovel] = useState<DocumentData | null>(null);
+  const [selectedNovel, setSelectedNovel] = useState<INovelWithChapters | null>(
+    null
+  );
 
   const [novelLoading, setNovelLoading] = useState(true);
   const [novelError, setNovelError] = useState<string | null>(null);
@@ -140,8 +149,16 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         }
       }
 
-      // Set the novel and its chapters in the state
-      setSelectedNovel({ novelData, chapters: chaptersContent });
+      const novelDataWithChapters = {
+        author: novelData.author,
+        authorId: novelData.authorId,
+        lastUpdated: novelData.lastUpdated,
+        title: novelData.title,
+        chaptersPath: novelData.chaptersPath,
+        chapters: chaptersContent,
+      };
+
+      setSelectedNovel(novelDataWithChapters);
     } catch (err) {
       setFetchNovelByIdError((err as Error).message);
     } finally {

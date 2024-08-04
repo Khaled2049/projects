@@ -44,7 +44,7 @@ const Edit = () => {
   return (
     selectedNovel && (
       <div>
-        You are editing: {selectedNovel.novelData.title}
+        You are editing: {selectedNovel.title}
         <Chapters edit={true} />
       </div>
     )

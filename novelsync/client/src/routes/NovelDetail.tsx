@@ -30,16 +30,14 @@ const NovelDetail = () => {
     if (id) {
       fetchNovelById(id);
     }
-    setShareUrl(
-      `${window.location.origin}/novel/${selectedNovel?.novelData.id}`
-    );
+    setShareUrl(`${window.location.origin}/novel/${selectedNovel?.title}`);
   }, []);
 
   const handleWebShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: selectedNovel?.novelData.title,
-        text: `Check out this novel by ${selectedNovel?.novelData.author}`,
+        title: selectedNovel?.title,
+        text: `Check out this novel by ${selectedNovel?.author}`,
         url: shareUrl,
       });
     }
@@ -89,14 +87,14 @@ const NovelDetail = () => {
     selectedNovel && (
       <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
         <h1 className="text-4xl font-bold mb-6 text-center text-gray-900">
-          {selectedNovel.novelData.title}
+          {selectedNovel.title}
         </h1>
         <p className="text-xl text-gray-700 mb-2 text-center">
-          By {selectedNovel.novelData.author}
+          By {selectedNovel.author}
         </p>
         <p className="text-sm text-gray-500 mb-6 text-center">
           Last updated:{" "}
-          {new Date(selectedNovel.novelData.lastUpdated).toLocaleDateString()}
+          {new Date(selectedNovel.lastUpdated).toLocaleDateString()}
         </p>
         <div className="prose prose-lg max-w-none bg-gray-50 p-4 rounded-md leading-relaxed">
           {selectedNovel.chapters.map((chapter: IRenderContent) => (
@@ -115,7 +113,7 @@ const NovelDetail = () => {
           </button>
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-              `Check out this novel by ${selectedNovel.novelData.author}: ${shareUrl}`
+              `Check out this novel by ${selectedNovel.author}: ${shareUrl}`
             )}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -125,7 +123,7 @@ const NovelDetail = () => {
           </a>
           <a
             href={`mailto:?subject=${encodeURIComponent(
-              `Check out this novel by ${selectedNovel.novelData.author}`
+              `Check out this novel by ${selectedNovel.author}`
             )}&body=${encodeURIComponent(shareUrl)}`}
             className="flex items-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
