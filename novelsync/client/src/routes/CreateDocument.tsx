@@ -7,7 +7,7 @@ const CreateDocument = () => {
     <>
       <div className="container mx-auto px-4 flex">
         <div className="px-4">
-          <Chapters />
+          <Chapters edit={false} />
         </div>
 
         <div className="pl-4">

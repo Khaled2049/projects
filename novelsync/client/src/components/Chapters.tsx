@@ -3,10 +3,13 @@ import { SimpleEditor } from "./SimpleEditor";
 import { useAuth } from "../contexts/AuthContext";
 import NovelsContext from "../contexts/NovelsContext";
 import { useNavigate } from "react-router-dom";
+import { IChapter } from "../types/INovel";
 
-interface ChaptersProps {}
+interface ChaptersProps {
+  edit: boolean;
+}
 
-const Chapters: React.FC<ChaptersProps> = () => {
+const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   const [chapterName, setChapterName] = useState("");
   const [chapters, setChapters] = useState<
     { chapterName: string; content: string }[]
@@ -22,7 +25,7 @@ const Chapters: React.FC<ChaptersProps> = () => {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
 
-  const { createNovel } = novelsContext;
+  const { createNovel, selectedNovel } = novelsContext;
 
   const handleAddChapter = () => {
     if (isEditing) {
@@ -69,44 +72,90 @@ const Chapters: React.FC<ChaptersProps> = () => {
   };
 
   return (
-    <div className="p-4 text-center justify-center flex">
-      <SimpleEditor
-        title={title}
-        chapterName={chapterName}
-        content={content}
-        setTitle={setTitle}
-        setChapterName={setChapterName}
-        setContent={setContent}
-      />
+    <div>
+      {edit && selectedNovel ? (
+        <div className="p-4 text-center justify-center flex">
+          <SimpleEditor
+            title={selectedNovel.novelData.title}
+            chapterName={"chapterName"}
+            content={"content"}
+            setTitle={setTitle}
+            setChapterName={setChapterName}
+            setContent={setContent}
+          />
 
-      <div>
-        <div className="mb-4">
-          {chapters.map((chapter, index) => (
-            <div
-              key={index}
-              className="mb-2 p-2 border rounded cursor-pointer"
-              onClick={() => handleChapterClick(chapter)}
-            >
-              {chapter.chapterName}
+          <div>
+            <div className="mb-4">
+              {selectedNovel.chapters.map(
+                (chapter: IChapter, index: number) => (
+                  <div
+                    key={index}
+                    className="mb-2 p-2 border rounded cursor-pointer"
+                    onClick={() => handleChapterClick(chapter)}
+                  >
+                    {chapter.chapterName}
+                  </div>
+                )
+              )}
             </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-center">
-          <button
-            onClick={handleAddChapter}
-            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-          >
-            {isEditing ? "Update Chapter" : "Add Chapter"}
-          </button>
-        </div>
+            <div className="flex items-center justify-center">
+              <button
+                onClick={handleAddChapter}
+                className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+              >
+                {isEditing ? "Update Chapter" : "Add Chapter"}
+              </button>
+            </div>
 
-        <button
-          onClick={handlePublish}
-          className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-        >
-          Publish
-        </button>
-      </div>
+            <button
+              onClick={handlePublish}
+              className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+            >
+              Publish
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="p-4 text-center justify-center flex">
+          <SimpleEditor
+            title={title}
+            chapterName={chapterName}
+            content={content}
+            setTitle={setTitle}
+            setChapterName={setChapterName}
+            setContent={setContent}
+          />
+
+          <div>
+            <div className="mb-4">
+              {chapters.map((chapter, index) => (
+                <div
+                  key={index}
+                  className="mb-2 p-2 border rounded cursor-pointer"
+                  onClick={() => handleChapterClick(chapter)}
+                >
+                  {chapter.chapterName}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center">
+              <button
+                onClick={handleAddChapter}
+                className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+              >
+                {isEditing ? "Update Chapter" : "Add Chapter"}
+              </button>
+            </div>
+
+            <button
+              onClick={handlePublish}
+              className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+            >
+              Publish
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

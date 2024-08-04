@@ -20,10 +20,10 @@ const ProtectedRoute: React.FC<ProtectedEditRouteProps> = ({ children }) => {
 
   const { selectedNovel, fetchNovelById } = novelsContext;
 
-  if (!id || !user) {
-    alert("Invalid novel or user ✌️");
-    return <Navigate to="/home" replace />;
-  }
+  // if (!id || !user) {
+  //   alert("Invalid novel or user ✌️");
+  //   return <Navigate to="/home" replace />;
+  // }
   useEffect(() => {
     if (id) {
       fetchNovelById(id);

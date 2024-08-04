@@ -26,16 +26,28 @@ const Edit = () => {
   }, []);
 
   if (!id) return <div>Invalid novel</div>;
-  if (fetchNovelByIdLoading) return <div>Loading...</div>;
-  if (fetchNovelByIdError) return <div>Error: {fetchNovelByIdError}</div>;
-  if (!selectedNovel) return <div>Novel not found</div>;
 
-  const { novelData, novelContent } = selectedNovel;
+  if (!selectedNovel) return <div>Loading...</div>;
+
+  // const { novelData, chapters } = selectedNovel;
+  if (fetchNovelByIdLoading) {
+    return <div className="text-center mt-8">Loading...</div>;
+  }
+  if (fetchNovelByIdError) {
+    return (
+      <div className="text-center text-red-500 mt-8">
+        Error: {fetchNovelByIdError}
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Chapters />
-    </div>
+    selectedNovel && (
+      <div>
+        You are editing: {selectedNovel.novelData.title}
+        <Chapters edit={true} />
+      </div>
+    )
   );
 };
 
