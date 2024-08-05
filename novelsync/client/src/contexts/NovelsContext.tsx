@@ -58,6 +58,9 @@ interface NovelsContextValue {
   selectedNovel: INovelWithChapters | null;
   fetchNovelByIdLoading: boolean;
   fetchNovelByIdError: string | null;
+  setSelectedNovel: React.Dispatch<
+    React.SetStateAction<INovelWithChapters | null>
+  >;
 }
 
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
@@ -146,6 +149,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         title: novelData.title,
         chaptersPath: novelData.chaptersPath,
         chapters: chaptersContent,
+        firstChapter: chaptersContent[0] || { chapterName: "", content: "" },
       };
 
       setSelectedNovel(novelDataWithChapters);
@@ -362,6 +366,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
           contentPath: `novels/${newNovelRef.id}`,
           chapters: chapterRefs,
           chaptersPath: `novels/${newNovelRef.id}/chapters`,
+          firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
         },
         ...prevNovels,
       ]);
@@ -410,6 +415,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     fetchNovels,
     fetchNovelById,
     fetchNovelsByUserId,
+    setSelectedNovel,
+
     userNovels,
     novelLoading,
     novelError,

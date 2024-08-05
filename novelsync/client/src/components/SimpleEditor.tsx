@@ -1,5 +1,5 @@
 import "./style.css";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -18,36 +18,12 @@ import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
 import { INovelWithChapters } from "../types/INovel";
 
-interface IChapter {
-  chapterName: string;
-  content: string;
-}
-
-interface INovel {
-  title: string;
-  chapters: IChapter[];
-}
-
 interface SimpleEditorProps {
-  novel: INovel;
-  setNovel: (novel: INovelWithChapters) => void;
-  isEditing: boolean;
-  setIsEditing: (isEditing: boolean) => void;
-  handlePublish: () => void;
+  novelState: INovelWithChapters;
+  setNovelState: (novelState: INovelWithChapters) => void;
 }
 
-export function SimpleEditor({
-  novel,
-  setNovel,
-  isEditing,
-  setIsEditing,
-  handlePublish,
-}: SimpleEditorProps) {
-  const [currentChapter, setCurrentChapter] = useState<IChapter>({
-    chapterName: "",
-    content: "",
-  });
-
+export function SimpleEditor({ novelState, setNovelState }: SimpleEditorProps) {
   const LiteralTab = Extension.create({
     name: "literalTab",
 
@@ -96,74 +72,37 @@ export function SimpleEditor({
         },
       }),
     ],
-    content: currentChapter.content,
+    content: novelState.firstChapter.content,
     onUpdate({ editor }) {
-      setCurrentChapter({ ...currentChapter, content: editor.getHTML() });
+      setNovelState({
+        ...novelState,
+        firstChapter: {
+          ...novelState.firstChapter,
+          content: editor.getHTML(),
+        },
+      });
     },
   }) as Editor;
 
-  if (!editor) {
-    return null;
-  }
-
   useEffect(() => {
-    if (editor && currentChapter.content !== editor.getHTML()) {
-      editor.commands.setContent(currentChapter.content);
+    if (editor && novelState.firstChapter.content !== editor.getHTML()) {
+      editor.commands.setContent(novelState.firstChapter.content);
     }
-  }, [currentChapter.content, editor]);
-
-  const handleAddChapter = () => {
-    const updatedChapters = isEditing
-      ? novel.chapters.map((chapter) =>
-          chapter.chapterName === currentChapter.chapterName
-            ? currentChapter
-            : chapter
-        )
-      : [...novel.chapters, currentChapter];
-
-    setNovel({
-      ...novel,
-      chapters: updatedChapters,
-      id: "",
-      chaptersPath: "",
-      author: "",
-      authorId: "",
-      lastUpdated: "",
-    });
-    setCurrentChapter({ chapterName: "", content: "" });
-    setIsEditing(false);
-  };
-
-  const handleChapterClick = (chapter: IChapter) => {
-    setCurrentChapter(chapter);
-    setIsEditing(true);
-  };
+  }, [novelState.firstChapter.content, editor]);
 
   return (
     <div className="p-4 relative">
       <input
         type="text"
-        value={novel.title}
+        value={novelState.firstChapter.chapterName}
         onChange={(e) =>
-          setNovel({
-            ...novel,
-            title: e.target.value,
-            id: "",
-            chaptersPath: "",
-            author: "",
-            authorId: "",
-            lastUpdated: "",
+          setNovelState({
+            ...novelState,
+            firstChapter: {
+              ...novelState.firstChapter,
+              chapterName: e.target.value,
+            },
           })
-        }
-        placeholder="Enter title here"
-        className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-
-      <input
-        type="text"
-        value={currentChapter.chapterName}
-        onChange={(e) =>
-          setCurrentChapter({ ...currentChapter, chapterName: e.target.value })
         }
         placeholder="Enter Chapter here"
         className="mt-4 w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -179,35 +118,6 @@ export function SimpleEditor({
         />
       </div>
       <EditorHeader editor={editor} />
-
-      <div>
-        <div className="mb-4">
-          {novel.chapters.map((chapter, index) => (
-            <div
-              key={index}
-              className="mb-2 p-2 border rounded cursor-pointer"
-              onClick={() => handleChapterClick(chapter)}
-            >
-              {chapter.chapterName}
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-center">
-          <button
-            onClick={handleAddChapter}
-            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-          >
-            {isEditing ? "Update Chapter" : "Add Chapter"}
-          </button>
-        </div>
-
-        <button
-          onClick={handlePublish}
-          className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-        >
-          Publish
-        </button>
-      </div>
     </div>
   );
 }

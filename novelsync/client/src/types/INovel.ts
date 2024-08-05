@@ -21,12 +21,13 @@ export interface CreateNovelParams {
 
 export interface INovelWithChapters {
   id: string;
+  title: string;
   chaptersPath: string;
   author: string;
   authorId: string;
   lastUpdated: string;
-  title: string;
   chapters: IChapter[];
+  firstChapter: IChapter;
 }
 
 export interface IRenderContent {
