@@ -35,7 +35,7 @@ interface NovelsContextValue {
   updateNovelById: ({
     id,
     title,
-    newContent,
+    chapters,
   }: UpdateNovelParams) => Promise<boolean>;
   deleteNovelById: (novel: INovelWithChapters) => Promise<boolean>;
   createNovel: ({
@@ -55,21 +55,29 @@ interface NovelsContextValue {
   updateError: string | null;
   createLoading: boolean;
   createError: string | null;
-  selectedNovel: INovelWithChapters | null;
+  selectedNovel: INovelWithChapters;
   fetchNovelByIdLoading: boolean;
   fetchNovelByIdError: string | null;
-  setSelectedNovel: React.Dispatch<
-    React.SetStateAction<INovelWithChapters | null>
-  >;
+  setSelectedNovel: React.Dispatch<React.SetStateAction<INovelWithChapters>>;
 }
 
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
 
 const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [novels, setNovels] = useState<INovelWithChapters[]>([]);
-  const [selectedNovel, setSelectedNovel] = useState<INovelWithChapters | null>(
-    null
-  );
+  const [selectedNovel, setSelectedNovel] = useState<INovelWithChapters>({
+    id: "",
+    chaptersPath: "",
+    author: "",
+    authorId: "",
+    lastUpdated: "",
+    title: "",
+    chapters: [],
+    firstChapter: {
+      chapterName: "",
+      content: "",
+    },
+  });
 
   const [novelLoading, setNovelLoading] = useState(true);
   const [novelError, setNovelError] = useState<string | null>(null);
@@ -163,13 +171,17 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const updateNovelById = async ({
     id,
     title,
-    newContent,
+    chapters,
   }: UpdateNovelParams) => {
     try {
+      console.log("id: ", id);
+      console.log("title: ", title);
+      console.log("chapters: ", chapters);
       const currentUser = auth.currentUser;
       if (!currentUser) {
         throw new Error("User not authenticated");
       }
+
       const novelRef = doc(firestore, "novels", id);
       const novelDoc = await getDoc(novelRef);
 
@@ -191,17 +203,48 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         updateData.title = title;
       }
 
-      // Update content if provided
-      if (newContent !== undefined) {
-        // Use the current title if a new one isn't provided
-        const contentFileName = `${title || currentNovel.title}.txt`;
-        const contentRef = ref(storage, `novels/${id}/${contentFileName}`);
+      // Update chapters if provided
+      if (chapters) {
+        for (const [index, chapter] of chapters.entries()) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(chapter.content, "text/html");
+          const images = doc.querySelectorAll("img");
 
-        await uploadString(contentRef, newContent);
-        const contentURL = await getDownloadURL(contentRef);
+          // Upload images and replace URLs
+          for (let img of images) {
+            const imgSrc = img.getAttribute("src");
+            if (imgSrc && imgSrc.startsWith("data:image")) {
+              // It's a base64 image, need to upload
+              const imgRef = ref(
+                storage,
+                `novels/${id}/chapters/${index + 1}/images/${Date.now()}.png`
+              );
+              try {
+                await uploadString(imgRef, imgSrc, "data_url");
+                const newUrl = await getDownloadURL(imgRef);
+                img.setAttribute("src", newUrl);
+              } catch (err) {
+                console.error("Error uploading image:", err);
+                throw new Error("Error uploading image");
+              }
+            }
+          }
 
-        updateData.contentPath = contentRef.fullPath;
-        updateData.contentURL = contentURL;
+          // Get the updated content with new image URLs
+          const updatedContent = doc.body.innerHTML;
+
+          // Save chapter content to Firebase Storage
+          const chapterContentPath = `novels/${id}/chapters/${index + 1}/${
+            chapter.chapterName
+          }.txt`;
+          const storageRef = ref(storage, chapterContentPath);
+          try {
+            await uploadString(storageRef, updatedContent);
+          } catch (err) {
+            console.error("Error uploading chapter content:", err);
+            throw new Error("Error uploading chapter content");
+          }
+        }
       }
 
       // Only proceed with update if there are changes

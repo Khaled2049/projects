@@ -74,10 +74,6 @@ const NovelDetail = () => {
     });
   };
 
-  // if (selectedNovel) {
-  //   console.log(selectedNovel.chapters);
-  // }
-
   return (
     selectedNovel && (
       <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">

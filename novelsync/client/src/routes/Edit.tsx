@@ -25,10 +25,6 @@ const Edit = () => {
     }
   }, []);
 
-  if (!id) return <div>Invalid novel</div>;
-
-  if (!selectedNovel) return <div>Loading...</div>;
-
   // const { novelData, chapters } = selectedNovel;
   if (fetchNovelByIdLoading) {
     return <div className="text-center mt-8">Loading...</div>;
@@ -44,7 +40,6 @@ const Edit = () => {
   return (
     selectedNovel && (
       <div>
-        You are editing: {selectedNovel.title}
         <Chapters edit={true} />
       </div>
     )

@@ -8,7 +8,7 @@ export interface IChapter {
 export interface UpdateNovelParams {
   id: string;
   title?: string;
-  newContent?: string;
+  chapters?: IChapter[];
   // Add other fields that can be updated
 }
 

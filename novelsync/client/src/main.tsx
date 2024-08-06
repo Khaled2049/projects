@@ -38,11 +38,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/edit/:id",
-        element: (
-          <ProtectedEditRoute>
-            <Edit />
-          </ProtectedEditRoute>
-        ),
+        element: <Edit />,
       },
       {
         path: "/novel/:id",

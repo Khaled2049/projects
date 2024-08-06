@@ -1,5 +1,5 @@
 import "./style.css";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -16,14 +16,15 @@ import { Extension } from "@tiptap/core";
 // Custom
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
-import { INovelWithChapters } from "../types/INovel";
+import NovelsContext from "../contexts/NovelsContext";
 
-interface SimpleEditorProps {
-  novelState: INovelWithChapters;
-  setNovelState: (novelState: INovelWithChapters) => void;
-}
+export function SimpleEditor() {
+  const novelsContext = useContext(NovelsContext);
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+  const { selectedNovel, setSelectedNovel } = novelsContext;
 
-export function SimpleEditor({ novelState, setNovelState }: SimpleEditorProps) {
   const LiteralTab = Extension.create({
     name: "literalTab",
 
@@ -72,12 +73,12 @@ export function SimpleEditor({ novelState, setNovelState }: SimpleEditorProps) {
         },
       }),
     ],
-    content: novelState.firstChapter.content,
+    content: selectedNovel.firstChapter.content,
     onUpdate({ editor }) {
-      setNovelState({
-        ...novelState,
+      setSelectedNovel({
+        ...selectedNovel,
         firstChapter: {
-          ...novelState.firstChapter,
+          ...selectedNovel.firstChapter,
           content: editor.getHTML(),
         },
       });
@@ -85,21 +86,34 @@ export function SimpleEditor({ novelState, setNovelState }: SimpleEditorProps) {
   }) as Editor;
 
   useEffect(() => {
-    if (editor && novelState.firstChapter.content !== editor.getHTML()) {
-      editor.commands.setContent(novelState.firstChapter.content);
+    if (editor && selectedNovel.firstChapter.content !== editor.getHTML()) {
+      editor.commands.setContent(selectedNovel.firstChapter.content);
     }
-  }, [novelState.firstChapter.content, editor]);
+  }, [selectedNovel.firstChapter.content, editor]);
 
   return (
     <div className="p-4 relative">
       <input
         type="text"
-        value={novelState.firstChapter.chapterName}
+        value={selectedNovel.title}
         onChange={(e) =>
-          setNovelState({
-            ...novelState,
+          setSelectedNovel({
+            ...selectedNovel,
+            title: e.target.value,
+          })
+        }
+        placeholder="Enter title here"
+        className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+      <input
+        type="text"
+        value={selectedNovel.firstChapter.chapterName}
+        onChange={(e) =>
+          setSelectedNovel({
+            ...selectedNovel,
             firstChapter: {
-              ...novelState.firstChapter,
+              ...selectedNovel.firstChapter,
               chapterName: e.target.value,
             },
           })
