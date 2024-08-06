@@ -25,7 +25,6 @@ const Edit = () => {
     }
   }, []);
 
-  // const { novelData, chapters } = selectedNovel;
   if (fetchNovelByIdLoading) {
     return <div className="text-center mt-8">Loading...</div>;
   }

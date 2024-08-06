@@ -9,13 +9,11 @@ export interface UpdateNovelParams {
   id: string;
   title?: string;
   chapters?: IChapter[];
-  // Add other fields that can be updated
 }
 
 export interface CreateNovelParams {
   user: AuthUser | null;
   title: string;
-  // content: string;
   chapters: { chapterName: string; content: string }[];
 }
 

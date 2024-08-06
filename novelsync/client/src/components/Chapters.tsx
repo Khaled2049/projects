@@ -4,6 +4,8 @@ import { useAuth } from "../contexts/AuthContext";
 import NovelsContext from "../contexts/NovelsContext";
 import { useNavigate } from "react-router-dom";
 import { IChapter } from "../types/INovel";
+import DigitalTimer from "./Timer";
+import Suggestions from "./Suggestions";
 
 interface ChaptersProps {
   edit?: boolean;
@@ -40,13 +42,21 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
     novelsContext;
 
   const handleAddChapter = () => {
-    const updatedChapters = isEditing
-      ? selectedNovel.chapters.map((chapter) =>
-          chapter.chapterName === selectedNovel.firstChapter.chapterName
-            ? selectedNovel.firstChapter
-            : chapter
-        )
-      : [...selectedNovel.chapters, selectedNovel.firstChapter];
+    let updatedChapters;
+
+    if (isEditing) {
+      updatedChapters = selectedNovel.chapters.map((chapter) => {
+        if (chapter.chapterName === selectedNovel.firstChapter.chapterName) {
+          return selectedNovel.firstChapter;
+        } else {
+          return chapter;
+        }
+      });
+    } else {
+      updatedChapters = [...selectedNovel.chapters, selectedNovel.firstChapter];
+    }
+
+    console.log("updatedChapters", updatedChapters);
 
     setSelectedNovel({
       ...selectedNovel,
@@ -118,18 +128,25 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
           </button>
         </div>
 
-        <button
-          onClick={handlePublish}
-          className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-        >
-          Publish
-        </button>
-        <button
-          onClick={handleUpdate}
-          className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-        >
-          Update
-        </button>
+        {edit ? (
+          <button
+            onClick={handleUpdate}
+            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+          >
+            Update
+          </button>
+        ) : (
+          <button
+            onClick={handlePublish}
+            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
+          >
+            Publish
+          </button>
+        )}
+      </div>
+      <div className="pl-4">
+        <DigitalTimer />
+        <Suggestions />
       </div>
     </div>
   );
