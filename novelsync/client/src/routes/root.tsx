@@ -34,48 +34,61 @@ const Root: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="bg-amber-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
         {user && (
-          <div className="max-w-4xl mx-auto p-4 relative mt-4">
-            <h1 className="text-2xl mb-4">
-              Hi {user.username}! Work on something new today
-              <Link to="/create">
-                <FaArrowRight className="inline-block text-gray-950 ml-3 text-3xl" />
+          <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
+            <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
+              <span>Welcome back, {user.username}</span>
+              <Link
+                to="/create"
+                className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
+              >
+                Start Writing
+                <FaArrowRight className="ml-2" />
               </Link>
             </h1>
           </div>
         )}
 
-        <div className="flex flex-wrap">
+        <div className="flex flex-wrap mx-4">
           {user && (
-            <UserNovels
-              loading={novelLoading}
-              error={novelError}
-              onDelete={handleDelete}
-              user={user}
-            />
-          )}{" "}
-          <div className="w-full lg:w-3/4 p-4">
-            <h2 className="text-xl font-semibold mb-4">Recent Novels</h2>
+            <div className="w-full  px-4 mb-8">
+              <UserNovels
+                loading={novelLoading}
+                error={novelError}
+                onDelete={handleDelete}
+                user={user}
+              />
+            </div>
+          )}
+          <div className="w-full lg:w-3/4 px-4">
+            <h2 className="text-2xl font-serif text-amber-900 mb-6">
+              Recent Novels
+            </h2>
 
-            {novelLoading && <p>Loading novels...</p>}
+            {novelLoading && <p className="text-gray-600">Loading novels...</p>}
             {novelError && <p className="text-red-500">Error: {novelError}</p>}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {novels.map((novel) => (
-                <div key={novel.id} className="border p-4 rounded shadow">
-                  <h3 className="font-semibold">{novel.title}</h3>
-                  <p>Author: {novel.author}</p>
-                  <p>
+                <div
+                  key={novel.id}
+                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+                >
+                  <h3 className="font-serif text-xl text-amber-900 mb-2">
+                    {novel.title}
+                  </h3>
+                  <p className="text-gray-600 mb-1">By {novel.author}</p>
+                  <p className="text-gray-500 text-sm mb-4">
                     Last Updated:{" "}
                     {new Date(novel.lastUpdated).toLocaleDateString()}
                   </p>
                   <Link
                     to={`/novel/${novel.id}`}
-                    className="text-blue-500 hover:underline"
+                    className="inline-block bg-amber-100 text-amber-800 px-4 py-2 rounded-full hover:bg-amber-200 transition-colors duration-200"
                   >
-                    Read
+                    Read Now
                   </Link>
                 </div>
               ))}
@@ -83,7 +96,7 @@ const Root: React.FC = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -27,7 +27,6 @@ export function SimpleEditor() {
 
   const LiteralTab = Extension.create({
     name: "literalTab",
-
     addKeyboardShortcuts() {
       return {
         Tab: () => {
@@ -68,8 +67,8 @@ export function SimpleEditor() {
       Heading.configure({
         levels: [1, 2],
         HTMLAttributes: {
-          "1": { class: "text-2xl font-bold" }, // Tailwind styles for H1
-          "2": { class: "text-xl font-semibold" }, // Tailwind styles for H2
+          "1": { class: "text-3xl font-bold mb-4" },
+          "2": { class: "text-2xl font-semibold mb-3" },
         },
       }),
     ],
@@ -92,46 +91,50 @@ export function SimpleEditor() {
   }, [selectedNovel.firstChapter.content, editor]);
 
   return (
-    <div className="p-4 relative">
-      <input
-        type="text"
-        value={selectedNovel.title}
-        onChange={(e) =>
-          setSelectedNovel({
-            ...selectedNovel,
-            title: e.target.value,
-          })
-        }
-        placeholder="Enter title here"
-        className="w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-
-      <input
-        type="text"
-        value={selectedNovel.firstChapter.chapterName}
-        onChange={(e) =>
-          setSelectedNovel({
-            ...selectedNovel,
-            firstChapter: {
-              ...selectedNovel.firstChapter,
-              chapterName: e.target.value,
-            },
-          })
-        }
-        placeholder="Enter Chapter here"
-        className="mt-4 w-full p-4 px-5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-
-      <div
-        onClick={() => editor.chain().focus().run()}
-        className="h-96 max-w-none mt-4 p-4 border rounded-lg shadow-sm focus-within:shadow-md transition-shadow flex flex-col overflow-hidden resize-y"
-      >
-        <EditorContent
-          className="flex-grow overflow-y-auto selection:bg-green-200 selection:text-green-900"
-          editor={editor}
+    <div className="flex flex-col items-center">
+      <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+        <input
+          type="text"
+          value={selectedNovel.title}
+          onChange={(e) =>
+            setSelectedNovel({
+              ...selectedNovel,
+              title: e.target.value,
+            })
+          }
+          placeholder="Enter title here"
+          className="w-full text-3xl font-bold mb-6 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
         />
+
+        <input
+          type="text"
+          value={selectedNovel.firstChapter.chapterName}
+          onChange={(e) =>
+            setSelectedNovel({
+              ...selectedNovel,
+              firstChapter: {
+                ...selectedNovel.firstChapter,
+                chapterName: e.target.value,
+              },
+            })
+          }
+          placeholder="Enter Chapter here"
+          className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
+        />
+
+        <div
+          onClick={() => editor.chain().focus().run()}
+          className="min-h-[24rem] max-w-none focus-within:shadow-lg transition-shadow"
+        >
+          <EditorContent
+            className="prose max-w-none focus:outline-none selection:bg-blue-100"
+            editor={editor}
+          />
+        </div>
       </div>
-      <EditorHeader editor={editor} />
+      <div className="mt-4">
+        <EditorHeader editor={editor} />
+      </div>
     </div>
   );
 }

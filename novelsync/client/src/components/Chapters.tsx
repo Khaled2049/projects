@@ -104,49 +104,72 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   };
 
   return (
-    <div className="p-4 text-center justify-center flex">
-      <SimpleEditor />
-
-      <div>
-        <div className="mb-4">
-          {selectedNovel.chapters.map((chapter, index) => (
-            <div
-              key={index}
-              className="mb-2 p-2 border rounded cursor-pointer"
-              onClick={() => handleChapterClick(chapter)}
-            >
-              {chapter.chapterName}
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-center">
-          <button
-            onClick={handleAddChapter}
-            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-          >
-            {isEditing ? "Update Chapter" : "Add Chapter"}
-          </button>
-        </div>
-
-        {edit ? (
-          <button
-            onClick={handleUpdate}
-            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-          >
-            Update
-          </button>
-        ) : (
-          <button
-            onClick={handlePublish}
-            className="bg-blue-500 m-2 w-40 text-white px-4 py-1 rounded"
-          >
-            Publish
-          </button>
-        )}
+    <div className="flex h-screen">
+      {/* Editor Column (60%) */}
+      <div className="w-3/5  p-4 overflow-auto">
+        <SimpleEditor />
       </div>
-      <div className="pl-4">
-        <DigitalTimer />
-        <Suggestions />
+
+      {/* Right side columns (40%) */}
+      <div className="w-2/5 flex flex-col">
+        {/* First row: Chapters and Timer */}
+        <div className="flex h-1/2 p-4">
+          {/* Chapters Column */}
+          <div className="w-1/2  p-6 m-2 overflow-hidden flex flex-col bg-amber-50 rounded-lg shadow-lg border border-amber-200">
+            <h2 className="text-2xl font-serif mb-4 text-amber-800">
+              Chapters
+            </h2>
+            <div className="flex-grow overflow-auto mb-4 pr-2 custom-scrollbar">
+              {selectedNovel.chapters.map((chapter, index) => (
+                <div
+                  key={index}
+                  className="mb-3 p-3 bg-white shadow-md rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg hover:bg-amber-100"
+                  onClick={() => handleChapterClick(chapter)}
+                >
+                  <span className="font-serif text-amber-900">{`Chapter ${
+                    index + 1
+                  }:`}</span>
+                  <span className="ml-2 text-gray-700">
+                    {chapter.chapterName}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col items-center justify-center space-y-3">
+              <button
+                onClick={handleAddChapter}
+                className="w-full bg-amber-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-amber-700 transition-colors duration-200"
+              >
+                {isEditing ? "Update Chapter" : "Add Chapter"}
+              </button>
+              {edit ? (
+                <button
+                  onClick={handleUpdate}
+                  className="w-full bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-green-700 transition-colors duration-200"
+                >
+                  Update Novel
+                </button>
+              ) : (
+                <button
+                  onClick={handlePublish}
+                  className="w-full bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Publish Novel
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Timer Column */}
+          <div className="w-1/2  p-6 m-2 overflow-hidden flex flex-col bg-amber-50 rounded-lg shadow-lg border border-amber-200">
+            <DigitalTimer />
+          </div>
+        </div>
+
+        {/* Second row: Suggestions */}
+        <div className="h-1/2 p-2 overflow-auto">
+          <Suggestions />
+        </div>
       </div>
     </div>
   );
