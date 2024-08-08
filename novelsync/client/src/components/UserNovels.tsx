@@ -47,7 +47,7 @@ const UserNovels: React.FC<UserNovelsProps> = ({
 
   return (
     <>
-      <div className="w-full lg:w-1/4 p-6 bg-white rounded-lg shadow-md">
+      <div className="w-full p-6 bg-white rounded-lg">
         {user ? (
           <h2 className="text-2xl font-serif text-amber-900 mb-6 flex items-center">
             <FaBook className="mr-2" />

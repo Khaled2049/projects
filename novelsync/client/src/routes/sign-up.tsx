@@ -24,7 +24,7 @@ const Signup: React.FC = () => {
     e.preventDefault();
     await signup(formData.email, formData.password, formData.userName);
     if (!error) {
-      navigate("/home");
+      navigate("/");
     }
   };
 

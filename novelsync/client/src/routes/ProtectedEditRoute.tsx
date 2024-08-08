@@ -31,7 +31,7 @@ const ProtectedRoute: React.FC<ProtectedEditRouteProps> = ({ children }) => {
   }, []);
 
   if (selectedNovel && selectedNovel.authorId !== user?.uid) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

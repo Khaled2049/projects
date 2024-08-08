@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { INovelWithChapters } from "../types/INovel";
 import UserNovels from "../components/UserNovels";
@@ -33,8 +33,14 @@ const Root: React.FC = () => {
     }
   };
 
+  const [isUserNovelsVisible, setIsUserNovelsVisible] = useState(false);
+
+  const toggleUserNovels = () => {
+    setIsUserNovelsVisible(!isUserNovelsVisible);
+  };
+
   return (
-    <div className="bg-amber-50 min-h-screen py-8">
+    <div className="bg-amber-50 min-h-screen py-8 relative">
       <div className="container mx-auto px-4">
         {user && (
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
@@ -52,16 +58,29 @@ const Root: React.FC = () => {
         )}
 
         <div className="flex flex-wrap mx-4">
-          {user && (
-            <div className="w-full  px-4 mb-8">
-              <UserNovels
-                loading={novelLoading}
-                error={novelError}
-                onDelete={handleDelete}
-                user={user}
-              />
-            </div>
-          )}
+          <div
+            className={`fixed top-20 right-0 h-[calc(100%-80px)] bg-white shadow-lg transition-transform duration-300 ${
+              isUserNovelsVisible ? "translate-x-0" : "translate-x-[95%]"
+            }`}
+          >
+            <button
+              onClick={toggleUserNovels}
+              className="absolute top-4 left-[-140px] bg-amber-600 text-white p-2 rounded-full hover:bg-amber-700 transition-colors duration-200 flex items-center"
+            >
+              <span className="mr-2">Your Work</span>
+              {isUserNovelsVisible ? <FaArrowRight /> : <FaArrowLeft />}
+            </button>
+            {user && (
+              <div className="p-4">
+                <UserNovels
+                  loading={novelLoading}
+                  error={novelError}
+                  onDelete={handleDelete}
+                  user={user}
+                />
+              </div>
+            )}
+          </div>
           <div className="w-full lg:w-3/4 px-4">
             <h2 className="text-2xl font-serif text-amber-900 mb-6">
               Recent Novels

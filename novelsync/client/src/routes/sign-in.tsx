@@ -27,7 +27,7 @@ const Signin: React.FC = () => {
 
     const res = await signin(formData.email, formData.password);
     if (res.status === 200) {
-      navigate("/home");
+      navigate("/");
     } else {
       setFormData({ email: "", password: "" });
       setIsLoading(false);

@@ -76,8 +76,8 @@ const NovelDetail = () => {
 
   return (
     selectedNovel && (
-      <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
-        <h1 className="text-4xl font-bold mb-6 text-center text-gray-900">
+      <div className="max-w-[75%] mx-auto p-8 bg-amber-50 shadow-lg rounded-lg mt-10">
+        <h1 className="text-4xl font-bold mb-6 text-center text-amber-900">
           {selectedNovel.title}
         </h1>
         <p className="text-xl text-gray-700 mb-2 text-center">
@@ -87,10 +87,10 @@ const NovelDetail = () => {
           Last updated:{" "}
           {new Date(selectedNovel.lastUpdated).toLocaleDateString()}
         </p>
-        <div className="prose prose-lg max-w-none bg-gray-50 p-4 rounded-md leading-relaxed">
+        <div className="prose prose-lg max-w-none bg-white p-4 rounded-md leading-relaxed shadow-md">
           {selectedNovel.chapters.map((chapter: IRenderContent) => (
             <div key={chapter.chapterName}>
-              <h1>{chapter.chapterName}</h1>
+              <h2 className="text-amber-900">{chapter.chapterName}</h2>
               <div>{renderContent(chapter.content)}</div>
             </div>
           ))}

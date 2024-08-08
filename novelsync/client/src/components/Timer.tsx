@@ -80,27 +80,23 @@ const DigitalTimer: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto text-center items-center justify-center">
-      <div className="mb-8">
-        <div className="w-64 h-64 mx-auto rounded-full bg-gray-200 flex items-center justify-center">
+      <div className="relative w-48 h-48 mx-auto">
+        <div className="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center relative">
           <div className="text-4xl font-mono font-bold text-gray-800">
             {formatTime(time)}
           </div>
         </div>
-        <svg
-          className="absolute top-0 left-1/2 transform -translate-x-1/2"
-          width="256"
-          height="256"
-        >
+        <svg className="absolute top-0 left-0" width="192" height="192">
           <circle
-            cx="128"
-            cy="128"
-            r="120"
+            cx="96"
+            cy="96"
+            r="88"
             fill="none"
             stroke="#3B82F6"
             strokeWidth="16"
-            strokeDasharray="753.6"
-            strokeDashoffset={753.6 - (progress / 100) * 753.6}
-            transform="rotate(-90 128 128)"
+            strokeDasharray="552.8"
+            strokeDashoffset={552.8 - (progress / 100) * 552.8}
+            transform="rotate(-90 96 96)"
           />
         </svg>
       </div>

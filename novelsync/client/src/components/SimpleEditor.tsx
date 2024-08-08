@@ -11,6 +11,7 @@ import Image from "@tiptap/extension-image";
 import CharacterCount from "@tiptap/extension-character-count";
 import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
 
 // Custom
@@ -71,6 +72,9 @@ export function SimpleEditor() {
           "2": { class: "text-2xl font-semibold mb-3" },
         },
       }),
+      Placeholder.configure({
+        placeholder: "Write something …",
+      }),
     ],
     content: selectedNovel.firstChapter.content,
     onUpdate({ editor }) {
@@ -91,48 +95,45 @@ export function SimpleEditor() {
   }, [selectedNovel.firstChapter.content, editor]);
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
-        <input
-          type="text"
-          value={selectedNovel.title}
-          onChange={(e) =>
-            setSelectedNovel({
-              ...selectedNovel,
-              title: e.target.value,
-            })
-          }
-          placeholder="Enter title here"
-          className="w-full text-3xl font-bold mb-6 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
-        />
-
-        <input
-          type="text"
-          value={selectedNovel.firstChapter.chapterName}
-          onChange={(e) =>
-            setSelectedNovel({
-              ...selectedNovel,
-              firstChapter: {
-                ...selectedNovel.firstChapter,
-                chapterName: e.target.value,
-              },
-            })
-          }
-          placeholder="Enter Chapter here"
-          className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
-        />
-
-        <div
-          onClick={() => editor.chain().focus().run()}
-          className="min-h-[24rem] max-w-none focus-within:shadow-lg transition-shadow"
-        >
-          <EditorContent
-            className="prose max-w-none focus:outline-none selection:bg-blue-100"
-            editor={editor}
+    <div>
+      <div className="flex flex-col items-center bg-amber-50 rounded-lg shadow-lg max-h-[46rem] overflow-y-auto p-4 border border-amber-200">
+        <div className="max-w-4xl mx-auto p-8 bg-amber-50 rounded-lg">
+          <input
+            type="text"
+            value={selectedNovel.title}
+            onChange={(e) =>
+              setSelectedNovel({
+                ...selectedNovel,
+                title: e.target.value,
+              })
+            }
+            placeholder="Title"
+            className="w-full text-3xl font-bold mb-6 p-2 focus:outline-none border-b-2 border-gray-200 bg-amber-50 focus:border-blue-500 transition-colors"
           />
+          <input
+            type="text"
+            value={selectedNovel.firstChapter.chapterName}
+            onChange={(e) =>
+              setSelectedNovel({
+                ...selectedNovel,
+                firstChapter: {
+                  ...selectedNovel.firstChapter,
+                  chapterName: e.target.value,
+                },
+              })
+            }
+            placeholder="Chapter"
+            className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 bg-amber-50 focus:border-blue-500 transition-colors"
+          />
+          <div className="min-h-[24rem] max-w-none bg-amber-50">
+            <EditorContent
+              className="prose max-w-none focus:outline-none bg-amber-50 selection:bg-blue-100"
+              editor={editor}
+            />
+          </div>
         </div>
       </div>
-      <div className="mt-4">
+      <div className="flex mt-3">
         <EditorHeader editor={editor} />
       </div>
     </div>
