@@ -63,7 +63,7 @@ export function SimpleEditor() {
       Image,
       LiteralTab,
       CharacterCount.configure({
-        limit: 500,
+        limit: 5000,
       }),
       Heading.configure({
         levels: [1, 2],
@@ -73,7 +73,7 @@ export function SimpleEditor() {
         },
       }),
       Placeholder.configure({
-        placeholder: "Write something …",
+        placeholder: "Write something already ya silly goose…",
       }),
     ],
     content: selectedNovel.firstChapter.content,

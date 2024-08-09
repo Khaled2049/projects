@@ -12,10 +12,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [genImage, setGenImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [limit, setlimit] = useState(300);
-  const percentage = editor
-    ? Math.round((100 / limit) * editor.storage.characterCount.characters())
-    : 0;
 
   const generateImage = async (prompt: string) => {
     setIsLoading(true);
@@ -137,31 +133,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
       >
         H2
       </button>
-
-      <div
-        className={`flex items-center p-2 rounded-md ${
-          editor.storage.characterCount.characters() === limit
-            ? "bg-yellow-100 text-yellow-800"
-            : " text-gray-700"
-        }`}
-      >
-        <svg className="w-5 h-5 mr-2" viewBox="0 0 20 20">
-          <circle r="10" cx="10" cy="10" fill="#e9ecef" />
-          <circle
-            r="5"
-            cx="10"
-            cy="10"
-            fill="transparent"
-            stroke="currentColor"
-            strokeWidth="10"
-            strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
-            transform="rotate(-90) translate(-20)"
-          />
-          <circle r="6" cx="10" cy="10" fill="white" />
-        </svg>
-
-        {editor.storage.characterCount.words()}
-      </div>
 
       <LinkModal
         url={genImage}

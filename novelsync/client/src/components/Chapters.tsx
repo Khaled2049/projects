@@ -44,6 +44,13 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   const handleAddChapter = () => {
     let updatedChapters;
 
+    if (selectedNovel.chapters.length === 5) {
+      alert(
+        "You can only have 5 chapters for now, sorry DUDE, I'm working on it"
+      );
+      return;
+    }
+
     if (isEditing) {
       updatedChapters = selectedNovel.chapters.map((chapter) => {
         if (chapter.chapterName === selectedNovel.firstChapter.chapterName) {
@@ -68,8 +75,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   };
 
   const handleChapterClick = (chapter: IChapter) => {
-    console.log("chapter", chapter);
-
     setSelectedNovel({
       ...selectedNovel,
       firstChapter: chapter,
@@ -106,7 +111,9 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   return (
     <div className="flex flex-col h-screen">
       <div className="w-full text-center p-4">
-        <h1 className="text-3xl font-bold text-amber-800">You got this!</h1>
+        <h1 className="text-3xl font-bold text-amber-800">
+          Call your friendly writing partner Jenna by pressing TAB
+        </h1>
       </div>
 
       <div className="flex h-full">
@@ -171,9 +178,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
           </div>
 
           {/* Second row: Suggestions */}
-          <div className="h-1/2 p-2 overflow-auto">
-            <Suggestions />
-          </div>
         </div>
       </div>
     </div>

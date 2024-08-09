@@ -68,7 +68,7 @@
 }
 
 p.is-editor-empty:first-child::before {
-  color: var(--gray-4);
+  color: #d3d3d3;
   content: attr(data-placeholder);
   float: left;
   height: 0;

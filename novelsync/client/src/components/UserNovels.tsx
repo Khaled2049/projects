@@ -68,16 +68,17 @@ const UserNovels: React.FC<UserNovelsProps> = ({
         {loading && <p className="text-gray-600">Loading your novels...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
 
-        <div className="space-y-6">
+        <div className="space-y-6 max-h-96 overflow-y-auto">
           {showMsg && (
             <p className="text-amber-600 bg-amber-100 p-3 rounded-lg">
               Editing is currently disabled
             </p>
           )}
+
           {userNovels.map((novel) => (
             <div
               key={novel.id}
-              className="bg-amber-50 p-4 rounded-lg shadow-sm"
+              className="bg-amber-50 p-4 rounded-lg shadow-sm mb-4"
             >
               <h3 className="font-serif text-xl text-amber-900 mb-2">
                 {novel.title}
