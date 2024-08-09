@@ -65,9 +65,8 @@ const Root: React.FC = () => {
           >
             <button
               onClick={toggleUserNovels}
-              className="absolute top-4 left-[-140px] bg-amber-600 text-white p-2 rounded-full hover:bg-amber-700 transition-colors duration-200 flex items-center"
+              className="absolute top-4 left-[-40px] bg-amber-600 text-white p-2 rounded-full hover:bg-amber-700 transition-colors duration-200 flex items-center"
             >
-              <span className="mr-2">Your Work</span>
               {isUserNovelsVisible ? <FaArrowRight /> : <FaArrowLeft />}
             </button>
             {user && (

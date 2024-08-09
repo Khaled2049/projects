@@ -127,7 +127,7 @@ export function SimpleEditor() {
           />
           <div className="min-h-[24rem] max-w-none bg-amber-50">
             <EditorContent
-              className="prose max-w-none focus:outline-none bg-amber-50 selection:bg-blue-100"
+              className="prose max-w-100 focus:outline-none bg-amber-50 selection:bg-blue-100"
               editor={editor}
             />
           </div>
