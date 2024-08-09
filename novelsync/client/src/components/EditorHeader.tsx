@@ -133,7 +133,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
       >
         H2
       </button>
-
+      <div className="flex items-center justify-center h-12 p-2 rounded-md">
+        {editor.storage.characterCount.words()} words
+      </div>
       <LinkModal
         url={genImage}
         isOpen={modalIsOpen}

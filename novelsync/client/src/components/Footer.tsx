@@ -6,11 +6,11 @@ const Footer: React.FC = () => {
     <footer className="bg-gray-800 text-white py-6 ">
       <div className="max-w-4xl mx-auto px-4 flex flex-col items-center">
         <div className="flex space-x-6 mb-4">
-          <a href="mailto:your-email@example.com">
+          <a href="khaledhossain.not@gmail.com">
             <FaEnvelope className="text-2xl hover:text-green-400 transition-colors duration-300" />
           </a>
           <a
-            href="https://github.com/yourprofile"
+            href="https://github.com/Khaled2049"
             target="_blank"
             rel="noopener noreferrer"
           >

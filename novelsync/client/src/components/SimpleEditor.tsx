@@ -14,6 +14,8 @@ import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
 
+const limit = 5000;
+
 // Custom
 import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
@@ -63,7 +65,7 @@ export function SimpleEditor() {
       Image,
       LiteralTab,
       CharacterCount.configure({
-        limit: 5000,
+        limit,
       }),
       Heading.configure({
         levels: [1, 2],

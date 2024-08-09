@@ -68,6 +68,9 @@ const UserNovels: React.FC<UserNovelsProps> = ({
         {loading && <p className="text-gray-600">Loading your novels...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
 
+        {userNovels.length === 0 && !loading && (
+          <p className="text-gray-600">Write something first silly!</p>
+        )}
         <div className="space-y-6 max-h-96 overflow-y-auto">
           {showMsg && (
             <p className="text-amber-600 bg-amber-100 p-3 rounded-lg">
