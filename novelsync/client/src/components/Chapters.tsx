@@ -84,11 +84,25 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   };
 
   const handlePublish = async () => {
-    await createNovel({
-      user,
-      title: selectedNovel.title,
-      chapters: selectedNovel.chapters,
-    });
+    if (selectedNovel.chapters.length === 0) {
+      alert("You need to add at least one chapter to publish the novel");
+      return;
+    }
+    if (selectedNovel.title === "") {
+      alert("You need to add a title to publish the novel");
+      return;
+    }
+    if (selectedNovel.chapters[0].content === "") {
+      alert("You think people like reading blank pages?");
+      return;
+    }
+    if (selectedNovel.chapters.length > 0 && selectedNovel.title !== "") {
+      await createNovel({
+        user,
+        title: selectedNovel.title,
+        chapters: selectedNovel.chapters,
+      });
+    }
 
     navigate("/");
   };

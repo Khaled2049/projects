@@ -85,7 +85,7 @@ const Root: React.FC = () => {
             >
               {isUserNovelsVisible ? <FaArrowRight /> : <FaArrowLeft />}
             </button>
-            {user && userNovels.length > 0 && (
+            {user && (
               <div className="p-4">
                 <UserNovels
                   loading={novelLoading}
@@ -96,6 +96,7 @@ const Root: React.FC = () => {
               </div>
             )}
           </div>
+
           <div className="flex flex-col lg:flex-row gap-2">
             <div className="w-[50%] p-2 overflow-auto">
               <Suggestions />
