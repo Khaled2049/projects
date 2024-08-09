@@ -14,6 +14,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
 import { NovelsProvider } from "./contexts/NovelsContext";
+import BookClub from "./routes/BookClub";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Root />,
+      },
+      {
+        path: "/clubs",
+        element: <BookClub />,
       },
       {
         path: "/sign-in",

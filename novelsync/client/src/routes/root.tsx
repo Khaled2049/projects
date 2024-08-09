@@ -16,14 +16,8 @@ const Root: React.FC = () => {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
 
-  const {
-    deleteNovelById,
-    fetchNovels,
-    novels,
-    novelLoading,
-    novelError,
-    userNovels,
-  } = novelsContext;
+  const { deleteNovelById, fetchNovels, novels, novelLoading, novelError } =
+    novelsContext;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isUserNovelsVisible, setIsUserNovelsVisible] = useState(false);

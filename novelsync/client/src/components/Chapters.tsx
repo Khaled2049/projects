@@ -38,8 +38,13 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   if (!novelsContext) {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
-  const { createNovel, selectedNovel, updateNovelById, setSelectedNovel } =
-    novelsContext;
+  const {
+    createNovel,
+    selectedNovel,
+    updateNovelById,
+    setSelectedNovel,
+    createError,
+  } = novelsContext;
 
   const handleAddChapter = () => {
     let updatedChapters;
@@ -104,6 +109,15 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
       });
     }
 
+    if (createError == "LIMIT_ERR") {
+      alert(
+        "You have reached the maximum limit of 10 novels (cuz we still testin)"
+      );
+    } else if (createError == "MAX_NOVELS") {
+      alert(
+        "Wow didn't think this would be this popular max number of novels reached for now(cuz we still testin)"
+      );
+    }
     navigate("/");
   };
 

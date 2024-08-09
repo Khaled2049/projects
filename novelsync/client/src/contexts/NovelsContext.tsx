@@ -62,7 +62,8 @@ interface NovelsContextValue {
 }
 
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
-
+const NUMBER_OF_NOVELS_LIMIT = 10;
+const TOTAL_NOVELS_LIMIT = 100;
 const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [novels, setNovels] = useState<INovelWithChapters[]>([]);
   const [selectedNovel, setSelectedNovel] = useState<INovelWithChapters>({
@@ -313,6 +314,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  // Each user should be able to only create 10 novels for now.
+  // Only 100 novels in DB for now.
   const createNovel = async ({ user, title, chapters }: CreateNovelParams) => {
     if (!user) {
       setCreateError("User not authenticated");
@@ -323,8 +326,30 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setCreateError(null);
 
     try {
-      // Create a new document in the novels collection
+      // Check the number of existing novels for the user
       const novelsCollection = collection(firestore, "novels");
+      const userNovelsQuery = query(
+        novelsCollection,
+        where("authorId", "==", user.uid)
+      );
+
+      const totalNovelsSnapshot = await getDocs(novelsCollection);
+      if (totalNovelsSnapshot.size >= TOTAL_NOVELS_LIMIT) {
+        console.log("here", totalNovelsSnapshot.size);
+        setCreateError("MAX_NOVELS");
+        setCreateLoading(false);
+        return null;
+      }
+
+      const userNovelsSnapshot = await getDocs(userNovelsQuery);
+
+      if (userNovelsSnapshot.size >= NUMBER_OF_NOVELS_LIMIT) {
+        setCreateError("LIMIT_ERR");
+        setCreateLoading(false);
+        return null;
+      }
+
+      // Create a new document in the novels collection
       const newNovelRef = await addDoc(novelsCollection, {
         author: user.username || "Unknown Author",
         authorId: user.uid,
