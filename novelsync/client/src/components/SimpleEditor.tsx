@@ -13,12 +13,11 @@ import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
-import { generateFromSuggestion } from "./gemin";
+import { AITextGenerator } from "./gemin";
 
 const limit = 5000;
 
 // Custom
-import { generateLine } from "./gemin";
 import EditorHeader from "./EditorHeader";
 import NovelsContext from "../contexts/NovelsContext";
 
@@ -30,6 +29,8 @@ export function SimpleEditor() {
   const { selectedNovel, setSelectedNovel, suggestion, setsuggestion } =
     novelsContext;
 
+  const aiGenerator = new AITextGenerator();
+
   const LiteralTab = Extension.create({
     name: "literalTab",
     addKeyboardShortcuts() {
@@ -40,7 +41,9 @@ export function SimpleEditor() {
 
           (async () => {
             try {
-              const generatedText = await generateLine(currentContent);
+              const generatedText = await aiGenerator.generateLine(
+                currentContent
+              );
               if (generatedText) {
                 editor.chain().focus().insertContent(generatedText).run();
               }
@@ -96,7 +99,7 @@ export function SimpleEditor() {
     if (editor && selectedNovel.firstChapter.content !== editor.getHTML()) {
       editor.commands.setContent(selectedNovel.firstChapter.content);
       if (suggestion) {
-        generateFromSuggestion(suggestion).then((generatedText) => {
+        aiGenerator.generateFromSuggestion(suggestion).then((generatedText) => {
           editor.chain().focus().insertContent(generatedText).run();
         });
       }

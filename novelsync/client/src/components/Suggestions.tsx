@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { generateSuggestions } from "./gemin";
+import { AITextGenerator } from "./gemin";
 import { Book, Feather, Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
@@ -21,6 +21,8 @@ const Suggestions = () => {
   // Destructure the setsuggestion function from the novelsContext
   const { setsuggestion } = novelsContext;
 
+  const aiGenerator = new AITextGenerator();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDesire(e.target.value);
   };
@@ -32,7 +34,7 @@ const Suggestions = () => {
     setSuggestions([]);
 
     try {
-      const newSuggestions = await generateSuggestions(desire);
+      const newSuggestions = await aiGenerator.generateSuggestions(desire);
       setSuggestions(newSuggestions);
       setDesire("");
     } catch (err) {

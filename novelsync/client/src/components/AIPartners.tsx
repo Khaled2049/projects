@@ -1,5 +1,5 @@
 import React from "react";
-import { setAiBuddy } from "./gemin";
+import { AITextGenerator } from "./gemin";
 
 interface Profile {
   id: number;
@@ -36,8 +36,9 @@ const profiles: Profile[] = [
 ];
 
 const AIPartners: React.FC = () => {
+  const aiGenerator = new AITextGenerator();
   const handleAvatarClick = async (profile: Profile) => {
-    setAiBuddy(profile.id);
+    aiGenerator.setAiBuddy(profile.id);
   };
 
   return (
@@ -50,12 +51,12 @@ const AIPartners: React.FC = () => {
             className="flex flex-col items-center w-32 cursor-pointer"
             onClick={() => handleAvatarClick(profile)}
           >
-            <div className="w-24 h-24 rounded-full overflow-hidden mb-2">
-              <img
+            <div className="w-24 h-24 rounded-full bg-red-200 overflow-hidden mb-2">
+              {/* <img
                 src={profile.img}
                 alt={profile.name}
                 className="w-full h-full object-cover"
-              />
+              /> */}
             </div>
             <span className="text-sm font-medium text-center">
               {profile.name}
