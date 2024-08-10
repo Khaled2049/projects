@@ -13,6 +13,7 @@ import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
+import { generateFromSuggestion } from "./gemin";
 
 const limit = 5000;
 
@@ -26,7 +27,8 @@ export function SimpleEditor() {
   if (!novelsContext) {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
-  const { selectedNovel, setSelectedNovel } = novelsContext;
+  const { selectedNovel, setSelectedNovel, suggestion, setsuggestion } =
+    novelsContext;
 
   const LiteralTab = Extension.create({
     name: "literalTab",
@@ -93,6 +95,12 @@ export function SimpleEditor() {
   useEffect(() => {
     if (editor && selectedNovel.firstChapter.content !== editor.getHTML()) {
       editor.commands.setContent(selectedNovel.firstChapter.content);
+      if (suggestion) {
+        generateFromSuggestion(suggestion).then((generatedText) => {
+          editor.chain().focus().insertContent(generatedText).run();
+        });
+      }
+      setsuggestion("");
     }
   }, [selectedNovel.firstChapter.content, editor]);
 

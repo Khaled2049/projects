@@ -47,6 +47,8 @@ interface NovelsContextValue {
   fetchNovelById: (id: string) => void;
   fetchNovelsByUserId: (userId: string) => void;
   userNovels: INovelWithChapters[];
+  suggestion: string;
+  setsuggestion: React.Dispatch<React.SetStateAction<string>>;
   novelLoading: boolean;
   novelError: string | null;
   deleteLoading: boolean;
@@ -96,6 +98,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [fetchNovelByIdError, setFetchNovelByIdError] = useState<string | null>(
     null
   );
+
+  const [suggestion, setsuggestion] = useState("");
 
   const [userNovels, setUserNovels] = useState<INovelWithChapters[]>([]);
   const [userNovelsLoading, setUserNovelsLoading] = useState(true);
@@ -484,7 +488,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     fetchNovelById,
     fetchNovelsByUserId,
     setSelectedNovel,
-
+    suggestion,
+    setsuggestion,
     userNovels,
     novelLoading,
     novelError,

@@ -5,7 +5,7 @@ import NovelsContext from "../contexts/NovelsContext";
 import { useNavigate } from "react-router-dom";
 import { IChapter } from "../types/INovel";
 import DigitalTimer from "./Timer";
-import Suggestions from "./Suggestions";
+import AIPartners from "./AIPartners";
 
 interface ChaptersProps {
   edit?: boolean;
@@ -67,8 +67,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
     } else {
       updatedChapters = [...selectedNovel.chapters, selectedNovel.firstChapter];
     }
-
-    console.log("updatedChapters", updatedChapters);
 
     setSelectedNovel({
       ...selectedNovel,
@@ -140,7 +138,7 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
     <div className="flex flex-col h-screen">
       <div className="w-full text-center p-4">
         <h1 className="text-3xl font-bold text-amber-800">
-          Call your friendly writing partner Jenna by pressing TAB
+          Call the ultimate writing buddy by pressing TAB
         </h1>
       </div>
 
@@ -206,6 +204,9 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
           </div>
 
           {/* Second row: Suggestions */}
+          <div className="h-1/2 p-4">
+            <AIPartners />
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { generateSuggestions } from "./gemin";
 import { Book, Feather, Loader } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import NovelsContext from "../contexts/NovelsContext";
 
 const Suggestions = () => {
   const [desire, setDesire] = useState("");
@@ -8,6 +11,15 @@ const Suggestions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const novelsContext = useContext(NovelsContext);
+  if (!novelsContext) {
+    throw new Error("useNovels must be used within a NovelsProvider");
+  }
+
+  // Destructure the setsuggestion function from the novelsContext
+  const { setsuggestion } = novelsContext;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDesire(e.target.value);
@@ -104,7 +116,9 @@ const Suggestions = () => {
               key={index}
               className="mb-2 sm:mb-3 p-2 sm:p-3 bg-amber-50 rounded-md hover:bg-amber-100 cursor-pointer transition-colors duration-200"
               onClick={() => {
-                console.log("clicked");
+                // setsuggestion in context
+                setsuggestion(suggestion);
+                navigate("/create");
               }}
             >
               <p className="text-xs sm:text-sm text-amber-900 font-serif">
