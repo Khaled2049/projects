@@ -5,7 +5,6 @@ const GenerateImage = () => {
   const [prompt, setprompt] = useState("");
   const [imageData, setImageData] = useState<string | null>(null);
   const handleGenerate = async () => {
-    console.log(prompt);
     try {
       const response = await axiosInstance.post("/generate", { prompt });
       const imageData = response.data.image;

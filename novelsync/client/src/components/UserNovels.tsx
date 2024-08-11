@@ -1,21 +1,19 @@
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaBook, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { INovel } from "../types/INovel";
-import { useContext, useEffect } from "react";
+import { INovelWithChapters } from "../types/INovel";
+import { useContext, useEffect, useState } from "react";
 import NovelsContext from "../contexts/NovelsContext";
 import { AuthUser } from "../types/IUser";
 
 interface UserNovelsProps {
-  novels: INovel[];
   loading: boolean;
   error: string | null;
-  onDelete: (novel: INovel) => void;
+  onDelete: (novel: INovelWithChapters) => void;
   user: AuthUser;
 }
 
 const UserNovels: React.FC<UserNovelsProps> = ({
-  novels,
   loading,
   error,
   onDelete,
@@ -23,6 +21,7 @@ const UserNovels: React.FC<UserNovelsProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  const [showMsg, setShowMsg] = useState(false);
   const novelsContext = useContext(NovelsContext);
 
   if (!novelsContext) {
@@ -38,19 +37,26 @@ const UserNovels: React.FC<UserNovelsProps> = ({
   }, [user]);
 
   const handleEdit = (novelId: string) => {
-    console.log(`Edit novel with id: ${novelId}`);
-    navigate(`/edit/${novelId}`);
+    console.log("Editing is currently disabled");
+    setShowMsg(true);
+    // navigate(`/edit/${novelId}`);
+    setTimeout(() => {
+      setShowMsg(false);
+    }, 2000);
   };
 
   return (
     <>
-      <div className="w-full lg:w-1/4 p-4 border-r">
+      <div className="w-full p-6 bg-amber-200 rounded-lg">
         {user ? (
-          <h2 className="text-xl font-semibold mb-4">Your Work</h2>
+          <h2 className="text-2xl font-serif text-amber-900 mb-6 flex items-center">
+            <FaBook className="mr-2" />
+            Your Work
+          </h2>
         ) : (
-          <h2 className="text-lg mb-4">
+          <h2 className="text-lg mb-6 font-serif text-amber-900">
             <Link
-              className="font-semibold text-blue-500 underline hover:text-blue-700"
+              className="font-semibold text-amber-600 hover:text-amber-700 transition-colors duration-200"
               to="/sign-in"
             >
               Sign in
@@ -59,27 +65,42 @@ const UserNovels: React.FC<UserNovelsProps> = ({
           </h2>
         )}
 
-        {loading && <p>Loading your novels...</p>}
+        {loading && <p className="text-gray-600">Loading your novels...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
 
-        <div className="space-y-4">
+        {userNovels.length === 0 && !loading && (
+          <p className="text-gray-600">Write something first silly!</p>
+        )}
+        <div className="space-y-6 max-h-96 overflow-y-auto">
+          {showMsg && (
+            <p className="text-amber-600 bg-amber-100 p-3 rounded-lg">
+              Editing is currently disabled
+            </p>
+          )}
+
           {userNovels.map((novel) => (
-            <div key={novel.id} className="border p-4 rounded shadow">
-              <h3 className="font-semibold">{novel.title}</h3>
-              <p>Author: {novel.author}</p>
-              <p>
+            <div
+              key={novel.id}
+              className="bg-amber-50 p-4 rounded-lg shadow-sm mb-4"
+            >
+              <h3 className="font-serif text-xl text-amber-900 mb-2">
+                {novel.title}
+              </h3>
+              <p className="text-gray-600 mb-1">By {novel.author}</p>
+              <p className="text-gray-500 text-sm mb-4">
                 Last Updated: {new Date(novel.lastUpdated).toLocaleDateString()}
               </p>
-              <div className="flex space-x-2 mt-2">
+              <div className="flex space-x-3 mt-2">
                 <button
                   onClick={() => handleEdit(novel.id)}
-                  className="flex items-center bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+                  disabled={true}
+                  className="flex items-center text-white px-3 py-2 rounded-full bg-gray-400 cursor-not-allowed"
                 >
                   <FaEdit className="mr-1" /> Edit
                 </button>
                 <button
                   onClick={() => onDelete(novel)}
-                  className="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors"
+                  className="flex items-center bg-red-500 text-white px-3 py-2 rounded-full hover:bg-red-600 transition-colors duration-200"
                 >
                   <FaTrashAlt className="mr-1" /> Delete
                 </button>

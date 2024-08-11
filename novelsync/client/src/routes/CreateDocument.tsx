@@ -1,10 +1,10 @@
-import { SimpleEditor } from "../components/SimpleEditor";
+import Chapters from "../components/Chapters";
 
 const CreateDocument = () => {
   return (
     <>
-      <div className="container mx-auto px-4">
-        <SimpleEditor />
+      <div className="px-4">
+        <Chapters edit={false} />
       </div>
     </>
   );

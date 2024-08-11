@@ -10,13 +10,14 @@ import {
   addDoc,
   setDoc,
   where,
-  DocumentData,
+  doc,
+  deleteDoc,
 } from "firebase/firestore";
 import {
-  INovel,
   UpdateNovelParams,
   CreateNovelParams,
-  ICurrentNovel,
+  INovelWithChapters,
+  IChapter,
 } from "../types/INovel";
 
 import { firestore, storage, auth } from "../config/firebase";
@@ -25,27 +26,29 @@ import {
   deleteObject,
   uploadString,
   getDownloadURL,
+  listAll,
 } from "firebase/storage";
-import { doc, deleteDoc } from "firebase/firestore";
 
 interface NovelsContextValue {
-  novels: INovel[];
-  setNovels: React.Dispatch<React.SetStateAction<INovel[]>>;
+  novels: INovelWithChapters[];
+  setNovels: React.Dispatch<React.SetStateAction<INovelWithChapters[]>>;
   updateNovelById: ({
     id,
     title,
-    newContent,
+    chapters,
   }: UpdateNovelParams) => Promise<boolean>;
-  deleteNovelById: (novel: INovel) => Promise<boolean>;
+  deleteNovelById: (novel: INovelWithChapters) => Promise<boolean>;
   createNovel: ({
     user,
     title,
-    content,
+    chapters,
   }: CreateNovelParams) => Promise<string | null>;
   fetchNovels: (limitCount?: number) => void;
   fetchNovelById: (id: string) => void;
   fetchNovelsByUserId: (userId: string) => void;
-  userNovels: INovel[];
+  userNovels: INovelWithChapters[];
+  suggestion: string;
+  setsuggestion: React.Dispatch<React.SetStateAction<string>>;
   novelLoading: boolean;
   novelError: string | null;
   deleteLoading: boolean;
@@ -54,16 +57,30 @@ interface NovelsContextValue {
   updateError: string | null;
   createLoading: boolean;
   createError: string | null;
-  selectedNovel: DocumentData | null;
+  selectedNovel: INovelWithChapters;
   fetchNovelByIdLoading: boolean;
   fetchNovelByIdError: string | null;
+  setSelectedNovel: React.Dispatch<React.SetStateAction<INovelWithChapters>>;
 }
 
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
-
+const NUMBER_OF_NOVELS_LIMIT = 10;
+const TOTAL_NOVELS_LIMIT = 100;
 const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [novels, setNovels] = useState<INovel[]>([]);
-  const [selectedNovel, setSelectedNovel] = useState<DocumentData | null>(null);
+  const [novels, setNovels] = useState<INovelWithChapters[]>([]);
+  const [selectedNovel, setSelectedNovel] = useState<INovelWithChapters>({
+    id: "",
+    chaptersPath: "",
+    author: "",
+    authorId: "",
+    lastUpdated: "",
+    title: "",
+    chapters: [],
+    firstChapter: {
+      chapterName: "",
+      content: "",
+    },
+  });
 
   const [novelLoading, setNovelLoading] = useState(true);
   const [novelError, setNovelError] = useState<string | null>(null);
@@ -82,12 +99,13 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     null
   );
 
-  const [userNovels, setUserNovels] = useState<INovel[]>([]);
+  const [suggestion, setsuggestion] = useState("");
+
+  const [userNovels, setUserNovels] = useState<INovelWithChapters[]>([]);
   const [userNovelsLoading, setUserNovelsLoading] = useState(true);
   const [userNovelsError, setUserNovelsError] = useState<string | null>(null);
 
   const fetchNovelsByUserId = async (userId: string) => {
-    console.log("fetching novels by user id", userId);
     try {
       const q = query(
         collection(firestore, "novels"),
@@ -95,7 +113,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       );
       const querySnapshot = await getDocs(q);
       const novelsData = querySnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as INovel)
+        (doc) => ({ id: doc.id, ...doc.data() } as INovelWithChapters)
       );
       setUserNovels(novelsData);
     } catch (err) {
@@ -104,27 +122,50 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       setUserNovelsLoading(false);
     }
   };
-
   const fetchNovelById = async (id: string) => {
     try {
       setFetchNovelByIdLoading(true);
       setFetchNovelByIdError(null);
 
+      // Fetch the novel document
       const novelDoc = await getDoc(doc(firestore, "novels", id));
 
       if (!novelDoc.exists()) {
         throw new Error("Novel not found");
       }
 
-      const novelData = novelDoc.data() as ICurrentNovel;
+      const novelData = novelDoc.data();
 
-      // Fetch novel content from Storage
-      const contentRef = ref(storage, novelData.contentPath);
-      const contentURL = await getDownloadURL(contentRef);
-      const contentResponse = await fetch(contentURL);
-      const novelContent = await contentResponse.text();
+      const chaptersPath = `novels/${id}/chapters`;
+      const chaptersRef = ref(storage, chaptersPath);
+      const chapterFolders = await listAll(chaptersRef);
 
-      setSelectedNovel({ novelData, novelContent });
+      const chaptersContent: IChapter[] = [];
+
+      for (const folderRef of chapterFolders.prefixes) {
+        const chapterFiles = await listAll(folderRef);
+        for (const fileRef of chapterFiles.items) {
+          const chapterURL = await getDownloadURL(fileRef);
+          const chapterResponse = await fetch(chapterURL);
+          const chapterContent = await chapterResponse.text();
+          const chapterName = fileRef.name.replace(".txt", "");
+
+          chaptersContent.push({ chapterName, content: chapterContent });
+        }
+      }
+
+      const novelDataWithChapters = {
+        id: id,
+        author: novelData.author,
+        authorId: novelData.authorId,
+        lastUpdated: novelData.lastUpdated,
+        title: novelData.title,
+        chaptersPath: novelData.chaptersPath,
+        chapters: chaptersContent,
+        firstChapter: chaptersContent[0] || { chapterName: "", content: "" },
+      };
+
+      setSelectedNovel(novelDataWithChapters);
     } catch (err) {
       setFetchNovelByIdError((err as Error).message);
     } finally {
@@ -135,13 +176,17 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const updateNovelById = async ({
     id,
     title,
-    newContent,
+    chapters,
   }: UpdateNovelParams) => {
     try {
+      console.log("id: ", id);
+      console.log("title: ", title);
+      console.log("chapters: ", chapters);
       const currentUser = auth.currentUser;
       if (!currentUser) {
         throw new Error("User not authenticated");
       }
+
       const novelRef = doc(firestore, "novels", id);
       const novelDoc = await getDoc(novelRef);
 
@@ -163,17 +208,48 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
         updateData.title = title;
       }
 
-      // Update content if provided
-      if (newContent !== undefined) {
-        // Use the current title if a new one isn't provided
-        const contentFileName = `${title || currentNovel.title}.txt`;
-        const contentRef = ref(storage, `novels/${id}/${contentFileName}`);
+      // Update chapters if provided
+      if (chapters) {
+        for (const [index, chapter] of chapters.entries()) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(chapter.content, "text/html");
+          const images = doc.querySelectorAll("img");
 
-        await uploadString(contentRef, newContent);
-        const contentURL = await getDownloadURL(contentRef);
+          // Upload images and replace URLs
+          for (let img of images) {
+            const imgSrc = img.getAttribute("src");
+            if (imgSrc && imgSrc.startsWith("data:image")) {
+              // It's a base64 image, need to upload
+              const imgRef = ref(
+                storage,
+                `novels/${id}/chapters/${index + 1}/images/${Date.now()}.png`
+              );
+              try {
+                await uploadString(imgRef, imgSrc, "data_url");
+                const newUrl = await getDownloadURL(imgRef);
+                img.setAttribute("src", newUrl);
+              } catch (err) {
+                console.error("Error uploading image:", err);
+                throw new Error("Error uploading image");
+              }
+            }
+          }
 
-        updateData.contentPath = contentRef.fullPath;
-        updateData.contentURL = contentURL;
+          // Get the updated content with new image URLs
+          const updatedContent = doc.body.innerHTML;
+
+          // Save chapter content to Firebase Storage
+          const chapterContentPath = `novels/${id}/chapters/${index + 1}/${
+            chapter.chapterName
+          }.txt`;
+          const storageRef = ref(storage, chapterContentPath);
+          try {
+            await uploadString(storageRef, updatedContent);
+          } catch (err) {
+            console.error("Error uploading chapter content:", err);
+            throw new Error("Error uploading chapter content");
+          }
+        }
       }
 
       // Only proceed with update if there are changes
@@ -204,32 +280,47 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const deleteNovelById = async (novel: INovel) => {
+  const deleteNovelById = async (novel: INovelWithChapters) => {
     try {
-      const contentRef = ref(storage, novel.contentPath);
+      setdeleteLoading(true);
+      setDeleteError(null);
 
-      await deleteObject(contentRef);
+      // Delete all chapters and their content
+      const chaptersRef = ref(storage, `novels/${novel.id}/chapters`);
+      const chaptersListResult = await listAll(chaptersRef);
 
+      // Delete chapter folders
+      for (const chapterFolderRef of chaptersListResult.prefixes) {
+        const chapterContentsResult = await listAll(chapterFolderRef);
+
+        // Delete all files in the chapter folder (content and images)
+        for (const itemRef of chapterContentsResult.items) {
+          await deleteObject(itemRef);
+        }
+      }
+
+      // Delete the Firestore document
       await deleteDoc(doc(firestore, "novels", novel.id));
 
       // Update the state
-      setNovels((prevNovels) =>
-        prevNovels.filter((novel) => novel.id !== novel.id)
-      );
+      setNovels((prevNovels) => prevNovels.filter((n) => n.id !== novel.id));
       setUserNovels((prevNovels) =>
-        prevNovels.filter((novel) => novel.id !== novel.id)
+        prevNovels.filter((n) => n.id !== novel.id)
       );
 
       setdeleteLoading(false);
       return true;
     } catch (err) {
+      console.error("Error deleting novel:", err);
       setDeleteError((err as Error).message);
       setdeleteLoading(false);
       return false;
     }
   };
 
-  const createNovel = async ({ user, title, content }: CreateNovelParams) => {
+  // Each user should be able to only create 10 novels for now.
+  // Only 100 novels in DB for now.
+  const createNovel = async ({ user, title, chapters }: CreateNovelParams) => {
     if (!user) {
       setCreateError("User not authenticated");
       return null;
@@ -238,62 +329,116 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setCreateLoading(true);
     setCreateError(null);
 
-    console.log("Creating novel:", title);
-
     try {
-      // Create a new document in the novels collection
+      // Check the number of existing novels for the user
       const novelsCollection = collection(firestore, "novels");
-      const newNovelRef = await addDoc(novelsCollection, {
-        title,
-        authorId: user.uid,
-        author: user.username,
-        lastUpdated: new Date().toISOString(),
-      });
+      const userNovelsQuery = query(
+        novelsCollection,
+        where("authorId", "==", user.uid)
+      );
 
-      // Parse the content to find images
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(content, "text/html");
-      const images = doc.querySelectorAll("img");
-
-      // Upload images and replace URLs
-      for (let img of images) {
-        const imgSrc = img.getAttribute("src");
-        if (imgSrc && imgSrc.startsWith("data:image")) {
-          // It's a base64 image, need to upload
-          const imgRef = ref(
-            storage,
-            `novels/${newNovelRef.id}/images/${Date.now()}.png`
-          );
-          await uploadString(imgRef, imgSrc, "data_url");
-          const newUrl = await getDownloadURL(imgRef);
-          img.setAttribute("src", newUrl);
-        }
+      const totalNovelsSnapshot = await getDocs(novelsCollection);
+      if (totalNovelsSnapshot.size >= TOTAL_NOVELS_LIMIT) {
+        console.log("here", totalNovelsSnapshot.size);
+        setCreateError("MAX_NOVELS");
+        setCreateLoading(false);
+        return null;
       }
 
-      // Get the updated content with new image URLs
-      const updatedContent = doc.body.innerHTML;
+      const userNovelsSnapshot = await getDocs(userNovelsQuery);
 
-      console.log("Updated content:", updatedContent);
+      if (userNovelsSnapshot.size >= NUMBER_OF_NOVELS_LIMIT) {
+        setCreateError("LIMIT_ERR");
+        setCreateLoading(false);
+        return null;
+      }
 
-      // Save content to Firebase Storage
-      const storageRef = ref(storage, `novels/${newNovelRef.id}/${title}.txt`);
-      await uploadString(storageRef, updatedContent);
+      // Create a new document in the novels collection
+      const newNovelRef = await addDoc(novelsCollection, {
+        author: user.username || "Unknown Author",
+        authorId: user.uid,
+        lastUpdated: new Date().toISOString(),
+        title,
+      });
 
-      await setDoc(
-        newNovelRef,
-        { contentPath: storageRef.fullPath },
-        { merge: true }
-      );
+      // Process each chapter
+      const chapterRefs: IChapter[] = [];
+      for (const [index, chapter] of chapters.entries()) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(chapter.content, "text/html");
+        const images = doc.querySelectorAll("img");
+
+        // Upload images and replace URLs
+        for (let img of images) {
+          const imgSrc = img.getAttribute("src");
+          if (imgSrc && imgSrc.startsWith("data:image")) {
+            // It's a base64 image, need to upload
+            const imgRef = ref(
+              storage,
+              `novels/${newNovelRef.id}/chapters/${
+                index + 1
+              }/images/${Date.now()}.png`
+            );
+            try {
+              await uploadString(imgRef, imgSrc, "data_url");
+              const newUrl = await getDownloadURL(imgRef);
+              img.setAttribute("src", newUrl);
+            } catch (err) {
+              console.error("Error uploading image:", err);
+              setCreateError("Error uploading image");
+              setCreateLoading(false);
+              return null;
+            }
+          }
+        }
+
+        // Get the updated content with new image URLs
+        const updatedContent = doc.body.innerHTML;
+
+        // Save chapter content to Firebase Storage
+        const chapterContentPath = `novels/${newNovelRef.id}/chapters/${
+          index + 1
+        }/${chapter.chapterName}.txt`;
+        const storageRef = ref(storage, chapterContentPath);
+        try {
+          await uploadString(storageRef, updatedContent);
+        } catch (err) {
+          console.error("Error uploading chapter content:", err);
+          setCreateError("Error uploading chapter content");
+          setCreateLoading(false);
+          return null;
+        }
+
+        // Add the chapter reference to the array
+        chapterRefs.push({
+          chapterName: chapter.chapterName,
+          content: updatedContent,
+        });
+      }
+
+      // Update the novel document with chapters collection reference
+      try {
+        await setDoc(
+          newNovelRef,
+          { chaptersPath: `novels/${newNovelRef.id}/chapters` },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Error updating novel document:", err);
+      }
 
       // Update the state
       setNovels((prevNovels) => [
         {
           id: newNovelRef.id,
           title,
-          authorId: user.uid!,
-          author: user.username!,
+          authorId: user.uid,
+          author: user.username || "Unknown Author",
           lastUpdated: new Date().toISOString(),
-          contentPath: storageRef.fullPath,
+          contentPath: `novels/${newNovelRef.id}`,
+          chapters: chapterRefs,
+          chaptersPath: `novels/${newNovelRef.id}/chapters`,
+          firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
         },
         ...prevNovels,
       ]);
@@ -301,6 +446,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       setCreateLoading(false);
       return newNovelRef.id;
     } catch (err) {
+      console.error("Error creating novel:", err);
       setCreateError((err as Error).message);
       setCreateLoading(false);
       return null;
@@ -321,7 +467,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
           ({
             id: doc.id,
             ...doc.data(),
-          } as INovel)
+          } as INovelWithChapters)
       );
 
       setNovels(fetchedNovels);
@@ -341,6 +487,9 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     fetchNovels,
     fetchNovelById,
     fetchNovelsByUserId,
+    setSelectedNovel,
+    suggestion,
+    setsuggestion,
     userNovels,
     novelLoading,
     novelError,

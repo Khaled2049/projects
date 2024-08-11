@@ -55,7 +55,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   const saveLink = useCallback(async () => {
     // Generate image if a prompt is provided
     if (genImage) {
-      console.log("genImage before calling func", genImage);
       await generateImage(genImage);
     }
 
@@ -69,7 +68,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   }, [editor, closeModal]);
 
   return (
-    <div className="flex flex-wrap gap-2 mb-4 p-2 bg-gray-100 rounded-lg">
+    <div className="flex flex-wrap gap-2 p-2 bg-amber-600 rounded-lg w-full text-center justify-center">
       <button
         className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         onClick={() => editor.chain().focus().undo().run()}
@@ -103,7 +102,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
       </button>
       <button
         className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
-          editor.isActive("underline") ? "bg-gray-300" : ""
+          editor.isActive("italic") ? "bg-gray-300" : ""
         }`}
         onClick={toggleItalic}
       >
@@ -118,6 +117,25 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
         {isLoading ? <h1>Loading...</h1> : <RiAiGenerate />}
       </button>
 
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+          editor.isActive("heading", { level: 1 }) ? "bg-gray-300 " : ""
+        }`}
+      >
+        H1
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+          editor.isActive("heading", { level: 2 }) ? "bg-gray-300 " : ""
+        }`}
+      >
+        H2
+      </button>
+      <div className="flex items-center justify-center h-12 p-2 rounded-md">
+        {editor.storage.characterCount.words()} words
+      </div>
       <LinkModal
         url={genImage}
         isOpen={modalIsOpen}

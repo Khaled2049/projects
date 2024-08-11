@@ -14,6 +14,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
 import { NovelsProvider } from "./contexts/NovelsContext";
+import BookClub from "./routes/BookClub";
+import { AIProvider } from "./contexts/AIContext";
 
 const router = createBrowserRouter([
   {
@@ -21,8 +23,12 @@ const router = createBrowserRouter([
     element: <NavbarWrapper />,
     children: [
       {
-        path: "/home",
+        path: "/",
         element: <Root />,
+      },
+      {
+        path: "/clubs",
+        element: <BookClub />,
       },
       {
         path: "/sign-in",
@@ -38,11 +44,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/edit/:id",
-        element: (
-          <ProtectedEditRoute>
-            <Edit />
-          </ProtectedEditRoute>
-        ),
+        element: <Edit />,
       },
       {
         path: "/novel/:id",
@@ -55,7 +57,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
       <NovelsProvider>
-        <RouterProvider router={router} />
+        <AIProvider>
+          <RouterProvider router={router} />
+        </AIProvider>
       </NovelsProvider>
     </AuthProvider>
   </React.StrictMode>
