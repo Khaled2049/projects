@@ -7,7 +7,7 @@ import {
   Signup,
   CreateDocument,
   NovelDetail,
-  Edit,
+  // Edit,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -41,10 +41,10 @@ const router = createBrowserRouter([
         path: "/create",
         element: <CreateDocument />,
       },
-      {
-        path: "/edit/:id",
-        element: <Edit />,
-      },
+      // {
+      //   path: "/edit/:id",
+      //   element: <Edit />,
+      // },
       {
         path: "/novel/:id",
         element: <NovelDetail />, // Add the route for the novel detail

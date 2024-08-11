@@ -36,14 +36,14 @@ const Signin: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-gray-700">Sign In</h2>
+    <div className="flex items-center justify-center min-h-screen bg-amber-50">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border border-amber-200">
+        <h2 className="text-3xl font-serif text-amber-900 mb-6">Sign In</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-600"
+              className="block text-sm font-medium text-amber-800"
             >
               Email
             </label>
@@ -54,13 +54,13 @@ const Signin: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-amber-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
             />
           </div>
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-600"
+              className="block text-sm font-medium text-amber-800"
             >
               Password
             </label>
@@ -71,21 +71,21 @@ const Signin: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-amber-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
             />
           </div>
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            className={`w-full bg-amber-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
               isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {isLoading ? "Signing In..." : "Sign In"}
           </button>
           <div className="text-center mt-4">
-            <Link to="/sign-up" className="text-blue-600 hover:text-blue-800">
+            <Link to="/sign-up" className="text-amber-600 hover:text-amber-800">
               Create an account
             </Link>
           </div>

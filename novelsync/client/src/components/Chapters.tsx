@@ -121,11 +121,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   };
 
   const handleUpdate = async () => {
-    console.log("Updating", {
-      user,
-      selectedNovel,
-    });
-
     await updateNovelById({
       id: selectedNovel.id,
       title: selectedNovel.title,
