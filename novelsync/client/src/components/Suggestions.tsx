@@ -56,19 +56,14 @@ const Suggestions = () => {
   }, [suggestions]);
 
   return (
-    <div className="bg-amber-50 rounded-lg shadow-lg border border-amber-200 overflow-hidden">
+    <div className="max-w-md bg-amber-50 rounded-lg shadow-lg border border-amber-200 overflow-hidden">
       <div className="p-4 sm:p-6">
-        <div className="flex items-center mb-4 sm:mb-6">
-          <Book className="text-amber-700 mr-2 flex-shrink-0" size={24} />
-          <h2 className="text-xl sm:text-2xl font-serif font-bold text-amber-900 truncate">
-            Novel Idea Generator
-          </h2>
-        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <label
             htmlFor="desire"
-            className="block text-base sm:text-lg font-serif font-semibold text-amber-800"
+            className="text-base sm:text-lg font-serif font-semibold text-amber-800 flex items-center"
           >
+            <Book className="text-amber-700 mr-2 flex-shrink-0" size={24} />
             What kind of idea are you looking for?
           </label>
           <div className="relative">
