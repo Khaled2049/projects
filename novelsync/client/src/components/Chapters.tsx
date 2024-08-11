@@ -108,7 +108,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
         title: selectedNovel.title,
         chapters: selectedNovel.chapters,
       });
-      console.log("createError", createError);
       if (err == "LIMIT_ERR") {
         alert(
           "You have reached the maximum limit of 10 novels (cuz we still testin)"

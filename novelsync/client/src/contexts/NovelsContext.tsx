@@ -326,7 +326,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     TOXICITY: number;
   }
   const analyzeText = async (text: string): Promise<AttributeScores> => {
-    console.log("Calling analyzeText", text);
     try {
       const commentsCollection = collection(firestore, "comments");
       const docRef = await addDoc(commentsCollection, {
@@ -340,8 +339,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
       while (!attributeScores && attempts < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, delayMs));
-
-        console.log("Attempt", attempts);
 
         const docSnapshot = await getDoc(doc(firestore, "comments", docRef.id));
         const data = docSnapshot.data();
@@ -506,20 +503,22 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       }
 
       // Update the state
-      setNovels((prevNovels) => [
-        {
-          id: newNovelRef.id,
-          title,
-          authorId: user.uid,
-          author: user.username || "Unknown Author",
-          lastUpdated: new Date().toISOString(),
-          contentPath: `novels/${newNovelRef.id}`,
-          chapters: chapterRefs,
-          chaptersPath: `novels/${newNovelRef.id}/chapters`,
-          firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
-        },
-        ...prevNovels,
-      ]);
+      if (user) {
+        setNovels((prevNovels) => [
+          {
+            id: newNovelRef.id,
+            title,
+            authorId: user.uid,
+            author: user.username || "Unknown Author",
+            lastUpdated: new Date().toISOString(),
+            contentPath: `novels/${newNovelRef.id}`,
+            chapters: chapterRefs,
+            chaptersPath: `novels/${newNovelRef.id}/chapters`,
+            firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
+          },
+          ...prevNovels,
+        ]);
+      }
 
       setCreateLoading(false);
       return newNovelRef.id;
