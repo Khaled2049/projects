@@ -28,14 +28,14 @@ const Navbar = () => {
           <Link to="/">Novel Sync</Link>
         </div>
         <div className="flex space-x-4">
-          {user && (
+          {/* {user && (
             <button
               onClick={handleJoinBookClub}
               className="bg-amber-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             >
               Join a BookClub
             </button>
-          )}
+          )} */}
           {user ? (
             <button
               onClick={handleSignOut}

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { IChapter } from "../types/INovel";
 import DigitalTimer from "./Timer";
 import AIPartners from "./AIPartners";
+import { useAI } from "../contexts/AIContext";
 
 interface ChaptersProps {
   edit?: boolean;
@@ -38,6 +39,7 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   if (!novelsContext) {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
+
   const {
     createNovel,
     selectedNovel,
@@ -46,12 +48,14 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
     createError,
   } = novelsContext;
 
+  const { selectedAI } = useAI();
+
   const handleAddChapter = () => {
     let updatedChapters;
 
     if (selectedNovel.chapters.length === 5) {
       alert(
-        "You can only have 5 chapters for now, sorry DUDE, I'm working on it"
+        "You can only have 5 chapters for now, sorry mr. pro, I'm working on it"
       );
       return;
     }
@@ -137,8 +141,9 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   return (
     <div className="flex flex-col h-screen">
       <div className="w-full text-center p-4">
-        <h1 className="text-3xl font-bold text-amber-800">
-          Call the ultimate writing buddy by pressing TAB
+        <h1 className="text-3xl font-bold text-slate-800 italic">
+          Summon your ultimate writing muse by pressing{" "}
+          <span className="underline decoration-wavy text-blue-600">TAB</span>
         </h1>
       </div>
 

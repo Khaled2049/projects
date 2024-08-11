@@ -1,44 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import { profiles } from "../profiles";
+import { useAI } from "../contexts/AIContext";
 import { AITextGenerator } from "./gemin";
 
-interface Profile {
-  id: number;
-  name: string;
-  desc: string;
-  img: string;
-}
-
-const profiles: Profile[] = [
-  {
-    id: 0,
-    name: "Pappu",
-    desc: "He a dawg",
-    img: "https://avatar.iran.liara.run/public/37",
-  },
-  {
-    id: 1,
-    name: "Sokina",
-    desc: "She be flirtatious",
-    img: "https://avatar.iran.liara.run/public/64",
-  },
-  {
-    id: 2,
-    name: "Ali",
-    desc: "He kinda sad",
-    img: "https://avatar.iran.liara.run/public/45",
-  },
-  {
-    id: 3,
-    name: "Rumana",
-    desc: "She aight",
-    img: "https://avatar.iran.liara.run/public/57",
-  },
-];
-
 const AIPartners: React.FC = () => {
-  const aiGenerator = new AITextGenerator();
-  const handleAvatarClick = async (profile: Profile) => {
-    aiGenerator.setAiBuddy(profile.id);
+  const { setSelectedAI } = useAI();
+  const [selectedProfileId, setSelectedProfileId] = useState<number>(0);
+
+  const handleClick = (profile: any) => {
+    const aiGenerator = new AITextGenerator(profile.id);
+    setSelectedAI(aiGenerator);
+    setSelectedProfileId(profile.id);
   };
 
   return (
@@ -48,15 +20,15 @@ const AIPartners: React.FC = () => {
         {profiles.map((profile) => (
           <div
             key={profile.id}
-            className="flex flex-col items-center w-32 cursor-pointer"
-            onClick={() => handleAvatarClick(profile)}
+            className={`flex flex-col items-center w-32 cursor-pointer p-2 rounded-lg transition-transform transform hover:scale-105 ${
+              selectedProfileId === profile.id
+                ? "bg-amber-300 border-2 border-amber-500"
+                : "bg-white border border-gray-300"
+            }`}
+            onClick={() => handleClick(profile)}
           >
             <div className="w-24 h-24 rounded-full bg-red-200 overflow-hidden mb-2">
-              {/* <img
-                src={profile.img}
-                alt={profile.name}
-                className="w-full h-full object-cover"
-              /> */}
+              <img src={profile.img} alt={profile.name} />
             </div>
             <span className="text-sm font-medium text-center">
               {profile.name}

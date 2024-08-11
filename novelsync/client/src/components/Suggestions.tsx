@@ -21,7 +21,7 @@ const Suggestions = () => {
   // Destructure the setsuggestion function from the novelsContext
   const { setsuggestion } = novelsContext;
 
-  const aiGenerator = new AITextGenerator();
+  const aiGenerator = new AITextGenerator(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDesire(e.target.value);

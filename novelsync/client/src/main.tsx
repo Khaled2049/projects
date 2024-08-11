@@ -15,6 +15,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
 import { NovelsProvider } from "./contexts/NovelsContext";
 import BookClub from "./routes/BookClub";
+import { AIProvider } from "./contexts/AIContext";
 
 const router = createBrowserRouter([
   {
@@ -56,7 +57,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
       <NovelsProvider>
-        <RouterProvider router={router} />
+        <AIProvider>
+          <RouterProvider router={router} />
+        </AIProvider>
       </NovelsProvider>
     </AuthProvider>
   </React.StrictMode>

@@ -1,5 +1,5 @@
 import "./style.css";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useMemo, useRef } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -20,19 +20,25 @@ const limit = 5000;
 // Custom
 import EditorHeader from "./EditorHeader";
 import NovelsContext from "../contexts/NovelsContext";
+import { useAI } from "../contexts/AIContext";
 
 export function SimpleEditor() {
   const novelsContext = useContext(NovelsContext);
   if (!novelsContext) {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
+
   const { selectedNovel, setSelectedNovel, suggestion, setsuggestion } =
     novelsContext;
 
-  const aiGenerator = new AITextGenerator();
+  const { selectedAI } = useAI();
+  const aiGeneratorRef = useRef<AITextGenerator | null>(null);
+
+  const aiGenerator = new AITextGenerator(selectedAI?.id || 0);
 
   const LiteralTab = Extension.create({
     name: "literalTab",
+
     addKeyboardShortcuts() {
       return {
         Tab: () => {
@@ -40,15 +46,23 @@ export function SimpleEditor() {
           const currentContent = editor.getText();
 
           (async () => {
-            try {
-              const generatedText = await aiGenerator.generateLine(
-                currentContent
-              );
+            if (aiGeneratorRef.current) {
+              let aitest = aiGeneratorRef.current;
+              const generatedText = await aitest.generateLine(currentContent);
               if (generatedText) {
                 editor.chain().focus().insertContent(generatedText).run();
               }
-            } catch (error) {
-              console.error("Error generating line:", error);
+            } else {
+              try {
+                const generatedText = await aiGenerator.generateLine(
+                  currentContent
+                );
+                if (generatedText) {
+                  editor.chain().focus().insertContent(generatedText).run();
+                }
+              } catch (error) {
+                console.error("Error generating line:", error);
+              }
             }
           })();
 
@@ -96,6 +110,13 @@ export function SimpleEditor() {
   }) as Editor;
 
   useEffect(() => {
+    console.log("selectedAI", selectedAI);
+    if (selectedAI) {
+      aiGeneratorRef.current = selectedAI;
+    }
+  }, [selectedAI]);
+
+  useEffect(() => {
     if (editor && selectedNovel.firstChapter.content !== editor.getHTML()) {
       editor.commands.setContent(selectedNovel.firstChapter.content);
       if (suggestion) {
@@ -110,7 +131,7 @@ export function SimpleEditor() {
   return (
     <div>
       <div className="flex flex-col items-center bg-amber-50 rounded-lg shadow-lg max-h-[46rem] overflow-y-auto p-4 border border-amber-200">
-        <div className="max-w-4xl mx-auto p-8 bg-amber-50 rounded-lg">
+        <div className="w-[55rem] mx-auto p-2 bg-amber-50 rounded-lg">
           <input
             type="text"
             value={selectedNovel.title}
@@ -138,9 +159,10 @@ export function SimpleEditor() {
             placeholder="Chapter"
             className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 bg-amber-50 focus:border-blue-500 transition-colors"
           />
-          <div className="min-h-[24rem] max-w-none bg-amber-50">
+          <div className="min-h-[24rem] w-full flex bg-amber-50 justify-center">
             <EditorContent
-              className="prose max-w-100 focus:outline-none bg-amber-50 selection:bg-blue-100"
+              onClick={() => editor?.commands.focus()}
+              className="w-full focus:outline-none bg-amber-50 selection:bg-blue-100"
               editor={editor}
             />
           </div>

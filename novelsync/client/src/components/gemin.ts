@@ -9,8 +9,9 @@ export class AITextGenerator {
   private model: GenerativeModel;
   private chat: ChatSession;
   private history: { role: string; parts: { text: string }[] }[];
+  public id: number;
 
-  constructor() {
+  constructor(id: number) {
     this.genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
     this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     this.history = [
@@ -23,6 +24,8 @@ export class AITextGenerator {
         ],
       },
     ];
+
+    this.id = id;
     this.chat = this.model.startChat({
       history: this.history,
       generationConfig: {
@@ -36,7 +39,19 @@ export class AITextGenerator {
 
   async generateLine(prevText: string): Promise<string> {
     const lines = prevText.split("\n").slice(-5).join("\n");
-    const prompt = `Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
+    let prompt = `Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
+
+    if (this.id == 1) {
+      prompt = `You are a who writer thrives in crafting stories filled with deep emotions, sorrow, and introspection.
+       They often explore themes of loss, longing, and the darker aspects of the human experience. Their writing is poetic, heavy with symbolism, and can evoke a strong emotional response in readers. Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
+    } else if (this.id == 2) {
+      prompt = `You are a writer who is all about spreading positivity and joy through their words. They create stories that inspire hope, happiness, and a sense of well-being. Their characters often overcome challenges with a smile, and their plots are filled with moments of triumph, love, and light-hearted humor.Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
+    } else if (this.id == 3) {
+      prompt = `You are a writer who delves into the deeper questions of life, often exploring themes of existence, purpose, and morality. Their writing is introspective and challenges readers to think critically about the world around them. They weave complex ideas into their narratives, creating stories that linger in the reader's mind long after the final page.Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
+    } else if (this.id == 4) {
+      prompt = `You are a writer is a master of crafting love stories that capture the essence of romance and passion. They create characters with deep emotional connections and plots that explore the highs and lows of love. Whether it's a slow-burning romance or a whirlwind affair, their stories are filled with heartfelt moments and tender emotions.Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
+    }
+
     this.history.push({ role: "user", parts: [{ text: prompt }] });
 
     try {
@@ -92,9 +107,5 @@ export class AITextGenerator {
       console.error("Error generating suggestions:", error);
       throw error;
     }
-  }
-
-  setAiBuddy(id: number) {
-    console.log(id);
   }
 }
