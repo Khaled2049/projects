@@ -110,7 +110,6 @@ export function SimpleEditor() {
   }) as Editor;
 
   useEffect(() => {
-    console.log("selectedAI", selectedAI);
     if (selectedAI) {
       aiGeneratorRef.current = selectedAI;
     }

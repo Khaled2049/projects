@@ -3,7 +3,7 @@ import * as Icons from "./Icons";
 import { Editor } from "@tiptap/react";
 import { LinkModal } from "./LinkModal";
 import axiosInstance from "../api";
-import { RiAiGenerate } from "react-icons/ri";
+// import { RiAiGenerate } from "react-icons/ri";
 interface EditorHeaderProps {
   editor: Editor;
 }
@@ -11,7 +11,7 @@ interface EditorHeaderProps {
 const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [genImage, setGenImage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
 
   const generateImage = async (prompt: string) => {
     setIsLoading(true);
@@ -43,9 +43,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
     editor.chain().focus().toggleItalic().run();
   }, [editor]);
 
-  const openModal = useCallback(() => {
-    setIsOpen(true);
-  }, [editor]);
+  // const openModal = useCallback(() => {
+  //   setIsOpen(true);
+  // }, [editor]);
 
   const closeModal = useCallback(() => {
     setIsOpen(false);
@@ -104,13 +104,13 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
         <Icons.Italic />
       </button>
 
-      <button
+      {/* <button
         onClick={openModal}
         className="p-2 rounded-md hover:bg-gray-200 transition-colors relative"
         disabled={isLoading}
       >
         {isLoading ? <h1>Loading...</h1> : <RiAiGenerate />}
-      </button>
+      </button> */}
 
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}

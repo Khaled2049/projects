@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { IChapter } from "../types/INovel";
 import DigitalTimer from "./Timer";
 import AIPartners from "./AIPartners";
+import { Loader } from "lucide-react";
 
 interface ChaptersProps {
   edit?: boolean;
@@ -40,11 +41,11 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   }
 
   const {
+    createLoading,
     createNovel,
     selectedNovel,
     updateNovelById,
     setSelectedNovel,
-    createError,
   } = novelsContext;
 
   const handleAddChapter = () => {
@@ -101,23 +102,29 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
       return;
     }
     if (selectedNovel.chapters.length > 0 && selectedNovel.title !== "") {
-      await createNovel({
+      const err = await createNovel({
         user,
         title: selectedNovel.title,
         chapters: selectedNovel.chapters,
       });
+      if (err == "LIMIT_ERR") {
+        alert(
+          "You have reached the maximum limit of 10 novels (cuz we still testin)"
+        );
+      } else if (err == "MAX_NOVELS") {
+        alert(
+          "Wow didn't think this would be this popular max number of novels reached for now(cuz we still testin)"
+        );
+      } else if (err == "TOXIC_TITLE") {
+        alert("Why are you like this? Please use a non-toxic title");
+        setSelectedNovel({
+          ...selectedNovel,
+          title: "",
+        });
+      } else {
+        navigate("/");
+      }
     }
-
-    if (createError == "LIMIT_ERR") {
-      alert(
-        "You have reached the maximum limit of 10 novels (cuz we still testin)"
-      );
-    } else if (createError == "MAX_NOVELS") {
-      alert(
-        "Wow didn't think this would be this popular max number of novels reached for now(cuz we still testin)"
-      );
-    }
-    navigate("/");
   };
 
   const handleUpdate = async () => {
@@ -131,7 +138,18 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="relative flex flex-col h-screen">
+      {createLoading && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-4">
+            <Loader className="animate-spin" size={24} />
+            <span className="text-lg font-semibold">
+              Publishing... but first Imma check some stuff so chill...
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full text-center p-4">
         <h1 className="text-3xl font-bold text-slate-800 italic">
           Summon your ultimate writing muse by pressing{" "}

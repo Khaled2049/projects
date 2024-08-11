@@ -317,6 +317,79 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   // Each user should be able to only create 10 novels for now.
   // Only 100 novels in DB for now.
+  interface AttributeScores {
+    IDENTITY_ATTACK: number;
+    INSULT: number;
+    PROFANITY: number;
+    SEVERE_TOXICITY: number;
+    THREAT: number;
+    TOXICITY: number;
+  }
+  const analyzeText = async (text: string): Promise<AttributeScores> => {
+    try {
+      const commentsCollection = collection(firestore, "comments");
+      const docRef = await addDoc(commentsCollection, {
+        text: text,
+      });
+
+      let attributeScores: AttributeScores | null = null;
+      let attempts = 0;
+      const maxAttempts = 2;
+      const delayMs = 3000;
+
+      while (!attributeScores && attempts < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+        const docSnapshot = await getDoc(doc(firestore, "comments", docRef.id));
+        const data = docSnapshot.data();
+
+        if (data && data.attribute_scores) {
+          attributeScores = data.attribute_scores as AttributeScores;
+        }
+
+        attempts++;
+      }
+
+      if (!attributeScores) {
+        throw new Error(
+          "Timeout: attribute_scores not available after maximum attempts"
+        );
+      }
+
+      return attributeScores;
+    } catch (error) {
+      console.error("Error analyzing text: ", error);
+      throw error;
+    }
+  };
+
+  const isToxic = (scores: AttributeScores): boolean => {
+    const toxicThreshold = 0.9;
+    const toxicAttributes = [
+      "IDENTITY_ATTACK",
+      "INSULT",
+      "PROFANITY",
+      "SEVERE_TOXICITY",
+      "THREAT",
+      "TOXICITY",
+    ] as const;
+
+    for (const attribute of toxicAttributes) {
+      if (scores[attribute] > toxicThreshold) {
+        console.log(
+          "Since",
+          attribute,
+          " is ",
+          scores[attribute],
+          "returning true"
+        );
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   const createNovel = async ({ user, title, chapters }: CreateNovelParams) => {
     if (!user) {
       setCreateError("User not authenticated");
@@ -338,7 +411,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       if (totalNovelsSnapshot.size >= TOTAL_NOVELS_LIMIT) {
         setCreateError("MAX_NOVELS");
         setCreateLoading(false);
-        return null;
+        return "MAX_NOVELS";
       }
 
       const userNovelsSnapshot = await getDocs(userNovelsQuery);
@@ -346,7 +419,14 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       if (userNovelsSnapshot.size >= NUMBER_OF_NOVELS_LIMIT) {
         setCreateError("LIMIT_ERR");
         setCreateLoading(false);
-        return null;
+        return "LIMIT_ERR";
+      }
+
+      const scores = await analyzeText(title);
+      if (isToxic(scores)) {
+        setCreateError("TOXIC_TITLE");
+        setCreateLoading(false);
+        return "TOXIC_TITLE";
       }
 
       // Create a new document in the novels collection
@@ -382,7 +462,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
             } catch (err) {
               console.error("Error uploading image:", err);
               setCreateError("Error uploading image");
-              setCreateLoading(false);
               return null;
             }
           }
@@ -424,20 +503,22 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
       }
 
       // Update the state
-      setNovels((prevNovels) => [
-        {
-          id: newNovelRef.id,
-          title,
-          authorId: user.uid,
-          author: user.username || "Unknown Author",
-          lastUpdated: new Date().toISOString(),
-          contentPath: `novels/${newNovelRef.id}`,
-          chapters: chapterRefs,
-          chaptersPath: `novels/${newNovelRef.id}/chapters`,
-          firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
-        },
-        ...prevNovels,
-      ]);
+      if (user) {
+        setNovels((prevNovels) => [
+          {
+            id: newNovelRef.id,
+            title,
+            authorId: user.uid,
+            author: user.username || "Unknown Author",
+            lastUpdated: new Date().toISOString(),
+            contentPath: `novels/${newNovelRef.id}`,
+            chapters: chapterRefs,
+            chaptersPath: `novels/${newNovelRef.id}/chapters`,
+            firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
+          },
+          ...prevNovels,
+        ]);
+      }
 
       setCreateLoading(false);
       return newNovelRef.id;
