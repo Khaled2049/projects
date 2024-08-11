@@ -42,6 +42,7 @@ const Signup: React.FC = () => {
               Username
             </label>
             <input
+              maxLength={20}
               type="text"
               id="userName"
               name="userName"
@@ -59,6 +60,7 @@ const Signup: React.FC = () => {
               Email
             </label>
             <input
+              maxLength={50}
               type="email"
               id="email"
               name="email"
@@ -77,6 +79,7 @@ const Signup: React.FC = () => {
               Password
             </label>
             <input
+              maxLength={20}
               type="password"
               id="password"
               name="password"
