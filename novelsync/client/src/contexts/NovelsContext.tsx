@@ -179,9 +179,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     chapters,
   }: UpdateNovelParams) => {
     try {
-      console.log("id: ", id);
-      console.log("title: ", title);
-      console.log("chapters: ", chapters);
       const currentUser = auth.currentUser;
       if (!currentUser) {
         throw new Error("User not authenticated");
@@ -339,7 +336,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
       const totalNovelsSnapshot = await getDocs(novelsCollection);
       if (totalNovelsSnapshot.size >= TOTAL_NOVELS_LIMIT) {
-        console.log("here", totalNovelsSnapshot.size);
         setCreateError("MAX_NOVELS");
         setCreateLoading(false);
         return null;
