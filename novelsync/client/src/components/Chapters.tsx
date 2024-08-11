@@ -46,7 +46,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
     selectedNovel,
     updateNovelById,
     setSelectedNovel,
-    createError,
   } = novelsContext;
 
   const handleAddChapter = () => {
