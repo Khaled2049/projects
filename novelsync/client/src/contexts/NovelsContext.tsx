@@ -102,8 +102,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [suggestion, setsuggestion] = useState("");
 
   const [userNovels, setUserNovels] = useState<INovelWithChapters[]>([]);
-  const [userNovelsLoading, setUserNovelsLoading] = useState(true);
-  const [userNovelsError, setUserNovelsError] = useState<string | null>(null);
+  const [_userNovelsLoading, setUserNovelsLoading] = useState(true);
+  const [_userNovelsError, setUserNovelsError] = useState<string | null>(null);
 
   const fetchNovelsByUserId = async (userId: string) => {
     try {

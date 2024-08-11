@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { IChapter } from "../types/INovel";
 import DigitalTimer from "./Timer";
 import AIPartners from "./AIPartners";
-import { useAI } from "../contexts/AIContext";
 
 interface ChaptersProps {
   edit?: boolean;
@@ -47,8 +46,6 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
     setSelectedNovel,
     createError,
   } = novelsContext;
-
-  const { selectedAI } = useAI();
 
   const handleAddChapter = () => {
     let updatedChapters;

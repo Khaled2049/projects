@@ -1,4 +1,3 @@
-import React from "react";
 import ReactModal from "react-modal";
 import * as Icons from "./Icons";
 import { Modal } from "./Modal";
@@ -8,12 +7,10 @@ interface IProps extends ReactModal.Props {
   closeModal: () => void;
   onChangeUrl: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSaveLink: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onRemoveLink: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export function LinkModal(props: IProps) {
-  const { url, closeModal, onChangeUrl, onSaveLink, onRemoveLink, ...rest } =
-    props;
+  const { url, closeModal, onChangeUrl, onSaveLink, ...rest } = props;
   return (
     <Modal {...rest}>
       <div className="relative p-6 bg-white rounded-lg shadow-xl">
@@ -32,13 +29,6 @@ export function LinkModal(props: IProps) {
           onChange={onChangeUrl}
         />
         <div className="flex justify-end space-x-2">
-          <button
-            className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 bg-red-100 hover:bg-red-200 rounded-md transition duration-150 ease-in-out"
-            type="button"
-            onClick={onRemoveLink}
-          >
-            Remove
-          </button>
           <button
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-150 ease-in-out"
             type="button"

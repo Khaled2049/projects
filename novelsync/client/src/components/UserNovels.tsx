@@ -1,5 +1,5 @@
 import { FaBook, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { INovelWithChapters } from "../types/INovel";
 import { useContext, useEffect, useState } from "react";
@@ -19,7 +19,7 @@ const UserNovels: React.FC<UserNovelsProps> = ({
   onDelete,
   user,
 }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [showMsg, setShowMsg] = useState(false);
   const novelsContext = useContext(NovelsContext);
@@ -37,6 +37,7 @@ const UserNovels: React.FC<UserNovelsProps> = ({
   }, [user]);
 
   const handleEdit = (novelId: string) => {
+    console.log("novelId", novelId);
     console.log("Editing is currently disabled");
     setShowMsg(true);
     // navigate(`/edit/${novelId}`);

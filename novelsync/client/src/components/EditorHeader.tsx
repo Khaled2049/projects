@@ -62,11 +62,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
     closeModal();
   }, [editor, genImage, closeModal]);
 
-  const removeLink = useCallback(() => {
-    editor.chain().focus().extendMarkRange("link").unsetLink().run();
-    closeModal();
-  }, [editor, closeModal]);
-
   return (
     <div className="flex flex-wrap gap-2 p-2 bg-amber-600 rounded-lg w-full text-center justify-center">
       <button
@@ -144,7 +139,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
         closeModal={closeModal}
         onChangeUrl={(e) => setGenImage(e.target.value)}
         onSaveLink={saveLink}
-        onRemoveLink={removeLink}
       />
     </div>
   );

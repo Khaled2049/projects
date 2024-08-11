@@ -1,4 +1,3 @@
-import React from "react";
 import { FaEnvelope, FaGithub } from "react-icons/fa";
 
 const Footer: React.FC = () => {

@@ -7,7 +7,6 @@ import {
   Signup,
   CreateDocument,
   NovelDetail,
-  ProtectedEditRoute,
   Edit,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";

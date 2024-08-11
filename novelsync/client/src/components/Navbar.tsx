@@ -17,9 +17,9 @@ const Navbar = () => {
     navigate("/sign-in");
   };
 
-  const handleJoinBookClub = async () => {
-    navigate("/clubs");
-  };
+  // const handleJoinBookClub = async () => {
+  //   navigate("/clubs");
+  // };
 
   return (
     <nav className="bg-gray-800 p-4 text-white">
