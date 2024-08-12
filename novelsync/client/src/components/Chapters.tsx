@@ -143,9 +143,7 @@ const Chapters: React.FC<ChaptersProps> = ({ edit }) => {
         <div className="absolute inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-4">
             <Loader className="animate-spin" size={24} />
-            <span className="text-lg font-semibold">
-              Publishing... but first Imma check some stuff so chill...
-            </span>
+            <span className="text-lg font-semibold">Publishing...</span>
           </div>
         </div>
       )}

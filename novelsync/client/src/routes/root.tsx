@@ -16,8 +16,14 @@ const Root: React.FC = () => {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
 
-  const { deleteNovelById, fetchNovels, novels, novelLoading, novelError } =
-    novelsContext;
+  const {
+    deleteNovelById,
+    fetchNovels,
+    novels,
+    novelLoading,
+    novelError,
+    userNovels,
+  } = novelsContext;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isUserNovelsVisible, setIsUserNovelsVisible] = useState(false);
@@ -49,6 +55,8 @@ const Root: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
+  console.log("userNovels", userNovels.length);
+
   return (
     <div className="bg-amber-50 min-h-screen py-8 relative ">
       <div className="container mx-auto px-4">
@@ -67,28 +75,30 @@ const Root: React.FC = () => {
           </div>
         )}
         <div className="flex flex-wrap mx-4">
-          <div
-            className={`fixed top-20 right-0 h-100 bg-white shadow-lg transition-transform duration-300 ${
-              isUserNovelsVisible ? "translate-x-0" : "translate-x-[95%]"
-            }`}
-          >
-            <button
-              onClick={toggleUserNovels}
-              className="absolute top-4 left-[-40px] bg-amber-600 text-white p-2 rounded-full hover:bg-amber-700 transition-colors duration-200 flex items-center"
+          {userNovels.length > 0 && (
+            <div
+              className={`fixed top-20 right-0 h-100 bg-white shadow-lg transition-transform duration-300 ${
+                isUserNovelsVisible ? "translate-x-0" : "translate-x-[95%]"
+              }`}
             >
-              {isUserNovelsVisible ? <FaArrowRight /> : <FaArrowLeft />}
-            </button>
-            {user && (
-              <div className="p-4">
-                <UserNovels
-                  loading={novelLoading}
-                  error={novelError}
-                  onDelete={handleDelete}
-                  user={user}
-                />
-              </div>
-            )}
-          </div>
+              <button
+                onClick={toggleUserNovels}
+                className="absolute top-4 left-[-40px] bg-amber-600 text-white p-2 rounded-full hover:bg-amber-700 transition-colors duration-200 flex items-center"
+              >
+                {isUserNovelsVisible ? <FaArrowRight /> : <FaArrowLeft />}
+              </button>
+              {user && (
+                <div className="p-4">
+                  <UserNovels
+                    loading={novelLoading}
+                    error={novelError}
+                    onDelete={handleDelete}
+                    user={user}
+                  />
+                </div>
+              )}
+            </div>
+          )}
           <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700">
             <Suggestions />
           </div>

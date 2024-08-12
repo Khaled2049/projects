@@ -569,6 +569,19 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
           },
           ...prevNovels,
         ]);
+        setUserNovels((prevNovels) => [
+          {
+            id: newNovelRef.id,
+            title,
+            authorId: user.uid,
+            chaptersPath: `novels/${newNovelRef.id}/chapters`,
+            chapters: chapterRefs,
+            author: user.username || "Unknown Author",
+            lastUpdated: new Date().toISOString(),
+            firstChapter: chapterRefs[0] || { chapterName: "", content: "" },
+          },
+          ...prevNovels,
+        ]);
       }
 
       setCreateLoading(false);
