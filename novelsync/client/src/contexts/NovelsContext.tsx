@@ -67,6 +67,7 @@ interface NovelsContextValue {
   addFeedback: (novelId: string, text: string) => Promise<void>;
   feedback: Feedback[];
   getFeedback: (novelId: string) => Promise<Feedback[]>;
+  deleteFeedback: (novelId: string, feedbackId: string) => Promise<void>;
 }
 
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
@@ -414,6 +415,30 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const deleteFeedback = async (
+    novelId: string,
+    feedbackId: string
+  ): Promise<void> => {
+    try {
+      const novelRef = doc(firestore, "novels", novelId);
+      const novelDoc = await getDoc(novelRef);
+
+      if (novelDoc.exists()) {
+        const novelData = novelDoc.data();
+        const updatedFeedback = novelData.feedback.filter(
+          (fb: Feedback) => fb.id !== feedbackId
+        );
+
+        await updateDoc(novelRef, { feedback: updatedFeedback });
+
+        setFeedback(updatedFeedback); // Update context state
+      }
+    } catch (error) {
+      console.error("Error deleting feedback: ", error);
+      throw error;
+    }
+  };
+
   const isToxic = (scores: AttributeScores): boolean => {
     const toxicThreshold = 0.9;
     const toxicAttributes = [
@@ -639,6 +664,7 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     addFeedback,
     feedback,
     getFeedback,
+    deleteFeedback,
   };
 
   return (

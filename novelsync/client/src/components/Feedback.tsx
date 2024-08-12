@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 import { useAuth } from "../contexts/AuthContext";
 import NovelsContext from "../contexts/NovelsContext";
+import { FaTrashAlt } from "react-icons/fa";
 
 interface FeedbackProps {
   novelId: string;
@@ -17,7 +18,7 @@ const Feedback: React.FC<FeedbackProps> = ({ novelId }) => {
     throw new Error("useNovels must be used within a NovelsProvider");
   }
 
-  const { feedback, getFeedback, addFeedback } = novelsContext;
+  const { feedback, getFeedback, addFeedback, deleteFeedback } = novelsContext;
   const [localFeedback, setLocalFeedback] = useState(feedback);
 
   useEffect(() => {
@@ -33,6 +34,10 @@ const Feedback: React.FC<FeedbackProps> = ({ novelId }) => {
     fetchFeedback();
   }, [novelId, getFeedback]);
 
+  useEffect(() => {
+    setLocalFeedback(feedback);
+  }, [feedback]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim() && user) {
@@ -46,8 +51,24 @@ const Feedback: React.FC<FeedbackProps> = ({ novelId }) => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      // Optimistically update local state
+      setLocalFeedback((prevFeedback) =>
+        prevFeedback.filter((item) => item.id !== id)
+      );
+
+      // Delete from Firestore
+      await deleteFeedback(novelId, id);
+    } catch (error) {
+      console.error("Error deleting feedback: ", error);
+      // Handle error (e.g., revert state update, show error message to user)
+      setLocalFeedback(feedback); // Revert state to the latest feedback in context
+    }
+  };
+
   return (
-    <div className="max-w-2xl w-1/2  mx-auto mt-8 p-6 bg-amber-50 rounded-lg shadow-lg m-4">
+    <div className="max-w-2xl w-1/2 mx-auto mt-8 p-6 bg-amber-50 rounded-lg shadow-lg m-4">
       {user ? (
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="flex">
@@ -73,12 +94,20 @@ const Feedback: React.FC<FeedbackProps> = ({ novelId }) => {
         {localFeedback.map((feedbackItem) => (
           <div
             key={feedbackItem.id}
-            className="bg-white p-4 rounded-lg shadow-md"
+            className="bg-white p-4 rounded-lg shadow-md flex justify-between items-start"
           >
-            <p className="text-amber-900">{feedbackItem.text}</p>
-            <p className="text-sm text-gray-500 mt-1">
-              {feedbackItem.username}
-            </p>
+            <div>
+              <p className="text-amber-900">{feedbackItem.text}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {feedbackItem.username}
+              </p>
+            </div>
+            <button
+              onClick={() => handleDelete(feedbackItem.id)}
+              className="flex items-center bg-red-500 text-white px-3 py-2 rounded-full hover:bg-red-600 transition-colors duration-200"
+            >
+              <FaTrashAlt className="mr-1" /> Delete
+            </button>
           </div>
         ))}
       </div>

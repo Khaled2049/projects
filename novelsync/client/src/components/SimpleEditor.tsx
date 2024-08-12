@@ -47,10 +47,17 @@ export function SimpleEditor() {
 
     addKeyboardShortcuts() {
       let isCooldown = false;
+      let tabPressCount = 0;
+      const maxTabPresses = 15;
 
       return {
         Tab: () => {
           if (isCooldown) {
+            return false;
+          }
+
+          if (tabPressCount >= maxTabPresses) {
+            alert("Chill out with the tab key, will ya?");
             return false;
           }
 
@@ -64,12 +71,16 @@ export function SimpleEditor() {
             }, this.options.cooldown);
 
             try {
-              const generatedText = aiGeneratorRef.current
-                ? await aiGeneratorRef.current.generateLine(currentContent)
-                : await aiGenerator.generateLine(currentContent);
+              console.log(tabPressCount);
+              if (tabPressCount < maxTabPresses) {
+                const generatedText = aiGeneratorRef.current
+                  ? await aiGeneratorRef.current.generateLine(currentContent)
+                  : await aiGenerator.generateLine(currentContent);
 
-              if (generatedText) {
-                editor.chain().focus().insertContent(generatedText).run();
+                if (generatedText) {
+                  editor.chain().focus().insertContent(generatedText).run();
+                  tabPressCount += 1;
+                }
               }
             } catch (error) {
               console.error("Error generating line:", error);

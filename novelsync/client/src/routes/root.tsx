@@ -7,6 +7,7 @@ import { INovelWithChapters } from "../types/INovel";
 import UserNovels from "../components/UserNovels";
 import NovelsContext from "../contexts/NovelsContext";
 import Suggestions from "../components/Suggestions";
+import RandomTopic from "../components/RandomTopic";
 
 const Root: React.FC = () => {
   const { user } = useAuth();
@@ -97,14 +98,13 @@ const Root: React.FC = () => {
               )}
             </div>
           )}
-          <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700">
+          <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700 space-y-4">
+            <RandomTopic />
             <Suggestions />
           </div>
 
           <div className="w-full lg:w-3/4 px-4">
-            <h2 className="text-2xl font-serif text-amber-900 mb-6">
-              Recent Novels
-            </h2>
+            <h2 className="text-2xl font-serif text-amber-900 mb-6">Stories</h2>
 
             {novelLoading && <p className="text-gray-600">Loading novels...</p>}
             {novelError && <p className="text-red-500">Error: {novelError}</p>}

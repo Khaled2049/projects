@@ -37,6 +37,20 @@ export class AITextGenerator {
     });
   }
 
+  async generateRandomTopic(): Promise<string> {
+    const prompt = "Generate a random topic for a story.";
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const generatedText = result.response.text().trim();
+      this.history.push({ role: "model", parts: [{ text: generatedText }] });
+      return generatedText;
+    } catch (error: any) {
+      console.error("Error:", error);
+      return "Error generating random topic";
+    }
+  }
+
   async generateLine(prevText: string): Promise<string> {
     const lines = prevText.split("\n").slice(-5).join("\n");
     let prompt = `Based on the following context, generate exactly one sentence to continue the story:\n\n${lines}\n\nContinue with one sentence:`;
