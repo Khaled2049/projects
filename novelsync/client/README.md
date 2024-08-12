@@ -1,30 +1,16 @@
-# React + TypeScript + Vite
+## NovelSync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+NovelSync is a novel-writing platform built to help authors create novels with the assistance of AI, using the Gemini API. This project is being developed as part of the Gemini Developer Competition.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Key Features
 
-## Expanding the ESLint configuration
+- User Authentication: Secure user authentication using google firebase
+- Text Editor: A powerful text editor, press tab to generate text with the help of gemini.
+- AI Partners: Utilize AI partners to generate text, find new ideas, and overcome writer's block. The AI is powered by the Gemini API, offering intelligent suggestions and content generation.
+- Share Feedback: Connect with other writers to give and receive feedback on your work. Improve your novel through collaborative critique.
+- Share Novels: Publish your completed novels to share them with the world.
+- Set timer so that you can focus
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### I'm working on adding edit and autosave functionalities and much more!
