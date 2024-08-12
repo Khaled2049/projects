@@ -64,7 +64,7 @@ const Suggestions = () => {
             className="text-base sm:text-lg font-serif font-semibold text-amber-800 flex items-center"
           >
             <Book className="text-amber-700 mr-2 flex-shrink-0" size={24} />
-            What kind of idea are you looking for?
+            What do you want to write about?
           </label>
           <div className="relative">
             <input

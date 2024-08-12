@@ -36,7 +36,12 @@ const Signin: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-amber-50">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-amber-50 pt-12">
+      <div className="flex items-center text-center mb-8 -ml-6">
+        <h1 className="text-4xl font-serif text-amber-900 ml-4">NovelSync</h1>
+      </div>
+
+      {/* Sign In Form Container */}
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border border-amber-200">
         <h2 className="text-3xl font-serif text-amber-900 mb-6">Sign In</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
