@@ -26,9 +26,16 @@ export interface INovelWithChapters {
   lastUpdated: string;
   chapters: IChapter[];
   firstChapter: IChapter;
+  feedback?: Feedback[];
 }
 
 export interface IRenderContent {
   chapterName: string;
   content: string;
+}
+export interface Feedback {
+  id: string;
+  text: string;
+  timestamp: Date;
+  username: string;
 }

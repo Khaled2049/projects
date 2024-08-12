@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import NovelsContext from "../contexts/NovelsContext";
 import { FaTwitter, FaEnvelope, FaShareAlt } from "react-icons/fa";
 import { IRenderContent } from "../types/INovel";
+import Feedback from "../components/Feedback";
 const NovelDetail = () => {
   const { id } = useParams<{ id: string }>();
-
+  const [showFeedback, setShowFeedback] = useState(true);
   if (!id)
     return (
       <div className="text-center text-red-500 mt-8">Invalid novel ID</div>
@@ -76,52 +77,63 @@ const NovelDetail = () => {
 
   return (
     selectedNovel && (
-      <div className="max-w-[75%] mx-auto p-8 bg-amber-50 shadow-lg rounded-lg mt-10">
-        <h1 className="text-4xl font-bold mb-6 text-center text-amber-900">
-          {selectedNovel.title}
-        </h1>
-        <p className="text-xl text-gray-700 mb-2 text-center">
-          By {selectedNovel.author}
-        </p>
-        <p className="text-sm text-gray-500 mb-6 text-center">
-          Last updated:{" "}
-          {new Date(selectedNovel.lastUpdated).toLocaleDateString()}
-        </p>
-        <div className="prose prose-lg max-w-none bg-white p-4 rounded-md leading-relaxed shadow-md">
-          {selectedNovel.chapters.map((chapter: IRenderContent) => (
-            <div key={chapter.chapterName}>
-              <h2 className="text-amber-900">{chapter.chapterName}</h2>
-              <div>{renderContent(chapter.content)}</div>
-            </div>
-          ))}
+      <>
+        <div className="max-w-[75%] mx-auto p-8 bg-amber-50 shadow-lg rounded-lg mt-10">
+          <h1 className="text-4xl font-bold mb-6 text-center text-amber-900">
+            {selectedNovel.title}
+          </h1>
+          <p className="text-xl text-gray-700 mb-2 text-center">
+            By {selectedNovel.author}
+          </p>
+          <p className="text-sm text-gray-500 mb-6 text-center">
+            Last updated:{" "}
+            {new Date(selectedNovel.lastUpdated).toLocaleDateString()}
+          </p>
+          <div className="prose prose-lg max-w-none bg-white p-4 rounded-md leading-relaxed shadow-md">
+            {selectedNovel.chapters.map((chapter: IRenderContent) => (
+              <div key={chapter.chapterName}>
+                <h2 className="text-amber-900">{chapter.chapterName}</h2>
+                <div>{renderContent(chapter.content)}</div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              className="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={handleWebShare}
+            >
+              <FaShareAlt className="mr-2" /> Share
+            </button>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                `Check out this novel by ${selectedNovel.author}: ${shareUrl}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center px-4 py-2 bg-slate-800 text-white rounded hover:bg-blue-500"
+            >
+              <FaTwitter className="mr-2" /> Share on X
+            </a>
+            <a
+              href={`mailto:?subject=${encodeURIComponent(
+                `Check out this novel by ${selectedNovel.author}`
+              )}&body=${encodeURIComponent(shareUrl)}`}
+              className="flex items-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              <FaEnvelope className="mr-2" /> Share via Email
+            </a>
+          </div>
         </div>
-        <div className="flex justify-center gap-4 mt-6">
+        <div className="flex flex-col items-center">
           <button
-            className="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={handleWebShare}
+            className="px-4 py-2 my-4 text-white bg-amber-600 rounded hover:bg-amber-700"
+            onClick={() => setShowFeedback(!showFeedback)}
           >
-            <FaShareAlt className="mr-2" /> Share
+            {showFeedback ? "Hide Feedback" : "Show Feedback"}
           </button>
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-              `Check out this novel by ${selectedNovel.author}: ${shareUrl}`
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center px-4 py-2 bg-slate-800 text-white rounded hover:bg-blue-500"
-          >
-            <FaTwitter className="mr-2" /> Share on X
-          </a>
-          <a
-            href={`mailto:?subject=${encodeURIComponent(
-              `Check out this novel by ${selectedNovel.author}`
-            )}&body=${encodeURIComponent(shareUrl)}`}
-            className="flex items-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            <FaEnvelope className="mr-2" /> Share via Email
-          </a>
+          {showFeedback && <Feedback novelId={id} />}
         </div>
-      </div>
+      </>
     )
   );
 };

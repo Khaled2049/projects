@@ -12,13 +12,16 @@ import {
   where,
   doc,
   deleteDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import {
   UpdateNovelParams,
   CreateNovelParams,
   INovelWithChapters,
   IChapter,
+  Feedback,
 } from "../types/INovel";
+import { v4 as uuidv4 } from "uuid";
 
 import { firestore, storage, auth } from "../config/firebase";
 import {
@@ -61,6 +64,9 @@ interface NovelsContextValue {
   fetchNovelByIdLoading: boolean;
   fetchNovelByIdError: string | null;
   setSelectedNovel: React.Dispatch<React.SetStateAction<INovelWithChapters>>;
+  addFeedback: (novelId: string, text: string) => Promise<void>;
+  feedback: Feedback[];
+  getFeedback: (novelId: string) => Promise<Feedback[]>;
 }
 
 const NovelsContext = createContext<NovelsContextValue | undefined>(undefined);
@@ -100,6 +106,8 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 
   const [suggestion, setsuggestion] = useState("");
+
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
 
   const [userNovels, setUserNovels] = useState<INovelWithChapters[]>([]);
   const [_userNovelsLoading, setUserNovelsLoading] = useState(true);
@@ -363,6 +371,49 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const getFeedback = async (novelId: string): Promise<Feedback[]> => {
+    try {
+      const novelRef = doc(firestore, "novels", novelId);
+      const novelDoc = await getDoc(novelRef);
+      const novelData = novelDoc.data();
+      const feedbackData = novelData?.feedback || [];
+      return feedbackData;
+    } catch (error) {
+      console.error("Error fetching feedback: ", error);
+      throw error;
+    }
+  };
+
+  const addFeedback = async (novelId: string, text: string): Promise<void> => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error("User must be authenticated to leave a comment");
+    }
+
+    const newFeedback = {
+      id: uuidv4(), // More robust ID generation
+      text: text,
+      timestamp: new Date(),
+      username: currentUser.displayName || "Anonymous",
+      userId: currentUser.uid,
+    };
+
+    setFeedback((prevFeedback) => [newFeedback, ...prevFeedback]);
+
+    try {
+      const novelRef = doc(firestore, "novels", novelId);
+      await updateDoc(novelRef, {
+        feedback: arrayUnion(newFeedback),
+      });
+    } catch (error) {
+      console.error("Error adding feedback: ", error);
+      setFeedback((prevFeedback) =>
+        prevFeedback.filter((fb) => fb.id !== newFeedback.id)
+      );
+      throw error;
+    }
+  };
+
   const isToxic = (scores: AttributeScores): boolean => {
     const toxicThreshold = 0.9;
     const toxicAttributes = [
@@ -579,6 +630,9 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     selectedNovel,
     fetchNovelByIdLoading,
     fetchNovelByIdError,
+    addFeedback,
+    feedback,
+    getFeedback,
   };
 
   return (

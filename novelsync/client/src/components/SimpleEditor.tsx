@@ -39,30 +39,40 @@ export function SimpleEditor() {
   const LiteralTab = Extension.create({
     name: "literalTab",
 
+    addOptions() {
+      return {
+        cooldown: 5000,
+      };
+    },
+
     addKeyboardShortcuts() {
+      let isCooldown = false;
+
       return {
         Tab: () => {
+          if (isCooldown) {
+            return false;
+          }
+
           const editor = this.editor;
           const currentContent = editor.getText();
 
           (async () => {
-            if (aiGeneratorRef.current) {
-              let aitest = aiGeneratorRef.current;
-              const generatedText = await aitest.generateLine(currentContent);
+            isCooldown = true;
+            setTimeout(() => {
+              isCooldown = false;
+            }, this.options.cooldown);
+
+            try {
+              const generatedText = aiGeneratorRef.current
+                ? await aiGeneratorRef.current.generateLine(currentContent)
+                : await aiGenerator.generateLine(currentContent);
+
               if (generatedText) {
                 editor.chain().focus().insertContent(generatedText).run();
               }
-            } else {
-              try {
-                const generatedText = await aiGenerator.generateLine(
-                  currentContent
-                );
-                if (generatedText) {
-                  editor.chain().focus().insertContent(generatedText).run();
-                }
-              } catch (error) {
-                console.error("Error generating line:", error);
-              }
+            } catch (error) {
+              console.error("Error generating line:", error);
             }
           })();
 
