@@ -427,13 +427,6 @@ const NovelsProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     for (const attribute of toxicAttributes) {
       if (scores[attribute] > toxicThreshold) {
-        console.log(
-          "Since",
-          attribute,
-          " is ",
-          scores[attribute],
-          "returning true"
-        );
         return true;
       }
     }

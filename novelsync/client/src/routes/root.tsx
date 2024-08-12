@@ -55,8 +55,6 @@ const Root: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
-  console.log("userNovels", userNovels.length);
-
   return (
     <div className="bg-amber-50 min-h-screen py-8 relative ">
       <div className="container mx-auto px-4">
