@@ -1,11 +1,22 @@
+import { AuthUser } from "./IUser";
+
 export interface Chapter {
-  id: string;
+  chapterId: string;
   title: string;
   content: string;
 }
 
 export interface Story {
-  id: string;
+  storyId: string;
+  title: string;
+  chapters: Chapter[];
+  author: string;
+  lastUpdated: string;
+}
+
+export interface CreateStoryParams {
+  storyId: string;
+  user: AuthUser | null;
   title: string;
   chapters: Chapter[];
 }

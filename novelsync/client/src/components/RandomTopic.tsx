@@ -37,7 +37,7 @@ const RandomTopic = () => {
   };
 
   useEffect(() => {
-    getTopic();
+    // getTopic();
   }, []);
 
   return (

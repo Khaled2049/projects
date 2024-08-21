@@ -12,6 +12,7 @@ export interface UpdateNovelParams {
 }
 
 export interface CreateNovelParams {
+  storyId: string;
   user: AuthUser | null;
   title: string;
   chapters: { chapterName: string; content: string }[];

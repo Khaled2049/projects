@@ -1,5 +1,29 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import { Chapter, Story } from "../types/IStory";
+import { Chapter, CreateStoryParams, Story } from "../types/IStory";
+
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { firestore, storage } from "../config/firebase";
+
+import { isToxic, analyzeText } from "../utils";
+import {
+  deleteObject,
+  getDownloadURL,
+  listAll,
+  ref,
+  uploadString,
+} from "firebase/storage";
+import { AuthUser } from "../types/IUser";
 
 interface EditorContextType {
   title: string;
@@ -15,11 +39,28 @@ interface EditorContextType {
   editingChapterId: string | null;
   setEditingChapterId: (id: string | null) => void;
   clearCurrentStory: () => void;
+  publishStory: (params: CreateStoryParams) => Promise<string | null>;
+  publishLoading: boolean;
+  fetchUserStories: (user: AuthUser) => Promise<void>;
+  fetchLoading: boolean;
+  userStories: Story[];
+  fetchStoryById: (story: Story) => Promise<Story | null>;
+  updateStoryById: (params: {
+    storyId: string;
+    user: AuthUser;
+    newTitle: string;
+    newChapters: Chapter[];
+  }) => Promise<boolean | null | string>;
+  deleteStoryById: (story: Story, user: AuthUser) => Promise<boolean | null>;
+  fetchAllStories: () => Promise<Story[]>;
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
 
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
+  const NUMBER_OF_NOVELS_LIMIT = 10;
+  const TOTAL_NOVELS_LIMIT = 100;
+
   const clearCurrentStory = () => {
     setTitle("");
     setCurrentChapters([]);
@@ -35,9 +76,490 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [editingStoryId, setEditingStoryId] = useState<string | null>(null);
   const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
 
+  const [publishLoading, setpublishLoading] = useState<boolean>(false);
+  const [fetchLoading, setFetchLoading] = useState<boolean>(false);
+
+  const [userStories, setUserStories] = useState<Story[]>([]);
+
+  const publishStory = async ({
+    storyId,
+    user,
+    title,
+    chapters,
+  }: CreateStoryParams) => {
+    if (!user) {
+      console.error("User is not logged");
+      return null;
+    }
+    setpublishLoading(true);
+
+    try {
+      // Check the number of existing novels for the user
+      const novelsCollection = collection(firestore, "novels");
+      const userNovelsQuery = query(
+        novelsCollection,
+        where("authorId", "==", user.uid)
+      );
+
+      const totalNovelsSnapshot = await getDocs(novelsCollection);
+      if (totalNovelsSnapshot.size >= TOTAL_NOVELS_LIMIT) {
+        return "MAX_NOVELS";
+      }
+
+      const userNovelsSnapshot = await getDocs(userNovelsQuery);
+
+      if (userNovelsSnapshot.size >= NUMBER_OF_NOVELS_LIMIT) {
+        return "LIMIT_ERR";
+      }
+
+      const scores = await analyzeText(title);
+      if (isToxic(scores)) {
+        return "TOXIC_TITLE";
+      }
+
+      // Create a new document in the novels collection
+      const newNovelRef = await addDoc(novelsCollection, {
+        storyId: storyId,
+        author: user.username || "Unknown Author",
+        authorId: user.uid,
+        lastUpdated: new Date().toISOString(),
+        title,
+      });
+
+      // Process each chapter
+      const chapterRefs: Chapter[] = [];
+      for (const chapter of chapters) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(chapter.content, "text/html");
+        const images = doc.querySelectorAll("img");
+
+        // Upload images and replace URLs
+        for (let img of images) {
+          const imgSrc = img.getAttribute("src");
+          if (imgSrc && imgSrc.startsWith("data:image")) {
+            // It's a base64 image, need to upload
+            const imgRef = ref(
+              storage,
+              `novels/${newNovelRef.id}/chapters/${
+                chapter.chapterId
+              }/images/${Date.now()}.png`
+            );
+            try {
+              await uploadString(imgRef, imgSrc, "data_url");
+              const newUrl = await getDownloadURL(imgRef);
+              img.setAttribute("src", newUrl);
+            } catch (err) {
+              console.error("Error uppublishLoading image:", err);
+
+              return null;
+            }
+          }
+        }
+
+        // Get the updated content with new image URLs
+        const updatedContent = doc.body.innerHTML;
+
+        // Save chapter content to Firebase Storage
+        const chapterContentPath = `novels/${newNovelRef.id}/chapters/${chapter.chapterId}/${chapter.title}.txt`;
+        const storageRef = ref(storage, chapterContentPath);
+        try {
+          await uploadString(storageRef, updatedContent);
+        } catch (err) {
+          console.error("Error uppublishLoading chapter content:", err);
+
+          return null;
+        }
+
+        // Add the chapter to the collection
+        chapterRefs.push({
+          chapterId: chapter.chapterId,
+          title: chapter.title,
+          content: chapterContentPath,
+        });
+      }
+
+      // Update the novel document with chapters collection reference
+      try {
+        await setDoc(
+          newNovelRef,
+          { chaptersPath: `novels/${newNovelRef.id}/chapters` },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Error updating novel document:", err);
+      }
+
+      console.log("Novel created successfully! updating state...");
+
+      // Update the state
+      setStories([
+        ...stories,
+        {
+          storyId: newNovelRef.id,
+          title,
+          chapters: chapterRefs,
+          author: user.username || "Unknown Author",
+          lastUpdated: new Date().toISOString(),
+        },
+      ]);
+
+      setUserStories([
+        ...userStories,
+        {
+          storyId: newNovelRef.id,
+          title,
+          chapters,
+          author: user.username || "Unknown Author",
+          lastUpdated: new Date().toISOString(),
+        },
+      ]);
+
+      setpublishLoading(false);
+
+      return newNovelRef.id;
+    } catch (err) {
+      console.error("Error creating novel:", err);
+      return null;
+    }
+  };
+
+  const deleteStoryById = async (story: Story, user: AuthUser) => {
+    if (!user) {
+      console.error("User is not logged in");
+      return null;
+    }
+
+    try {
+      // Delete all chapters and their content
+      const chaptersRef = ref(storage, `novels/${story.storyId}/chapters`);
+      const chaptersListResult = await listAll(chaptersRef);
+
+      // Delete chapter folders
+      for (const chapterFolderRef of chaptersListResult.prefixes) {
+        const chapterContentsResult = await listAll(chapterFolderRef);
+
+        // Delete all files in the chapter folder (content and images)
+        for (const itemRef of chapterContentsResult.items) {
+          await deleteObject(itemRef);
+        }
+      }
+
+      // Delete the Firestore document
+      await deleteDoc(doc(firestore, "novels", story.storyId));
+
+      // Update the state
+      setStories((prevNovels) =>
+        prevNovels.filter((n) => n.storyId !== story.storyId)
+      );
+      setUserStories((prevNovels) =>
+        prevNovels.filter((n) => n.storyId !== story.storyId)
+      );
+
+      return true;
+    } catch (err) {
+      console.error("Error deleting novel:", err);
+
+      return false;
+    }
+  };
+
+  const fetchStoryById = async (story: Story) => {
+    try {
+      // Fetch story by ID from Firestore
+      const novelDoc = await getDoc(doc(firestore, "novels", story.storyId));
+      if (!novelDoc.exists()) {
+        console.error("Story not found");
+        return null;
+      }
+
+      const novelData = novelDoc.data();
+      const chaptersRef = ref(storage, novelData?.chaptersPath);
+
+      // List all chapter folders in Storage
+      const chapterFolders = await listAll(chaptersRef);
+      const chapters: Chapter[] = [];
+
+      // Iterate over each chapter folder
+      for (const folderRef of chapterFolders.prefixes) {
+        const chapterFiles = await listAll(folderRef);
+
+        // Iterate over each file in the chapter folder
+        for (const fileRef of chapterFiles.items) {
+          const chapterId = fileRef.fullPath.split("/")[3];
+          console.log("chapterId", chapterId);
+          // Get the download URL for the file
+          const chapterURL = await getDownloadURL(fileRef);
+          console.log("chapterURL", chapterURL);
+          const chapterResponse = await fetch(chapterURL);
+
+          // Get the text content of the chapter
+          const chapterContent = await chapterResponse.text();
+          const chapterName = fileRef.name.replace(".txt", "");
+
+          // Push the chapter data into the chapters array
+          chapters.push({
+            chapterId: chapterId,
+            title: chapterName,
+            content: chapterContent,
+          });
+        }
+      }
+
+      // Update the story with the fetched chapters
+      const updatedStory = {
+        ...story,
+        chapters,
+      };
+
+      // Return or set the updated story as needed
+      return updatedStory;
+    } catch (err) {
+      console.error("Error fetching story:", err);
+      return null;
+    }
+  };
+
+  const updateStoryById = async ({
+    storyId,
+    user,
+    newTitle,
+    newChapters,
+  }: {
+    storyId: string;
+    user: AuthUser;
+    newTitle: string;
+    newChapters: Chapter[];
+  }) => {
+    if (!user) {
+      console.error("User is not logged in");
+      return null;
+    }
+
+    try {
+      // Fetch the existing story document
+      const novelDocRef = doc(firestore, "novels", storyId);
+      const novelDoc = await getDoc(novelDocRef);
+
+      if (!novelDoc.exists()) {
+        console.error("Story not found");
+        return null;
+      }
+
+      const novelData = novelDoc.data();
+
+      // Check if the title has changed and update it
+      if (newTitle !== novelData?.title) {
+        const scores = await analyzeText(newTitle);
+        if (isToxic(scores)) {
+          return "TOXIC_TITLE";
+        }
+
+        await updateDoc(novelDocRef, {
+          title: newTitle,
+          lastUpdated: new Date().toISOString(),
+        });
+      }
+
+      const updatedChapters: Chapter[] = [];
+
+      for (const chapter of newChapters) {
+        const chapterRefPath = `novels/${storyId}/chapters/${chapter.chapterId}`;
+        const chapterRef = ref(storage, chapterRefPath);
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(chapter.content, "text/html");
+        const images = doc.querySelectorAll("img");
+
+        // Upload images and replace URLs
+        for (let img of images) {
+          const imgSrc = img.getAttribute("src");
+          if (imgSrc && imgSrc.startsWith("data:image")) {
+            // It's a base64 image, need to upload
+            const imgRef = ref(
+              storage,
+              `${chapterRefPath}/images/${Date.now()}.png`
+            );
+            try {
+              await uploadString(imgRef, imgSrc, "data_url");
+              const newUrl = await getDownloadURL(imgRef);
+              img.setAttribute("src", newUrl);
+            } catch (err) {
+              console.error("Error uploading image:", err);
+              return null;
+            }
+          }
+        }
+
+        // Get the updated content with new image URLs
+        const updatedContent = doc.body.innerHTML;
+
+        // Save updated chapter content to Firebase Storage
+        const chapterContentPath = `${chapterRefPath}/${chapter.title}.txt`;
+        try {
+          await uploadString(chapterRef, updatedContent);
+        } catch (err) {
+          console.error("Error uploading chapter content:", err);
+          return null;
+        }
+
+        // Add the updated chapter to the collection
+        updatedChapters.push({
+          chapterId: chapter.chapterId,
+          title: chapter.title,
+          content: updatedContent, // The updated content with images and other modifications
+        });
+
+        // Update the chapter content in Firebase Storage with the new updated content
+        const storageRef = ref(storage, chapterContentPath);
+        try {
+          await uploadString(storageRef, updatedContent);
+        } catch (err) {
+          console.error("Error updating chapter content in storage:", err);
+          return null;
+        }
+      }
+
+      // Update the novel document with new chapters information
+      try {
+        await updateDoc(novelDocRef, {
+          chaptersPath: `novels/${storyId}/chapters`,
+          lastUpdated: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error("Error updating novel document:", err);
+        return null;
+      }
+
+      console.log("Story updated successfully!");
+      return true;
+    } catch (err) {
+      console.error("Error updating story:", err);
+      return null;
+    }
+  };
+
+  const fetchUserStories = async (user: AuthUser) => {
+    setFetchLoading(true);
+
+    try {
+      const novelsCollection = collection(firestore, "novels");
+      const userNovelsQuery = query(
+        novelsCollection,
+        where("authorId", "==", user.uid)
+      );
+
+      const userNovelsSnapshot = await getDocs(userNovelsQuery);
+
+      // Clear the userStories state before adding new stories to prevent duplicates
+      const newUserStories = [];
+
+      // Get user Novels, get chapters of stories and set the state
+      for (const doc of userNovelsSnapshot.docs) {
+        const novelData = doc.data();
+        const chaptersPath = novelData.chaptersPath;
+        const chaptersCollection = collection(firestore, chaptersPath);
+
+        const chaptersSnapshot = await getDocs(chaptersCollection);
+        const chapters: Chapter[] = [];
+
+        for (const chapterDoc of chaptersSnapshot.docs) {
+          const chapterData = chapterDoc.data();
+          const contentRef = ref(storage, chapterData.content);
+          const contentUrl = await getDownloadURL(contentRef);
+          const chapterContent = await fetch(contentUrl).then((res) =>
+            res.text()
+          );
+
+          chapters.push({
+            chapterId: chapterDoc.id,
+            title: chapterData.title,
+            content: chapterContent,
+          });
+        }
+
+        // Add the story to the newUserStories array
+        newUserStories.push({
+          storyId: doc.id,
+          title: novelData.title,
+          chapters,
+          author: user.username || "Unknown Author",
+          lastUpdated: new Date().toISOString(),
+        });
+      }
+
+      // Set the new state with the fetched stories
+      setUserStories(newUserStories);
+      console.log("userStories", newUserStories.length);
+
+      setFetchLoading(false);
+    } catch (err) {
+      console.error("Error fetching user stories:", err);
+      setFetchLoading(false);
+    }
+  };
+
+  const fetchAllStories = async () => {
+    try {
+      // Reference to the novels collection in Firestore
+      const novelsCollection = collection(firestore, "novels");
+
+      // Fetch all documents in the novels collection
+      const novelsSnapshot = await getDocs(novelsCollection);
+
+      // Prepare an array to hold all stories
+      const allStories: Story[] = [];
+
+      // Iterate over each document in the snapshot
+      for (const doc of novelsSnapshot.docs) {
+        const novelData = doc.data();
+
+        // Fetch chapters for each story
+        const chaptersPath = novelData.chaptersPath;
+        const chaptersRef = collection(firestore, chaptersPath);
+
+        const chaptersSnapshot = await getDocs(chaptersRef);
+        const chapters: Chapter[] = [];
+
+        for (const chapterDoc of chaptersSnapshot.docs) {
+          const chapterData = chapterDoc.data();
+          const contentRef = ref(storage, chapterData.content);
+          const contentUrl = await getDownloadURL(contentRef);
+          const chapterContent = await fetch(contentUrl).then((res) =>
+            res.text()
+          );
+
+          chapters.push({
+            chapterId: chapterDoc.id,
+            title: chapterData.title,
+            content: chapterContent,
+          });
+        }
+
+        // Add the story with its chapters to the array
+        allStories.push({
+          storyId: doc.id,
+          title: novelData.title,
+          chapters,
+          author: novelData.author,
+          lastUpdated: novelData.lastUpdated,
+        });
+      }
+
+      // update state
+      setStories(allStories);
+
+      // Return the array of all stories
+      return allStories;
+    } catch (err) {
+      console.error("Error fetching all stories:", err);
+      return [];
+    }
+  };
+
   return (
     <EditorContext.Provider
       value={{
+        fetchAllStories,
         title,
         setTitle,
         currentChapterTitle,
@@ -51,6 +573,14 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         editingChapterId,
         setEditingChapterId,
         clearCurrentStory,
+        publishStory,
+        publishLoading,
+        fetchUserStories,
+        fetchLoading,
+        userStories,
+        fetchStoryById,
+        updateStoryById,
+        deleteStoryById,
       }}
     >
       {children}

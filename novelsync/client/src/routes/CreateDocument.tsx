@@ -4,7 +4,7 @@ const CreateDocument = () => {
   return (
     <>
       <div className="px-4">
-        <Chapters edit={false} />
+        <Chapters />
       </div>
     </>
   );
