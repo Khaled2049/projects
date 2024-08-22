@@ -16,7 +16,7 @@ import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./gemin";
 
 const limit = 5000;
-import { Plus, Edit3 } from "lucide-react";
+import { Book, Trash2 } from "lucide-react";
 
 import EditorHeader from "./EditorHeader";
 import NovelsContext from "../contexts/NovelsContext";
@@ -39,7 +39,6 @@ export function SimpleEditor() {
     setCurrentChapterTitle,
     currentChapters,
     setCurrentChapters,
-    stories,
     fetchStoryById,
     setStories,
     editingStoryId,
@@ -147,7 +146,7 @@ export function SimpleEditor() {
   };
   const loadStoryForEditing = async (story: Story) => {
     const s = await fetchStoryById(story);
-    console.log("Story fetched", s);
+
     if (!s) return;
     setTitle(s.title);
     setCurrentChapters(s.chapters);
@@ -216,7 +215,6 @@ export function SimpleEditor() {
             }, this.options.cooldown);
 
             try {
-              console.log(tabPressCount);
               if (tabPressCount < maxTabPresses) {
                 const generatedText = aiGeneratorRef.current
                   ? await aiGeneratorRef.current.generateLine(currentContent)
@@ -290,7 +288,7 @@ export function SimpleEditor() {
   }, [selectedAI, user]);
 
   return (
-    <div className="flex p-2 mt-4 overflow-auto w-full">
+    <div className="flex p-2 mt-4 justify-center overflow-auto w-full">
       {publishLoading && <div>Loading...</div>}
       <div className="w-[70%] p-4 bg-amber-50 rounded-lg shadow-lg overflow-y-auto">
         {publishLoading && (
@@ -363,65 +361,81 @@ export function SimpleEditor() {
             onClick={addStory}
             className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
-            Publish new Story
+            Publish Story
           </button>
         )}
       </div>
 
-      <div className="w-[20%] p-4 bg-white border border-gray-400 rounded shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">User Stories</h2>
-        {userStories.length === 0 && <p>No stories added yet.</p>}
-        {userStories.map((story) => (
-          <div key={story.storyId}>
-            <h2 className="text-xl font-semibold mb-4">{story.title}</h2>
-            {story.chapters.map((chapter) => (
+      <div className="w-full md:w-1/4 p-6 bg-amber-50 rounded-lg shadow-lg ml-5">
+        <h2 className="text-2xl font-bold mb-4 text-amber-800">
+          {title || "Untitled Masterpiece"}
+        </h2>
+
+        {currentChapters.length === 0 ? (
+          <p className="text-amber-700 italic">
+            No chapters added yet. Start your journey!
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {currentChapters.map((chapter) => (
               <li
                 key={chapter.chapterId}
-                className={`p-1 rounded ${
-                  isEditing
-                    ? "cursor-pointer hover:bg-gray-100"
-                    : "text-gray-400 cursor-not-allowed"
-                }`}
-                onClick={() => isEditing && loadChapterForEditing(chapter)}
+                className="bg-white rounded-md shadow transition-all hover:shadow-md"
               >
-                <strong>{chapter.title}</strong>
+                <div className="flex items-center justify-between p-3">
+                  <div
+                    className="flex items-center space-x-3 cursor-pointer"
+                    onClick={() => loadChapterForEditing(chapter)}
+                  >
+                    <Book className="w-5 h-5 text-amber-600" />
+                    <span className="font-medium text-amber-900">
+                      {chapter.title}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => deleteChapter(chapter.chapterId)}
+                    className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                    aria-label="Delete chapter"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </li>
             ))}
-            <button
-              onClick={() => loadStoryForEditing(story)}
-              className="w-full p-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Edit Story
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <div className="w-1/2 p-4 bg-white border border-gray-400 rounded shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Current Story</h2>
-        <h3 className="text-lg font-semibold mb-2">
-          {title || "No title yet"}
-        </h3>
-        <ul className="list-disc list-inside">
-          {currentChapters.map((chapter) => (
-            <li
-              key={chapter.chapterId}
-              className="cursor-pointer hover:bg-gray-100 p-1 rounded flex justify-between items-center"
-            >
-              <div onClick={() => loadChapterForEditing(chapter)}>
-                <strong>{chapter.title}</strong>
-              </div>
-              <button
-                onClick={() => deleteChapter(chapter.chapterId)}
-                className="ml-4 p-1 text-red-500 hover:text-red-700"
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-        {currentChapters.length === 0 && <p>No chapters added yet.</p>}
+          </ul>
+        )}
       </div>
     </div>
   );
+}
+
+{
+  /* <div className="w-[20%] p-4 bg-white border border-gray-400 rounded shadow-lg">
+  <h2 className="text-xl font-semibold mb-4">User Stories</h2>
+  {userStories.length === 0 && <p>No stories added yet.</p>}
+  {userStories.map((story) => (
+    <div key={story.storyId}>
+      <h2 className="text-xl font-semibold mb-4">{story.title}</h2>
+      {story.chapters.map((chapter) => (
+        <li
+          key={chapter.chapterId}
+          className={`p-1 rounded ${
+            isEditing
+              ? "cursor-pointer hover:bg-gray-100"
+              : "text-gray-400 cursor-not-allowed"
+          }`}
+          onClick={() => isEditing && loadChapterForEditing(chapter)}
+        >
+          <strong>{chapter.title}</strong>
+        </li>
+      ))}
+      <button
+        onClick={() => loadStoryForEditing(story)}
+        className="w-full p-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Edit Story
+      </button>
+    </div>
+  ))}
+</div> */
 }

@@ -14,6 +14,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
 import { NovelsProvider } from "./contexts/NovelsContext";
 import BookClub from "./routes/BookClub";
+import UserStories from "./routes/UserStories";
 import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "/create",
         element: <CreateDocument />,
+      },
+      {
+        path: "/user-stories",
+        element: <UserStories />,
       },
       // {
       //   path: "/edit/:id",

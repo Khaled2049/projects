@@ -45,17 +45,8 @@ const Root: React.FC = () => {
     }
   };
 
-  const toggleUserNovels = () => {
-    setIsUserNovelsVisible(!isUserNovelsVisible);
-  };
-
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-  };
-  const navigate = useNavigate();
-
-  const handleEdit = (story: Story) => {
-    navigate("/create", { state: { story } });
   };
 
   return (
@@ -76,28 +67,6 @@ const Root: React.FC = () => {
           </div>
         )}
         <div className="flex flex-wrap mx-4">
-          <div
-            className={`fixed top-20 right-0 h-100 bg-white shadow-lg transition-transform duration-300 ${
-              isUserNovelsVisible ? "translate-x-0" : "translate-x-[95%]"
-            }`}
-          >
-            <button
-              onClick={toggleUserNovels}
-              className="absolute top-4 left-[-40px] bg-amber-600 text-white p-2 rounded-full hover:bg-amber-700 transition-colors duration-200 flex items-center"
-            >
-              {isUserNovelsVisible ? <FaArrowRight /> : <FaArrowLeft />}
-            </button>
-            {user && (
-              <div className="p-4">
-                <UserNovels
-                  onDelete={handleDelete}
-                  onEdit={handleEdit}
-                  user={user}
-                />
-              </div>
-            )}
-          </div>
-
           <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700 space-y-4">
             <RandomTopic />
             <Suggestions />
