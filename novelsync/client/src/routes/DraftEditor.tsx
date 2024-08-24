@@ -1,4 +1,4 @@
-import "./style.css";
+import "../components/style.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
@@ -13,12 +13,12 @@ import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
-import { AITextGenerator } from "./gemin";
+import { AITextGenerator } from "../components/gemin";
 
 const limit = 5000;
 import { Book, Trash2 } from "lucide-react";
 
-import EditorHeader from "./EditorHeader";
+import EditorHeader from "../components/EditorHeader";
 import NovelsContext from "../contexts/NovelsContext";
 import { useAI } from "../contexts/AIContext";
 import { Loader } from "lucide-react";
@@ -29,7 +29,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useEditorContext } from "../contexts/EditorContext";
 import { Chapter, Draft, Story } from "../types/IStory";
 
-export function SimpleEditor() {
+export function DraftEditor() {
   const [isEditing, setIsEditing] = useState(false);
 
   const {
@@ -40,7 +40,6 @@ export function SimpleEditor() {
     currentChapters,
     setCurrentChapters,
     fetchStoryById,
-    setStories,
     setDrafts,
     editingStoryId,
     setEditingStoryId,
@@ -50,8 +49,7 @@ export function SimpleEditor() {
     publishStory,
     publishLoading,
     userDrafts,
-    userStories,
-    updateStoryById,
+
     saveDraft,
     updateDraftById,
     fetchDraftById,
@@ -125,51 +123,40 @@ export function SimpleEditor() {
   const addDraft = async () => {
     if (!user) return "Please login to save a draft";
     if (title && currentChapters.length > 0) {
-      const newDraft = {
+      const newStory = {
         draftId: uuidv4(),
         user,
         title,
         chapters: currentChapters,
       };
-
-      setSavingMessage("Saving...");
-
       try {
-        await saveDraft(newDraft);
-        setSavingMessage("Saved!");
-        setTimeout(() => {
-          setSavingMessage(""); // Clear the message after 3 seconds
-        }, 3000);
+        await saveDraft(newStory);
       } catch (error) {
-        console.log("Error publishing draft", error);
-        setSavingMessage("Failed to save draft.");
-        setTimeout(() => {
-          setSavingMessage(""); // Clear the message after 3 seconds
-        }, 3000);
+        console.log("Error publishing story", error);
       }
+      clearCurrentStory();
     } else {
       alert("Please enter a title and at least one chapter.");
     }
-    navigate("/user-stories");
   };
 
-  const editStory = () => {
+  const editDraft = () => {
     if (editingStoryId && title && currentChapters.length > 0) {
-      const updatedStories = userStories.map((story) =>
-        story.storyId === editingStoryId
-          ? { ...story, title, chapters: currentChapters }
-          : story
+      const updatedDrafts = userDrafts.map((draft) =>
+        draft.draftId === editingStoryId
+          ? { ...draft, title, chapters: currentChapters }
+          : draft
       );
-      if (!user) return "Please login to update a story";
+      if (!user) return "Please login to update draft";
 
-      updateStoryById({
-        storyId: editingStoryId,
+      updateDraftById({
+        draftId: editingStoryId,
         user,
         newTitle: title,
         chapters: currentChapters,
       });
-      setStories(updatedStories);
-      clearCurrentStory();
+      setDrafts(updatedDrafts);
+      // clearCurrentStory();
     } else {
       alert("Please enter a title and at least one chapter.");
     }
@@ -313,9 +300,8 @@ export function SimpleEditor() {
 
   useEffect(() => {
     if (location.state?.draft) {
+      console.log("Loading draft for editing", location.state?.draft);
       loadDraftForEditing(location.state?.draft);
-    } else if (location.state?.story) {
-      loadStoryForEditing(location.state?.story);
     }
 
     if (selectedAI) {
@@ -329,7 +315,7 @@ export function SimpleEditor() {
 
     setsuggestion("");
   }, [selectedAI, user]);
-  const [savingMessage, setSavingMessage] = useState("");
+
   return (
     <div className="flex p-2 mt-4 justify-center overflow-auto w-full">
       {publishLoading && <div>Loading...</div>}
@@ -370,11 +356,6 @@ export function SimpleEditor() {
               editor={editor}
             />
           </div>
-          {savingMessage && (
-            <div className="mt-2 text-center text-gray-500">
-              {savingMessage}
-            </div>
-          )}
         </div>
 
         <div className="flex my-3">
@@ -396,28 +377,20 @@ export function SimpleEditor() {
             Add Chapter
           </button>
         )}
+
         <button
-          onClick={addDraft}
+          onClick={editDraft}
           className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
         >
-          Save as Draft
+          Update Draft
         </button>
 
-        {editingStoryId ? (
-          <button
-            onClick={editStory}
-            className="w-full mt-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            Update story
-          </button>
-        ) : (
-          <button
-            onClick={addStory}
-            className="w-full p-2 mt-2 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            Publish Story
-          </button>
-        )}
+        <button
+          onClick={addStory}
+          className="w-full p-2 mt-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Publish Story
+        </button>
       </div>
 
       <div className="w-full md:w-1/4 p-6 bg-amber-50 rounded-lg shadow-lg ml-5">
@@ -461,35 +434,4 @@ export function SimpleEditor() {
       </div>
     </div>
   );
-}
-
-{
-  /* <div className="w-[20%] p-4 bg-white border border-gray-400 rounded shadow-lg">
-  <h2 className="text-xl font-semibold mb-4">User Stories</h2>
-  {userStories.length === 0 && <p>No stories added yet.</p>}
-  {userStories.map((story) => (
-    <div key={story.storyId}>
-      <h2 className="text-xl font-semibold mb-4">{story.title}</h2>
-      {story.chapters.map((chapter) => (
-        <li
-          key={chapter.chapterId}
-          className={`p-1 rounded ${
-            isEditing
-              ? "cursor-pointer hover:bg-gray-100"
-              : "text-gray-400 cursor-not-allowed"
-          }`}
-          onClick={() => isEditing && loadChapterForEditing(chapter)}
-        >
-          <strong>{chapter.title}</strong>
-        </li>
-      ))}
-      <button
-        onClick={() => loadStoryForEditing(story)}
-        className="w-full p-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Edit Story
-      </button>
-    </div>
-  ))}
-</div> */
 }
