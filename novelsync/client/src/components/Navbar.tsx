@@ -49,10 +49,34 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-800 p-4 text-white">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-          <Link to="/">Novel Sync</Link>
+        {/* Left Section - Novel Sync */}
+        <div className="flex items-center">
+          <Link
+            className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
+            to="/"
+          >
+            Novel Sync
+          </Link>
         </div>
-        <div className="flex space-x-4 items-center">
+
+        {/* Middle Section - Book Club and Community */}
+        <div className="flex-1 flex justify-center space-x-4">
+          <Link
+            to="/book-clubs"
+            className="block px-4 py-2 border border-white text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+          >
+            Book Clubs
+          </Link>
+          <Link
+            to="/community"
+            className="block px-4 py-2 border border-white text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+          >
+            Community
+          </Link>
+        </div>
+
+        {/* Right Section - Dropdown */}
+        <div className="flex items-center">
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button

@@ -18,6 +18,7 @@ import UserStories from "./routes/UserStories";
 import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 import { DraftEditor } from "./routes/DraftEditor";
+import Community from "./routes/Community";
 
 const router = createBrowserRouter([
   {
@@ -29,8 +30,12 @@ const router = createBrowserRouter([
         element: <Root />,
       },
       {
-        path: "/clubs",
+        path: "/book-clubs",
         element: <BookClub />,
+      },
+      {
+        path: "/community",
+        element: <Community />,
       },
       {
         path: "/sign-in",
