@@ -12,6 +12,8 @@ export interface Story {
   chapters: Chapter[];
   author: string;
   lastUpdated: string;
+  views: number;
+  likes: number;
 }
 export interface Draft {
   draftId: string;
@@ -33,4 +35,10 @@ export interface CreateDraftParams {
   user: AuthUser | null;
   title: string;
   chapters: Chapter[];
+}
+
+export interface ILikes {
+  storyId: string;
+  likes: number;
+  likedBy: string[];
 }

@@ -12,8 +12,10 @@ import CharacterCount from "@tiptap/extension-character-count";
 import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
+import BulletList from "@tiptap/extension-bullet-list";
 import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./gemin";
+import ListItem from "@tiptap/extension-list-item";
 
 const limit = 5000;
 import { Book, Trash2 } from "lucide-react";
@@ -41,7 +43,6 @@ export function SimpleEditor() {
     setCurrentChapters,
     fetchStoryById,
     setStories,
-    setDrafts,
     editingStoryId,
     setEditingStoryId,
     editingChapterId,
@@ -49,11 +50,9 @@ export function SimpleEditor() {
     clearCurrentStory,
     publishStory,
     publishLoading,
-    userDrafts,
     userStories,
     updateStoryById,
     saveDraft,
-    updateDraftById,
     fetchDraftById,
   } = useEditorContext();
   const { user } = useAuth();
@@ -305,6 +304,12 @@ export function SimpleEditor() {
       Placeholder.configure({
         placeholder: "Write something already ya silly goose…",
       }),
+      BulletList.configure({
+        HTMLAttributes: {
+          class: "list-disc",
+        },
+      }),
+      ListItem,
     ],
     content: "",
   }) as Editor;

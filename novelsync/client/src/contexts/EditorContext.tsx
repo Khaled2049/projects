@@ -14,6 +14,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  increment,
   query,
   setDoc,
   updateDoc,
@@ -72,6 +73,9 @@ interface EditorContextType {
     newTitle: string;
     chapters: Chapter[];
   }) => Promise<boolean | null | string>;
+  incrementViewCount: (storyId: string) => Promise<void>;
+  incrementLikes: (storyId: string) => Promise<void>;
+  likes: number;
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
@@ -96,6 +100,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [editingStoryId, setEditingStoryId] = useState<string | null>(null);
   const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
 
+  const [likes, setLikes] = useState<number>(0);
   const [publishLoading, setpublishLoading] = useState<boolean>(false);
   const [fetchLoading, setFetchLoading] = useState<boolean>(false);
 
@@ -145,6 +150,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         authorId: user.uid,
         lastUpdated: new Date().toISOString(),
         title,
+        views: 0,
+        likes: 0,
       });
 
       // Process each chapter
@@ -219,6 +226,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
           chapters: chapterRefs,
           author: user.username || "Unknown Author",
           lastUpdated: new Date().toISOString(),
+          views: 0,
+          likes: 0,
         },
       ]);
 
@@ -230,6 +239,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
           chapters,
           author: user.username || "Unknown Author",
           lastUpdated: new Date().toISOString(),
+          views: 0,
+          likes: 0,
         },
       ]);
 
@@ -239,6 +250,18 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error("Error creating novel:", err);
       return null;
+    }
+  };
+
+  const incrementViewCount = async (storyId: string) => {
+    const storyRef = doc(firestore, "novels", storyId);
+
+    try {
+      await updateDoc(storyRef, {
+        views: increment(1),
+      });
+    } catch (error) {
+      console.error("Error incrementing views: ", error);
     }
   };
 
@@ -894,6 +917,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
           chapters,
           author: user.username || "Unknown Author",
           lastUpdated: new Date().toISOString(),
+          views: novelData.views,
+          likes: novelData.likes,
         });
       }
 
@@ -904,6 +929,37 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error("Error fetching user stories:", err);
       setFetchLoading(false);
+    }
+  };
+
+  // check if current user has liked the story
+  const checkUserLiked = async (storyId: string, user: AuthUser) => {
+    const novelDocRef = doc(firestore, "novels", storyId);
+    const novelDoc = await getDoc(novelDocRef);
+
+    if (!novelDoc.exists()) {
+      console.error("Story not found");
+      return null;
+    }
+
+    const novelData = novelDoc.data();
+    const likes = novelData?.likes;
+    const liked = likes?.includes(user.uid);
+
+    return liked;
+  };
+
+  const incrementLikes = async (storyId: string) => {
+    const storyRef = doc(firestore, "novels", storyId);
+
+    try {
+      await updateDoc(storyRef, {
+        likes: increment(1),
+      });
+
+      setLikes(likes + 1);
+    } catch (error) {
+      console.error("Error liking novel: ", error);
     }
   };
 
@@ -951,6 +1007,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
           chapters,
           author: novelData.author,
           lastUpdated: novelData.lastUpdated,
+          views: novelData.views,
+          likes: novelData.likes,
         });
       }
 
@@ -968,6 +1026,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   return (
     <EditorContext.Provider
       value={{
+        incrementViewCount,
         drafts,
         fetchAllStories,
         title,
@@ -998,6 +1057,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         fetchUserDrafts,
         fetchDraftById,
         updateDraftById,
+        likes,
+        incrementLikes,
       }}
     >
       {children}

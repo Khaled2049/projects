@@ -1,14 +1,12 @@
 import { useAuth } from "../contexts/AuthContext";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { FaArrowRight, FaComment, FaEye, FaThumbsUp } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import UserNovels from "../components/UserNovels";
+
 import NovelsContext from "../contexts/NovelsContext";
 import Suggestions from "../components/Suggestions";
 import RandomTopic from "../components/RandomTopic";
 import { useEditorContext } from "../contexts/EditorContext";
-import { Story } from "../types/IStory";
 
 const Root: React.FC = () => {
   const { user } = useAuth();
@@ -19,9 +17,8 @@ const Root: React.FC = () => {
   }
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isUserNovelsVisible, setIsUserNovelsVisible] = useState(false);
 
-  const { stories, deleteStoryById, fetchAllStories } = useEditorContext();
+  const { stories, fetchAllStories, incrementViewCount } = useEditorContext();
 
   const novelsPerPage = 9;
   const indexOfLastNovel = currentPage * novelsPerPage;
@@ -32,18 +29,6 @@ const Root: React.FC = () => {
   useEffect(() => {
     fetchAllStories();
   }, []);
-
-  const handleDelete = async (story: Story) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this novel?"
-    );
-    if (!user) {
-      return;
-    }
-    if (confirmed) {
-      await deleteStoryById(story, user);
-    }
-  };
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -77,25 +62,33 @@ const Root: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentNovels.map((story) => (
-                <div
-                  key={story.storyId}
-                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+                <Link
+                  to={`/novel/${story.storyId}`}
+                  onClick={() => incrementViewCount(story.storyId)}
                 >
-                  <h3 className="font-serif text-xl text-amber-900 mb-2">
-                    {story.title}
-                  </h3>
-                  <p className="text-gray-600 mb-1">By {story.author}</p>
-                  <p className="text-gray-500 text-sm mb-4">
-                    Last Updated:{" "}
-                    {new Date(story.lastUpdated).toLocaleDateString()}
-                  </p>
-                  <Link
-                    to={`/novel/${story.storyId}`}
-                    className="inline-block bg-amber-100 text-amber-800 px-4 py-2 rounded-full hover:bg-amber-200 transition-colors duration-200"
+                  <div
+                    key={story.storyId}
+                    className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
                   >
-                    Read Now
-                  </Link>
-                </div>
+                    <h3 className="font-serif text-xl text-amber-900 mb-2">
+                      {story.title}
+                    </h3>
+                    <p className="text-gray-600 mb-1">By {story.author}</p>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Last Updated:{" "}
+                      {new Date(story.lastUpdated).toLocaleDateString()}
+                    </p>
+
+                    <div className="flex items-center mt-4 text-gray-600 text-sm">
+                      <div className="flex items-center mr-2">
+                        <FaEye className="mr-1" /> {story.views}
+                      </div>
+                      <div className="flex items-center mr-2">
+                        <FaThumbsUp className="mr-1" /> {story.likes}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
 
