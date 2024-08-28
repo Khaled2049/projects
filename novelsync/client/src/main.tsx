@@ -5,18 +5,19 @@ import {
   Root,
   Signin,
   Signup,
-  CreateDocument,
-  NovelDetail,
+  CreateStory,
+  StoryDetail,
+  BookClub,
+  Community,
+  DraftEditor,
+  UserStories,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
-import BookClub from "./routes/BookClub";
-import UserStories from "./routes/UserStories";
+
 import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
-import { DraftEditor } from "./routes/DraftEditor";
-import Community from "./routes/Community";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +50,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/create",
-        element: <CreateDocument />,
+        element: <CreateStory />,
       },
       {
         path: "/user-stories",
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/novel/:id",
-        element: <NovelDetail />, // Add the route for the novel detail
+        element: <StoryDetail />, // Add the route for the novel detail
       },
     ],
   },

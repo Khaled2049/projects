@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { AITextGenerator } from "./gemin";
+import { AITextGenerator } from "./AITextGenerator";
 import { useNavigate } from "react-router-dom";
 
 import { Loader } from "lucide-react";

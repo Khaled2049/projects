@@ -14,7 +14,7 @@ import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
 import BulletList from "@tiptap/extension-bullet-list";
 import { Extension } from "@tiptap/core";
-import { AITextGenerator } from "./gemin";
+import { AITextGenerator } from "./AITextGenerator";
 import ListItem from "@tiptap/extension-list-item";
 
 const limit = 5000;

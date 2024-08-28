@@ -1,10 +1,10 @@
-import Chapters from "../components/Chapters";
+import { SimpleEditor } from "../../components/SimpleEditor";
 
 const CreateDocument = () => {
   return (
     <>
       <div className="px-4">
-        <Chapters />
+        <SimpleEditor />;
       </div>
     </>
   );

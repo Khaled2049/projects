@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { profiles } from "../profiles";
 import { useAI } from "../contexts/AIContext";
-import { AITextGenerator } from "./gemin";
+import { AITextGenerator } from "./AITextGenerator";
 
 const AIPartners: React.FC = () => {
   const { setSelectedAI } = useAI();

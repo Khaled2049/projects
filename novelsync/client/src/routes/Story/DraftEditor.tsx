@@ -1,5 +1,5 @@
-import "../components/style.css";
-import { useEffect, useRef, useState } from "react";
+import "../../components/style.css";
+import { useEffect, useRef } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -13,23 +13,23 @@ import Heading from "@tiptap/extension-heading";
 import History from "@tiptap/extension-history";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Extension } from "@tiptap/core";
-import { AITextGenerator } from "../components/gemin";
+import { AITextGenerator } from "../../components/AITextGenerator";
 
 const limit = 5000;
 import { Book, Trash2 } from "lucide-react";
 
-import EditorHeader from "../components/EditorHeader";
+import EditorHeader from "../../components/EditorHeader";
 
-import { useAI } from "../contexts/AIContext";
+import { useAI } from "../../contexts/AIContext";
 import { Loader } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 import { v4 as uuidv4 } from "uuid";
-import { useEditorContext } from "../contexts/EditorContext";
-import { Chapter, Draft } from "../types/IStory";
+import { useEditorContext } from "../../contexts/EditorContext";
+import { Chapter, Draft } from "../../types/IStory";
 
-export function DraftEditor() {
+const DraftEditor = () => {
   const {
     title,
     setTitle,
@@ -390,4 +390,6 @@ export function DraftEditor() {
       </div>
     </div>
   );
-}
+};
+
+export default DraftEditor;

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { AITextGenerator } from "../components/gemin"; // Assuming AITextGenerator is in the same directory
+import { AITextGenerator } from "../components/AITextGenerator"; // Assuming AITextGenerator is in the same directory
 
 type AIContextType = {
   selectedAI: AITextGenerator | null;

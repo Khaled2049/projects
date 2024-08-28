@@ -5,11 +5,11 @@ import { FaTwitter, FaEnvelope, FaShareAlt } from "react-icons/fa";
 
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
-import { useEditorContext } from "../contexts/EditorContext";
+import { useEditorContext } from "../../contexts/EditorContext";
 import { Loader } from "lucide-react";
-import { Chapter, Story } from "../types/IStory";
+import { Chapter, Story } from "../../types/IStory";
 
-const NovelDetail = () => {
+const StoryDetail = () => {
   const [liked, setLiked] = useState<boolean>(false);
   const [story, setStory] = useState<Story | null>(null);
   const location = useLocation();
@@ -164,4 +164,4 @@ const NovelDetail = () => {
   );
 };
 
-export default NovelDetail;
+export default StoryDetail;
