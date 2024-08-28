@@ -1,20 +1,14 @@
 import { useAuth } from "../contexts/AuthContext";
-import { FaArrowRight, FaComment, FaEye, FaThumbsUp } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-
-import NovelsContext from "../contexts/NovelsContext";
+import { FaArrowRight, FaEye, FaThumbsUp } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Suggestions from "../components/Suggestions";
 import RandomTopic from "../components/RandomTopic";
 import { useEditorContext } from "../contexts/EditorContext";
+import { Story } from "../types/IStory";
 
 const Root: React.FC = () => {
   const { user } = useAuth();
-  const novelsContext = useContext(NovelsContext);
-
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -25,6 +19,7 @@ const Root: React.FC = () => {
   const indexOfFirstNovel = indexOfLastNovel - novelsPerPage;
   const currentNovels = stories.slice(indexOfFirstNovel, indexOfLastNovel);
   const totalPages = Math.ceil(stories.length / novelsPerPage);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAllStories();
@@ -32,6 +27,11 @@ const Root: React.FC = () => {
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleStoryClick = (story: Story) => {
+    incrementViewCount(story.storyId);
+    navigate(`/novel/${story.storyId}`, { state: { story } });
   };
 
   return (
@@ -62,33 +62,29 @@ const Root: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentNovels.map((story) => (
-                <Link
-                  to={`/novel/${story.storyId}`}
-                  onClick={() => incrementViewCount(story.storyId)}
+                <div
+                  onClick={() => handleStoryClick(story)}
+                  key={story.storyId}
+                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
                 >
-                  <div
-                    key={story.storyId}
-                    className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
-                  >
-                    <h3 className="font-serif text-xl text-amber-900 mb-2">
-                      {story.title}
-                    </h3>
-                    <p className="text-gray-600 mb-1">By {story.author}</p>
-                    <p className="text-gray-500 text-sm mb-4">
-                      Last Updated:{" "}
-                      {new Date(story.lastUpdated).toLocaleDateString()}
-                    </p>
+                  <h3 className="font-serif text-xl text-amber-900 mb-2">
+                    {story.title}
+                  </h3>
+                  <p className="text-gray-600 mb-1">By {story.author}</p>
+                  <p className="text-gray-500 text-sm mb-4">
+                    Last Updated:{" "}
+                    {new Date(story.lastUpdated).toLocaleDateString()}
+                  </p>
 
-                    <div className="flex items-center mt-4 text-gray-600 text-sm">
-                      <div className="flex items-center mr-2">
-                        <FaEye className="mr-1" /> {story.views}
-                      </div>
-                      <div className="flex items-center mr-2">
-                        <FaThumbsUp className="mr-1" /> {story.likes}
-                      </div>
+                  <div className="flex items-center mt-4 text-gray-600 text-sm">
+                    <div className="flex items-center mr-2">
+                      <FaEye className="mr-1" /> {story.views}
+                    </div>
+                    <div className="flex items-center mr-2">
+                      <FaThumbsUp className="mr-1" /> {story.likes}
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
 

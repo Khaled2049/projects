@@ -76,6 +76,8 @@ interface EditorContextType {
   incrementViewCount: (storyId: string) => Promise<void>;
   incrementLikes: (storyId: string) => Promise<void>;
   likes: number;
+  setsuggestion: React.Dispatch<React.SetStateAction<string>>;
+  suggestion: string;
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
@@ -106,6 +108,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   const [userStories, setUserStories] = useState<Story[]>([]);
   const [userDrafts, setUserDrafts] = useState<Draft[]>([]);
+
+  const [suggestion, setsuggestion] = useState("");
 
   const publishStory = async ({
     storyId,
@@ -956,8 +960,6 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       await updateDoc(storyRef, {
         likes: increment(1),
       });
-
-      setLikes(likes + 1);
     } catch (error) {
       console.error("Error liking novel: ", error);
     }
@@ -1059,6 +1061,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         updateDraftById,
         likes,
         incrementLikes,
+        setsuggestion,
+        suggestion,
       }}
     >
       {children}

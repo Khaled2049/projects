@@ -1,5 +1,5 @@
 import "../components/style.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -19,7 +19,7 @@ const limit = 5000;
 import { Book, Trash2 } from "lucide-react";
 
 import EditorHeader from "../components/EditorHeader";
-import NovelsContext from "../contexts/NovelsContext";
+
 import { useAI } from "../contexts/AIContext";
 import { Loader } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -27,11 +27,9 @@ import { useAuth } from "../contexts/AuthContext";
 
 import { v4 as uuidv4 } from "uuid";
 import { useEditorContext } from "../contexts/EditorContext";
-import { Chapter, Draft, Story } from "../types/IStory";
+import { Chapter, Draft } from "../types/IStory";
 
 export function DraftEditor() {
-  const [isEditing, setIsEditing] = useState(false);
-
   const {
     title,
     setTitle,
@@ -39,7 +37,7 @@ export function DraftEditor() {
     setCurrentChapterTitle,
     currentChapters,
     setCurrentChapters,
-    fetchStoryById,
+
     setDrafts,
     editingStoryId,
     setEditingStoryId,
@@ -50,9 +48,10 @@ export function DraftEditor() {
     publishLoading,
     userDrafts,
 
-    saveDraft,
     updateDraftById,
     fetchDraftById,
+    suggestion,
+    setsuggestion,
   } = useEditorContext();
   const { user } = useAuth();
 
@@ -120,26 +119,6 @@ export function DraftEditor() {
     }
   };
 
-  const addDraft = async () => {
-    if (!user) return "Please login to save a draft";
-    if (title && currentChapters.length > 0) {
-      const newStory = {
-        draftId: uuidv4(),
-        user,
-        title,
-        chapters: currentChapters,
-      };
-      try {
-        await saveDraft(newStory);
-      } catch (error) {
-        console.log("Error publishing story", error);
-      }
-      clearCurrentStory();
-    } else {
-      alert("Please enter a title and at least one chapter.");
-    }
-  };
-
   const editDraft = () => {
     if (editingStoryId && title && currentChapters.length > 0) {
       const updatedDrafts = userDrafts.map((draft) =>
@@ -162,20 +141,6 @@ export function DraftEditor() {
     }
   };
 
-  const loadStoryForEditing = async (story: Story) => {
-    const s = await fetchStoryById(story);
-
-    if (!s) return;
-    setTitle(s.title);
-    setCurrentChapters(s.chapters);
-    setEditingStoryId(s.storyId);
-    setIsEditing(true);
-    if (s.chapters.length > 0) {
-      loadChapterForEditing(s.chapters[0]);
-    } else {
-      editor.commands.clearContent();
-    }
-  };
   const loadDraftForEditing = async (draft: Draft) => {
     const s = await fetchDraftById(draft);
 
@@ -183,7 +148,6 @@ export function DraftEditor() {
     setTitle(s.title);
     setCurrentChapters(s.chapters);
     setEditingStoryId(s.draftId);
-    setIsEditing(true);
     if (s.chapters.length > 0) {
       loadChapterForEditing(s.chapters[0]);
     } else {
@@ -197,15 +161,7 @@ export function DraftEditor() {
     setEditingChapterId(chapter.chapterId);
   };
 
-  const novelsContext = useContext(NovelsContext);
-
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
-
   const navigate = useNavigate();
-
-  const { suggestion, setsuggestion } = novelsContext;
 
   const { selectedAI } = useAI();
   const aiGeneratorRef = useRef<AITextGenerator | null>(null);

@@ -1,8 +1,7 @@
 import { FaBook, FaEdit, FaTrashAlt } from "react-icons/fa";
 // import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useContext, useEffect } from "react";
-import NovelsContext from "../contexts/NovelsContext";
+import { useEffect } from "react";
 import { AuthUser } from "../types/IUser";
 import { useEditorContext } from "../contexts/EditorContext";
 import { Story } from "../types/IStory";
@@ -15,11 +14,6 @@ interface UserNovelsProps {
 
 const UserNovels: React.FC<UserNovelsProps> = ({ onDelete, onEdit, user }) => {
   // const navigate = useNavigate();
-  const novelsContext = useContext(NovelsContext);
-
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
 
   const { userStories, fetchUserStories } = useEditorContext();
 

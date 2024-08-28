@@ -1,5 +1,5 @@
 import "./style.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -21,7 +21,6 @@ const limit = 5000;
 import { Book, Trash2 } from "lucide-react";
 
 import EditorHeader from "./EditorHeader";
-import NovelsContext from "../contexts/NovelsContext";
 import { useAI } from "../contexts/AIContext";
 import { Loader } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -54,6 +53,8 @@ export function SimpleEditor() {
     updateStoryById,
     saveDraft,
     fetchDraftById,
+    suggestion,
+    setsuggestion,
   } = useEditorContext();
   const { user } = useAuth();
 
@@ -209,15 +210,7 @@ export function SimpleEditor() {
     setEditingChapterId(chapter.chapterId);
   };
 
-  const novelsContext = useContext(NovelsContext);
-
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
-
   const navigate = useNavigate();
-
-  const { suggestion, setsuggestion } = novelsContext;
 
   const { selectedAI } = useAI();
   const aiGeneratorRef = useRef<AITextGenerator | null>(null);

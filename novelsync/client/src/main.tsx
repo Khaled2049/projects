@@ -7,12 +7,10 @@ import {
   Signup,
   CreateDocument,
   NovelDetail,
-  // Edit,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { NavbarWrapper } from "./NavbarWrapper";
-import { NovelsProvider } from "./contexts/NovelsContext";
 import BookClub from "./routes/BookClub";
 import UserStories from "./routes/UserStories";
 import { AIProvider } from "./contexts/AIContext";
@@ -57,10 +55,6 @@ const router = createBrowserRouter([
         path: "/user-stories",
         element: <UserStories />,
       },
-      // {
-      //   path: "/edit/:id",
-      //   element: <Edit />,
-      // },
       {
         path: "/novel/:id",
         element: <NovelDetail />, // Add the route for the novel detail
@@ -71,13 +65,11 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
-      <NovelsProvider>
-        <AIProvider>
-          <EditorProvider>
-            <RouterProvider router={router} />
-          </EditorProvider>
-        </AIProvider>
-      </NovelsProvider>
+      <AIProvider>
+        <EditorProvider>
+          <RouterProvider router={router} />
+        </EditorProvider>
+      </AIProvider>
     </AuthProvider>
   </React.StrictMode>
 );
