@@ -11,6 +11,7 @@ import {
   Community,
   DraftEditor,
   UserStories,
+  AllStories,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Root />,
+      },
+      {
+        path: "/stories",
+        element: <AllStories />,
       },
       {
         path: "/book-clubs",

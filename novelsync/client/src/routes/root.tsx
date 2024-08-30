@@ -1,116 +1,211 @@
-import { useAuth } from "../contexts/AuthContext";
-import { FaArrowRight, FaEye, FaThumbsUp } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import Suggestions from "../components/Suggestions";
-import RandomTopic from "../components/RandomTopic";
-import { useEditorContext } from "../contexts/EditorContext";
-import { Story } from "../types/IStory";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { useEffect } from "react";
+import {
+  Book,
+  BookOpen,
+  Feather,
+  Globe,
+  MessageCircle,
+  Users,
+} from "lucide-react";
+import { profiles } from "../profiles";
 
-const Root: React.FC = () => {
-  const { user } = useAuth();
-
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const { stories, fetchAllStories, incrementViewCount } = useEditorContext();
-
-  const novelsPerPage = 9;
-  const indexOfLastNovel = currentPage * novelsPerPage;
-  const indexOfFirstNovel = indexOfLastNovel - novelsPerPage;
-  const currentNovels = stories.slice(indexOfFirstNovel, indexOfLastNovel);
-  const totalPages = Math.ceil(stories.length / novelsPerPage);
-  const navigate = useNavigate();
-
+const HomePage = () => {
   useEffect(() => {
-    fetchAllStories();
+    AOS.init({ duration: 1000 });
   }, []);
 
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+  const novels = [
+    {
+      title: "The Lost Kingdom",
+      author: "John Doe",
+      description: "An epic fantasy adventure.",
+      cover: "https://via.placeholder.com/150", // Placeholder image
+    },
+    {
+      title: "Echoes of the Past",
+      author: "Jane Smith",
+      description: "A gripping historical novel.",
+      cover: "https://via.placeholder.com/150", // Placeholder image
+    },
+    {
+      title: "Future Visions",
+      author: "Alice Johnson",
+      description: "A journey into the unknown.",
+      cover: "https://via.placeholder.com/150", // Placeholder image
+    },
+  ];
 
-  const handleStoryClick = (story: Story) => {
-    incrementViewCount(story.storyId);
-    navigate(`/novel/${story.storyId}`, { state: { story } });
-  };
+  const features = [
+    {
+      title: "Draft Mode and Feedback",
+      description:
+        "Save your progress and continue whenever you're ready. Get valuable feedback from a community of fellow writers and readers.",
+    },
+    {
+      title: "AI Partners",
+      description:
+        "Collaborate with AI partners to brainstorm and develop your ideas. Let AI assist you in writing your novel with creative suggestions.",
+    },
+    {
+      title: "Global Audience",
+      description: "Share your novel with readers around the world.",
+    },
+
+    {
+      title: "Author Updates",
+      description:
+        "Follow your favorite authors and get the latest updates on their works and thoughts.",
+    },
+    {
+      title: "Book Clubs",
+      description:
+        "Join book clubs and engage in meaningful discussions with fellow readers.",
+    },
+    {
+      title: "Spoiler-Free Reviews",
+      description:
+        "Read and write reviews without the fear of spoilers, so you can enjoy the story to the fullest.",
+    },
+  ];
 
   return (
-    <div className="bg-amber-50 min-h-screen py-8 relative ">
-      <div className="container mx-auto px-4">
-        {user && (
-          <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
-            <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
-              <span>Welcome back, {user.username}!</span>
-              <Link
-                to="/create"
-                className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
+    <div className="bg-amber-50 text-amber-900">
+      <header className="bg-gradient-to-r from-amber-700 to-amber-900 text-amber-50 py-16 h-[70vh] flex items-center">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 drop-shadow-lg">
+            Welcome to NovelSync
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 font-light">
+            Your gateway to amazing stories and novels.
+          </p>
+          <button className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">
+            Start Your Journey
+          </button>
+        </div>
+      </header>
+
+      <section className="py-16 bg-amber-100" data-aos="fade-up">
+        <div className="container mx-auto px-4">
+          {/* Featured Novels Section */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-serif font-bold mb-8 text-center">
+              Featured Novels
+            </h2>
+            <div className="max-w-xl mx-auto border border-amber-400">
+              <Carousel
+                showArrows={true}
+                autoPlay={true}
+                infiniteLoop={true}
+                showThumbs={false}
+                showStatus={false}
+                interval={5000}
+                className="bg-amber-50 p-8 rounded-lg"
               >
-                Start Writing
-                <FaArrowRight className="ml-2" />
-              </Link>
-            </h1>
-          </div>
-        )}
-        <div className="flex flex-wrap mx-4">
-          <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700 space-y-4">
-            <RandomTopic />
-            <Suggestions />
-          </div>
-
-          <div className="w-full lg:w-3/4 px-4">
-            <h2 className="text-2xl font-serif text-amber-900 mb-6">Stories</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentNovels.map((story) => (
-                <div
-                  onClick={() => handleStoryClick(story)}
-                  key={story.storyId}
-                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
-                >
-                  <h3 className="font-serif text-xl text-amber-900 mb-2">
-                    {story.title}
-                  </h3>
-                  <p className="text-gray-600 mb-1">By {story.author}</p>
-                  <p className="text-gray-500 text-sm mb-4">
-                    Last Updated:{" "}
-                    {new Date(story.lastUpdated).toLocaleDateString()}
-                  </p>
-
-                  <div className="flex items-center mt-4 text-gray-600 text-sm">
-                    <div className="flex items-center mr-2">
-                      <FaEye className="mr-1" /> {story.views}
-                    </div>
-                    <div className="flex items-center mr-2">
-                      <FaThumbsUp className="mr-1" /> {story.likes}
-                    </div>
+                {novels.map((novel, index) => (
+                  <div key={index} className="p-6 rounded-lg text-center">
+                    <img
+                      src={novel.cover}
+                      alt={`${novel.title} cover`}
+                      className="w-full h-auto mb-4 rounded-lg"
+                    />
+                    <h3 className="text-2xl font-serif font-bold mb-2">
+                      {novel.title}
+                    </h3>
+                    <p className="text-amber-700 mb-4 italic">
+                      by {novel.author}
+                    </p>
+                    <p className="text-amber-900">{novel.description}</p>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center mt-8">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNumber) => (
-                  <button
-                    key={pageNumber}
-                    onClick={() => handlePageChange(pageNumber)}
-                    className={`mx-1 px-3 py-1 rounded ${
-                      currentPage === pageNumber
-                        ? "bg-amber-600 text-white"
-                        : "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                )
-              )}
+                ))}
+              </Carousel>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-amber-50" data-aos="fade-up">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-serif font-bold mb-12 text-center">
+            Our Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                <div className="text-amber-600 mb-4">
+                  {index === 0 && <Book size={48} />}
+                  {index === 1 && <Feather size={48} />}
+                  {index === 2 && <Users size={48} />}
+                  {index === 3 && <Globe size={48} />}
+                  {index === 4 && <MessageCircle size={48} />}
+                  {index === 5 && <BookOpen size={48} />}
+                </div>
+                <h3 className="text-2xl font-serif font-bold mb-4">
+                  {feature.title}
+                </h3>
+                <p className="text-amber-800">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Meet Our AI Partners Section */}
+      <section className="py-16 bg-amber-100" data-aos="fade-up">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-serif font-bold mb-8 text-center">
+            Meet Our AI Partners
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {profiles.map((profile) => (
+              <div
+                key={profile.id}
+                className="bg-white p-6 rounded-lg text-center"
+              >
+                <img
+                  src={profile.img}
+                  alt={profile.name}
+                  className="w-24 h-24 mx-auto rounded-full mb-4"
+                />
+                <h3 className="text-xl font-bold mb-2">{profile.name}</h3>
+                <p className="text-gray-700">{profile.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-amber-50" data-aos="fade-up">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-serif font-bold mb-8 text-center">
+            What Our Authors Say
+          </h2>
+          <div className="max-w-xl mx-auto bg-white p-8 rounded-lg">
+            <p className="text-xl italic mb-4">
+              "I really enjoy this platform! I was able to write my first novel
+              and share it with my friends and family. I absolutely love using
+              this app."
+            </p>
+            <p className="text-right font-bold">- Ali</p>
+          </div>
+        </div>
+      </section>
+      <div className="text-center">
+        <p className="text-sm md:text-base text-red-900 bg-red">
+          This is a beta version, so there might be bugs and errors. But don't
+          worry, Khaled is working hard! If you see any errors or need some
+          features, hit him up or create an issue on GitHub.
+        </p>
       </div>
     </div>
   );
 };
 
-export default Root;
+export default HomePage;
