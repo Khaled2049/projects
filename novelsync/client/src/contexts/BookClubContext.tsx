@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { IBookClub, IClub } from "../types/IClub"; // Define your BookClub type here
+import { IClub } from "../types/IClub"; // Define your BookClub type here
 
 interface BookClubContextProps {
   bookClubs: IClub[];
@@ -24,10 +24,22 @@ export const useBookClub = () => {
 export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [bookClubs, setBookClubs] = useState<IClub[]>([]);
+  const [bookClubs, setBookClubs] = useState<IClub[]>([
+    {
+      creatorId: "1",
+      id: "1",
+      name: "Classic Literature Lovers",
+      members: 1250,
+      description:
+        "Dive into the world of classic literature with fellow book enthusiasts.",
+      category: "Classics",
+      activity: "Very Active",
+      image: "/api/placeholder/400/250",
+    },
+  ]);
 
   const createBookClub = async (club: IClub) => {
-    // Logic to add the club to Firebase and update state
+    console.log("club", club);
     setBookClubs([...bookClubs, club]);
   };
 
@@ -36,14 +48,12 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const updateBookClub = async (id: string, updatedClub: IClub) => {
-    // Logic to update the club in Firebase and state
     setBookClubs(
       bookClubs.map((club) => (club.id === id ? updatedClub : club))
     );
   };
 
   const deleteBookClub = async (id: string) => {
-    // Logic to delete the club from Firebase and state
     setBookClubs(bookClubs.filter((club) => club.id !== id));
   };
 

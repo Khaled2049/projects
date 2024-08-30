@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { IBookClub } from "../types/IClub";
-import { BookOpen, Clock, UserPlus, Users, X } from "lucide-react";
+import { IClub } from "../types/IClub";
+import { BookOpen, Clock, UserPlus, Users, X, Edit } from "lucide-react";
 
-const BookClubCard = ({ club }: IBookClub) => {
+interface BookClubCardProps {
+  club: IClub;
+  onEdit: () => void;
+}
+
+const BookClubCard = ({ club, onEdit }: BookClubCardProps) => {
   const [joined, setJoined] = useState(false);
 
   return (
@@ -23,24 +28,36 @@ const BookClubCard = ({ club }: IBookClub) => {
           <Clock size={16} className="mr-1" />
           <span>{club.activity}</span>
         </div>
-        <button
-          onClick={() => setJoined(!joined)}
-          className={`w-full py-2 px-4 rounded-full flex items-center justify-center ${
-            joined ? "bg-gray-200 text-gray-800" : "bg-blue-600 text-white"
-          }`}
-        >
-          {joined ? (
-            <>
-              <X size={16} className="mr-2" />
-              Leave Group
-            </>
-          ) : (
-            <>
-              <UserPlus size={16} className="mr-2" />
-              Join Group
-            </>
-          )}
-        </button>
+
+        <div className="flex justify-between items-center">
+          <button
+            onClick={() => setJoined(!joined)}
+            className={`w-full py-2 px-4 rounded-full flex items-center justify-center ${
+              joined ? "bg-gray-200 text-gray-800" : "bg-blue-600 text-white"
+            }`}
+          >
+            {joined ? (
+              <>
+                <X size={16} className="mr-2" />
+                Leave Group
+              </>
+            ) : (
+              <>
+                <UserPlus size={16} className="mr-2" />
+                Join Group
+              </>
+            )}
+          </button>
+
+          {/* Edit Button */}
+          <button
+            onClick={onEdit}
+            className="ml-4 py-2 px-3 bg-yellow-500 text-white rounded-full flex items-center justify-center"
+          >
+            <Edit size={16} className="mr-2" />
+            Edit
+          </button>
+        </div>
       </div>
     </div>
   );

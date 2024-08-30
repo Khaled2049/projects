@@ -1,30 +1,26 @@
 import { useState } from "react";
-
 import { Plus } from "lucide-react";
 import BookClubCard from "../../components/BookClubCard";
 import { IClub } from "../../types/IClub";
 import CreateBookClub from "./CreateBookClub";
-// Demo data for book clubs
-const bookClubs = [
-  {
-    id: "1",
-    name: "Classic Literature Lovers",
-    members: 1250,
-    description:
-      "Dive into the world of classic literature with fellow book enthusiasts.",
-    category: "Classics",
-    activity: "Very Active",
-    image: "/api/placeholder/400/250",
-  },
-];
+import UpdateBookClub from "./UpdateBookClub";
+import { useBookClub } from "../../contexts/BookClubContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 const BookClubs = () => {
-  const [clubs, setClubs] = useState(bookClubs);
+  const { bookClubs, createBookClub, updateBookClub } = useBookClub();
+  const { user } = useAuth();
+
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [selectedClub, setSelectedClub] = useState<IClub | null>(null);
 
   const handleCreateClub = (newClub: IClub) => {
-    setClubs([newClub, ...clubs]);
-    setShowCreateForm(false); // Hide the form after creating the club
+    if (user) {
+      newClub.creatorId = user.uid;
+    }
+    createBookClub(newClub);
+    setShowCreateForm(false);
   };
 
   const handleShowCreateForm = () => {
@@ -35,9 +31,29 @@ const BookClubs = () => {
     setShowCreateForm(false);
   };
 
+  const handleUpdateClub = (updatedClub: IClub) => {
+    updateBookClub(updatedClub.id, updatedClub);
+    setShowUpdateForm(false);
+    setSelectedClub(null);
+  };
+
+  const handleShowUpdateForm = (club: IClub) => {
+    if (club.creatorId === user?.uid) {
+      setSelectedClub(club);
+      setShowUpdateForm(true);
+    } else {
+      alert("You can only update clubs you created.");
+    }
+  };
+
+  const handleCancelUpdateClub = () => {
+    setShowUpdateForm(false);
+    setSelectedClub(null);
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-4">
-      {!showCreateForm ? (
+      {!showCreateForm && !showUpdateForm ? (
         <>
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Discover Book Clubs</h1>
@@ -50,16 +66,29 @@ const BookClubs = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {clubs.map((club) => (
-              <BookClubCard key={club.id} club={club} />
+            {bookClubs.map((club) => (
+              <BookClubCard
+                key={club.id}
+                club={club}
+                onEdit={() => handleShowUpdateForm(club)}
+              />
             ))}
           </div>
         </>
-      ) : (
+      ) : showCreateForm ? (
         <CreateBookClub
           onCreate={handleCreateClub}
           onCancel={handleCancelCreateClub}
         />
+      ) : (
+        showUpdateForm &&
+        selectedClub && (
+          <UpdateBookClub
+            club={selectedClub}
+            onUpdate={handleUpdateClub}
+            onCancel={handleCancelUpdateClub}
+          />
+        )
       )}
     </div>
   );

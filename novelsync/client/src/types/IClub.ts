@@ -6,6 +6,7 @@ export interface IClub {
   members: number;
   category: string;
   activity: string;
+  creatorId: string;
 }
 
 export interface IBookClub {
