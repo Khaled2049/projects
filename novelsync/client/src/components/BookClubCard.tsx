@@ -1,13 +1,22 @@
 import { useState } from "react";
 import { IClub } from "../types/IClub";
-import { BookOpen, Clock, UserPlus, Users, X, Edit } from "lucide-react";
+import {
+  BookOpen,
+  Clock,
+  UserPlus,
+  Users,
+  X,
+  Edit,
+  Trash2,
+} from "lucide-react";
 
 interface BookClubCardProps {
   club: IClub;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
-const BookClubCard = ({ club, onEdit }: BookClubCardProps) => {
+const BookClubCard = ({ club, onEdit, onDelete }: BookClubCardProps) => {
   const [joined, setJoined] = useState(false);
 
   return (
@@ -49,14 +58,23 @@ const BookClubCard = ({ club, onEdit }: BookClubCardProps) => {
             )}
           </button>
 
-          {/* Edit Button */}
-          <button
-            onClick={onEdit}
-            className="ml-4 py-2 px-3 bg-yellow-500 text-white rounded-full flex items-center justify-center"
-          >
-            <Edit size={16} className="mr-2" />
-            Edit
-          </button>
+          {/* Edit and Delete Buttons */}
+          <div className="ml-4 flex space-x-2">
+            <button
+              onClick={onEdit}
+              className="py-2 px-3 bg-yellow-500 text-white rounded-full flex items-center justify-center"
+            >
+              <Edit size={16} className="mr-2" />
+              Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="py-2 px-3 bg-red-600 text-white rounded-full flex items-center justify-center"
+            >
+              <Trash2 size={16} className="mr-2" />
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>

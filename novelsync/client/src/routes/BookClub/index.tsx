@@ -8,7 +8,8 @@ import { useBookClub } from "../../contexts/BookClubContext";
 import { useAuth } from "../../contexts/AuthContext";
 
 const BookClubs = () => {
-  const { bookClubs, createBookClub, updateBookClub } = useBookClub();
+  const { bookClubs, createBookClub, updateBookClub, deleteBookClub } =
+    useBookClub();
   const { user } = useAuth();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -46,6 +47,16 @@ const BookClubs = () => {
     }
   };
 
+  const handleDeleteClub = (club: IClub) => {
+    if (club.creatorId === user?.uid) {
+      if (window.confirm("Are you sure you want to delete this club?")) {
+        deleteBookClub(club.id);
+      }
+    } else {
+      alert("You can only delete clubs you created.");
+    }
+  };
+
   const handleCancelUpdateClub = () => {
     setShowUpdateForm(false);
     setSelectedClub(null);
@@ -71,6 +82,7 @@ const BookClubs = () => {
                 key={club.id}
                 club={club}
                 onEdit={() => handleShowUpdateForm(club)}
+                onDelete={() => handleDeleteClub(club)}
               />
             ))}
           </div>
