@@ -3,7 +3,7 @@ export interface IClub {
   name: string;
   description: string;
   image: string;
-  members: number;
+  members: string[];
   category: string;
   activity: string;
   creatorId: string;

@@ -8,8 +8,14 @@ import { useBookClub } from "../../contexts/BookClubContext";
 import { useAuth } from "../../contexts/AuthContext";
 
 const BookClubs = () => {
-  const { bookClubs, createBookClub, updateBookClub, deleteBookClub } =
-    useBookClub();
+  const {
+    bookClubs,
+    createBookClub,
+    updateBookClub,
+    deleteBookClub,
+    joinBookClub,
+    leaveBookClub,
+  } = useBookClub();
   const { user } = useAuth();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -47,6 +53,15 @@ const BookClubs = () => {
     }
   };
 
+  const handleJoinClub = (clubId: string) => {
+    if (user) {
+      console.log(user.uid, "Joining club", clubId);
+      joinBookClub(clubId, user.uid);
+    } else {
+      alert("You must be logged in to join a club.");
+    }
+  };
+
   const handleDeleteClub = (club: IClub) => {
     if (club.creatorId === user?.uid) {
       if (window.confirm("Are you sure you want to delete this club?")) {
@@ -54,6 +69,13 @@ const BookClubs = () => {
       }
     } else {
       alert("You can only delete clubs you created.");
+    }
+  };
+
+  const handleLeaveClub = (clubId: string) => {
+    if (user) {
+      console.log(user.uid, "Leaving club", clubId);
+      leaveBookClub(clubId, user.uid);
     }
   };
 
@@ -79,16 +101,20 @@ const BookClubs = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {bookClubs.map((club) => (
               <BookClubCard
+                joined={user ? club.members.includes(user.uid) : false}
                 key={club.id}
                 club={club}
                 onEdit={() => handleShowUpdateForm(club)}
                 onDelete={() => handleDeleteClub(club)}
+                onJoin={() => handleJoinClub(club.id)}
+                onLeave={() => handleLeaveClub(club.id)}
               />
             ))}
           </div>
         </>
-      ) : showCreateForm ? (
+      ) : showCreateForm && user ? (
         <CreateBookClub
+          user={user}
           onCreate={handleCreateClub}
           onCancel={handleCancelCreateClub}
         />

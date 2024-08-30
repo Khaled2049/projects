@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IClub } from "../../types/IClub";
+import { AuthUser } from "../../types/IUser";
 
 const CreateBookClub = ({
+  user,
   onCreate,
   onCancel,
 }: {
+  user: AuthUser;
   onCreate: (newClub: IClub) => void;
   onCancel: () => void;
 }) => {
@@ -28,9 +31,10 @@ const CreateBookClub = ({
     const clubWithDefaults = {
       ...newClub,
       id: uuidv4(),
-      members: 1,
+      members: [user.uid],
       activity: "New",
       image: "/api/placeholder/400/250",
+      creatorId: user.uid,
     };
     onCreate(clubWithDefaults);
   };

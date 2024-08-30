@@ -7,6 +7,8 @@ interface BookClubContextProps {
   getBookClub: (id: string) => IClub | undefined;
   updateBookClub: (id: string, IClub: IClub) => Promise<void>;
   deleteBookClub: (id: string) => Promise<void>;
+  joinBookClub: (clubId: string, userId: string) => Promise<void>;
+  leaveBookClub: (clubId: string, userId: string) => Promise<void>;
 }
 
 const BookClubContext = createContext<BookClubContextProps | undefined>(
@@ -29,7 +31,7 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
       creatorId: "1",
       id: "1",
       name: "Classic Literature Lovers",
-      members: 1250,
+      members: ["1"],
       description:
         "Dive into the world of classic literature with fellow book enthusiasts.",
       category: "Classics",
@@ -57,6 +59,26 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
     setBookClubs(bookClubs.filter((club) => club.id !== id));
   };
 
+  const joinBookClub = async (clubId: string, userId: string) => {
+    setBookClubs(
+      bookClubs.map((club) =>
+        club.id === clubId
+          ? { ...club, members: [...club.members, userId] }
+          : club
+      )
+    );
+  };
+
+  const leaveBookClub = async (clubId: string, userId: string) => {
+    setBookClubs(
+      bookClubs.map((club) =>
+        club.id === clubId
+          ? { ...club, members: club.members.filter((id) => id !== userId) }
+          : club
+      )
+    );
+  };
+
   return (
     <BookClubContext.Provider
       value={{
@@ -65,6 +87,8 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
         getBookClub,
         updateBookClub,
         deleteBookClub,
+        joinBookClub,
+        leaveBookClub,
       }}
     >
       {children}
