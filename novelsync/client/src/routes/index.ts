@@ -8,6 +8,7 @@ export { default as DraftEditor } from "./Story/DraftEditor";
 export { default as UserStories } from "./Story/UserStories";
 export { default as StoryDetail } from "./Story/StoryDetail";
 
-export { default as BookClub } from "./BookClub/BookClub";
+export { default as BookClubs } from "./BookClub";
+export { default as CreateBookClub } from "./BookClub/CreateBookClub";
 
 export { default as Community } from "./Community/Community";

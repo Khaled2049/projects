@@ -7,7 +7,7 @@ import {
   Signup,
   CreateStory,
   StoryDetail,
-  BookClub,
+  BookClubs,
   Community,
   DraftEditor,
   UserStories,
@@ -18,6 +18,7 @@ import { NavbarWrapper } from "./NavbarWrapper";
 
 import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
+import { BookClubProvider } from "./contexts/BookClubContext";
 
 const router = createBrowserRouter([
   {
@@ -30,7 +31,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/book-clubs",
-        element: <BookClub />,
+        element: <BookClubs />, // This will be the main component for the book clubs
       },
       {
         path: "/community",
@@ -67,9 +68,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
       <AIProvider>
-        <EditorProvider>
-          <RouterProvider router={router} />
-        </EditorProvider>
+        <BookClubProvider>
+          <EditorProvider>
+            <RouterProvider router={router} />
+          </EditorProvider>
+        </BookClubProvider>
       </AIProvider>
     </AuthProvider>
   </React.StrictMode>
