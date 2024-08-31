@@ -11,5 +11,9 @@ export { default as AllStories } from "./Story/AllStories";
 
 export { default as BookClubs } from "./BookClub";
 export { default as CreateBookClub } from "./BookClub/CreateBookClub";
+export { default as BookClubDetails } from "./BookClub/BookClubDetails";
 
 export { default as Community } from "./Community/Community";
+
+export { default as Library } from "./Library";
+export { default as BookDetails } from "./Library/BookDetails";

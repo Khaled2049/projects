@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Book, Plus } from "lucide-react";
 import BookClubCard from "../../components/BookClubCard";
 import { IClub } from "../../types/IClub";
 import CreateBookClub from "./CreateBookClub";
 import UpdateBookClub from "./UpdateBookClub";
 import { useBookClub } from "../../contexts/BookClubContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const BookClubs = () => {
   const {
@@ -85,47 +86,61 @@ const BookClubs = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4">
+    <div className="bg-amber-50 min-h-screen p-6">
       {!showCreateForm && !showUpdateForm ? (
         <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">Discover Book Clubs</h1>
-            <button
-              onClick={handleShowCreateForm}
-              className="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center"
-            >
-              <Plus size={16} className="mr-2" />
-              Create Club
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {bookClubs.map((club) => (
-              <BookClubCard
-                joined={user ? club.members.includes(user.uid) : false}
-                key={club.id}
-                club={club}
-                onEdit={() => handleShowUpdateForm(club)}
-                onDelete={() => handleDeleteClub(club)}
-                onJoin={() => handleJoinClub(club.id)}
-                onLeave={() => handleLeaveClub(club.id)}
-              />
-            ))}
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-serif font-bold text-amber-800 mb-4 md:mb-0 flex items-center">
+                <Book className="mr-3" size={36} />
+                Discover Book Clubs
+              </h1>
+              <button
+                onClick={handleShowCreateForm}
+                className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full flex items-center transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
+              >
+                <Plus size={20} className="mr-2" />
+                Create Club
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bookClubs.map((club) => (
+                <Link
+                  to={`/book-clubs/${club.id}`}
+                  key={club.id}
+                  className="block transition duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <BookClubCard
+                    joined={user ? club.members.includes(user.uid) : false}
+                    club={club}
+                    onEdit={() => handleShowUpdateForm(club)}
+                    onDelete={() => handleDeleteClub(club)}
+                    onJoin={() => handleJoinClub(club.id)}
+                    onLeave={() => handleLeaveClub(club.id)}
+                  />
+                </Link>
+              ))}
+            </div>
           </div>
         </>
       ) : showCreateForm && user ? (
-        <CreateBookClub
-          user={user}
-          onCreate={handleCreateClub}
-          onCancel={handleCancelCreateClub}
-        />
+        <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+          <CreateBookClub
+            user={user}
+            onCreate={handleCreateClub}
+            onCancel={handleCancelCreateClub}
+          />
+        </div>
       ) : (
         showUpdateForm &&
         selectedClub && (
-          <UpdateBookClub
-            club={selectedClub}
-            onUpdate={handleUpdateClub}
-            onCancel={handleCancelUpdateClub}
-          />
+          <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <UpdateBookClub
+              club={selectedClub}
+              onUpdate={handleUpdateClub}
+              onCancel={handleCancelUpdateClub}
+            />
+          </div>
         )
       )}
     </div>

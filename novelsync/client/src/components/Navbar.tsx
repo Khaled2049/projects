@@ -3,14 +3,20 @@ import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
-import { User } from "lucide-react";
+import { Menu, Search, User } from "lucide-react";
 
 const Navbar = () => {
   const { signout } = useFirebaseAuth();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   const handleSignOut = async () => {
     await signout();
@@ -49,7 +55,7 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-800 p-4 text-white">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Left Section - Novel Sync */}
+        {/* Left Section - Logo */}
         <div className="flex items-center">
           <Link
             className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
@@ -59,30 +65,49 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Middle Section - Book Club and Community */}
-        <div className="flex-1 flex justify-center space-x-4">
+        {/* Middle Section - Navigation Links */}
+        <div className="hidden lg:flex flex-1 justify-center space-x-6">
+          <Link
+            to="/"
+            className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+          >
+            Home
+          </Link>
           <Link
             to="/stories"
-            className="block px-4 py-2 border border-white text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+            className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
           >
             Stories
           </Link>
           <Link
-            to="/book-clubs"
-            className="block px-4 py-2 border border-white text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+            to="/user-stories"
+            className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
           >
-            Book Clubs
+            My Books
           </Link>
           <Link
-            to="/community"
-            className="block px-4 py-2 border border-white text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+            to="/library"
+            className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
           >
-            Community
+            Library
           </Link>
         </div>
 
-        {/* Right Section - Dropdown */}
-        <div className="flex items-center">
+        {/* Right Section - Search and User Dropdown */}
+        <div className="hidden lg:flex items-center space-x-4">
+          {/* Search Bar */}
+          <div className="relative text-gray-600">
+            <input
+              type="search"
+              placeholder="Search..."
+              className="bg-gray-700 text-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none"
+            />
+            <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
+              <Search className="text-white" />
+            </button>
+          </div>
+
+          {/* User Dropdown */}
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -96,7 +121,7 @@ const Navbar = () => {
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (
-                  <User className="w-8 h-8 rounded-full" /> // Use the User icon as a fallback
+                  <User className="w-8 h-8 rounded-full" />
                 )}
                 <span>{user.displayName || "User"}</span>
               </button>
@@ -126,6 +151,57 @@ const Navbar = () => {
               Sign In
             </button>
           )}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden">
+          <button
+            onClick={toggleMobileMenu}
+            className="text-white focus:outline-none hover:text-gray-400"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`lg:hidden ${isMobileMenuOpen ? "block" : "hidden"} mt-4`}
+      >
+        <Link
+          to="/"
+          className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded mb-2"
+        >
+          Home
+        </Link>
+        <Link
+          to="/stories"
+          className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded mb-2"
+        >
+          Stories
+        </Link>
+        <Link
+          to="/my-books"
+          className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded mb-2"
+        >
+          My Books
+        </Link>
+        <Link
+          to="/library"
+          className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded mb-2"
+        >
+          Library
+        </Link>
+        {/* Mobile Search Bar */}
+        <div className="relative text-gray-600 mt-4">
+          <input
+            type="search"
+            placeholder="Search..."
+            className="bg-gray-700 text-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none w-full"
+          />
+          <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
+            <Search className="text-white" />
+          </button>
         </div>
       </div>
     </nav>

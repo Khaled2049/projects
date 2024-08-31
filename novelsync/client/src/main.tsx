@@ -12,6 +12,9 @@ import {
   DraftEditor,
   UserStories,
   AllStories,
+  BookClubDetails,
+  Library,
+  BookDetails,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -35,8 +38,20 @@ const router = createBrowserRouter([
         element: <AllStories />,
       },
       {
+        path: "/library",
+        element: <Library />,
+      },
+      {
+        path: "/library/book/:id",
+        element: <BookDetails />,
+      },
+      {
         path: "/book-clubs",
         element: <BookClubs />, // This will be the main component for the book clubs
+      },
+      {
+        path: "/book-clubs/:id",
+        element: <BookClubDetails />, // This will be the main component for the book clubs
       },
       {
         path: "/community",

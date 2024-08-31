@@ -31,12 +31,19 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
       creatorId: "1",
       id: "1",
       name: "Classic Literature Lovers",
-      members: ["1"],
+      members: ["Khaled", "Jane Doe", "John Doe"],
       description:
         "Dive into the world of classic literature with fellow book enthusiasts.",
       category: "Classics",
       activity: "Very Active",
       image: "/api/placeholder/400/250",
+      bookOfTheMonth: {
+        title: "Pride and Prejudice",
+        author: "Jane Austen",
+        description:
+          "Austen's best-loved tale of love, marriage, and society in class-conscious Georgian England.",
+      },
+      meetUp: "Every Saturday at 3pm virtually",
     },
   ]);
 
