@@ -2,12 +2,15 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "../config/firebase";
 import {
+  arrayRemove,
+  arrayUnion,
   doc,
   getDoc,
   getDocs,
   limit,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 import { IUser } from "../types/IUser";
 import { collection } from "firebase/firestore";
@@ -16,6 +19,8 @@ interface AuthContextType {
   user: IUser | null;
   loading: boolean;
   fetchUsersOrderedByLastLogin: (userLimit: number) => Promise<IUser[]>;
+  followUser: (uid: string) => Promise<void>;
+  unfollowUser: (uid: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -99,9 +104,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const followUser = async (uid: string) => {
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    try {
+      const userDocRef = doc(firestore, "users", uid);
+
+      await updateDoc(userDocRef, {
+        followers: arrayUnion(user.uid), // Add the current user's UID to the followers array
+      });
+
+      console.log(`User with UID ${user.uid} followed user with UID ${uid}`);
+    } catch (error) {
+      console.error("Error following user:", error);
+      throw new Error("Failed to follow user");
+    }
+  };
+
+  const unfollowUser = async (uid: string) => {
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    try {
+      const userDocRef = doc(firestore, "users", uid);
+
+      await updateDoc(userDocRef, {
+        followers: arrayRemove(user.uid), // Remove the current user's UID from the followers array
+      });
+
+      console.log(`User with UID ${user.uid} unfollowed user with UID ${uid}`);
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      throw new Error("Failed to unfollow user");
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, fetchUsersOrderedByLastLogin }}
+      value={{
+        user,
+        loading,
+        fetchUsersOrderedByLastLogin,
+        followUser,
+        unfollowUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

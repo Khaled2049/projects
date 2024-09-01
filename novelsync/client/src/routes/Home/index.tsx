@@ -3,24 +3,31 @@ import { User, BookIcon, Send, UserPlus, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { IUser } from "../../types/IUser";
-
-const bookClubs = [
-  { id: 1, name: "Classic Literature Club" },
-  { id: 2, name: "Sci-Fi Enthusiasts" },
-  { id: 3, name: "Poetry Corner" },
-];
+import { AiOutlineLoading3Quarters, AiOutlinePlus } from "react-icons/ai";
 
 const Home: React.FC = () => {
   const [status, setStatus] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
+  const [following, setFollowing] = useState([] as string[]);
 
-  const { fetchUsersOrderedByLastLogin } = useAuthContext();
+  const [bookClubs, setBookClubs] = useState([]);
+  const [currentTab, setCurrentTab] = useState("discover");
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const { fetchUsersOrderedByLastLogin, user, followUser, unfollowUser } =
+    useAuthContext();
 
   useEffect(() => {
     fetchUsersOrderedByLastLogin(5).then((users) => {
       setUsers(users);
+      setFollowing(
+        users
+          .filter((author) => author.followers.includes(user?.uid || ""))
+          .map((author) => author.uid)
+      );
     });
-  }, []);
+  }, [fetchUsersOrderedByLastLogin, user?.uid]);
 
   const handleStatusSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,30 +35,53 @@ const Home: React.FC = () => {
     setStatus("");
   };
 
-  const [currentTab, setCurrentTab] = useState("discover");
+  const handleFollow = async (uid: string) => {
+    setLoading(uid); // Set loading state
+    try {
+      await followUser(uid);
+      setFollowing([...following, uid]);
+      setUsers(
+        users.map((author) =>
+          author.uid === uid
+            ? { ...author, followers: [...author.followers, user?.uid || ""] }
+            : author
+        )
+      );
+    } catch (error) {
+      console.error("Error following user:", error);
+    } finally {
+      setLoading(null); // Reset loading state
+    }
+  };
 
-  const [posts] = useState([
-    { id: 1, author: "John Doe", content: "Loving this new book!", likes: 12 },
-    {
-      id: 2,
-      author: "Jane Smith",
-      content: "Writing is my therapy.",
-      likes: 8,
-    },
-    {
-      id: 3,
-      author: "Alice Johnson",
-      content: "Poetry is the essence of soul.",
-      likes: 15,
-    },
-    { id: 4, author: "Mark Brown", content: "Reading a lot lately!", likes: 5 },
-  ]);
-  const [following, setFollowing] = useState(["Jane Smith", "Mark Brown"]);
+  const handleUnfollow = async (uid: string) => {
+    setLoading(uid); // Set loading state
+    try {
+      await unfollowUser(uid);
+      setFollowing(following.filter((id) => id !== uid));
+      setUsers(
+        users.map((author) =>
+          author.uid === uid
+            ? {
+                ...author,
+                followers: author.followers.filter(
+                  (follower) => follower !== user?.uid
+                ),
+              }
+            : author
+        )
+      );
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    } finally {
+      setLoading(null); // Reset loading state
+    }
+  };
 
-  const filteredPosts =
-    currentTab === "myFeed"
-      ? posts.filter((post) => following.includes(post.author))
-      : posts;
+  // const filteredPosts =
+  //   currentTab === "myFeed"
+  //     ? posts.filter((post) => following.includes(post.author))
+  //     : posts;
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-amber-50">
@@ -61,17 +91,55 @@ const Home: React.FC = () => {
           Authors
         </h2>
         <ul>
-          {users.map((author) => (
-            <li
-              key={author.uid}
-              className="flex items-center mb-2 p-2 hover:bg-amber-200 rounded transition duration-300"
-            >
-              <User className="mr-2 text-amber-700" />
-              <span className="font-serif text-amber-800">
-                {author.username}
-              </span>
-            </li>
-          ))}
+          {users.map((author) => {
+            const isFollowing = following.includes(author.uid);
+            const isLoading = loading === author.uid;
+
+            return (
+              <li
+                key={author.uid}
+                className="flex items-center justify-between mb-2 p-2"
+              >
+                <div className="flex items-center">
+                  <User className="mr-2 text-amber-700" />
+                  <span className="font-serif text-amber-800">
+                    {author.username}
+                  </span>
+                </div>
+                {author.uid !== user?.uid && (
+                  <button
+                    onClick={() =>
+                      isFollowing
+                        ? handleUnfollow(author.uid)
+                        : handleFollow(author.uid)
+                    }
+                    className={`flex items-center ${
+                      isFollowing
+                        ? "text-red-700 bg-red-100 hover:bg-red-200"
+                        : "text-amber-700 bg-amber-100 hover:bg-amber-200"
+                    } rounded p-2 transition duration-300`}
+                    aria-label={`${isFollowing ? "Unfollow" : "Follow"} ${
+                      author.username
+                    }`}
+                    disabled={isLoading} // Disable the button while loading
+                  >
+                    {isLoading ? (
+                      <AiOutlineLoading3Quarters className="animate-spin text-lg" />
+                    ) : isFollowing ? (
+                      <>Unfollow</>
+                    ) : (
+                      <>
+                        Follow <AiOutlinePlus className="ml-1 text-lg" />
+                      </>
+                    )}
+                    <span className="sr-only">
+                      {isFollowing ? "Unfollow" : "Follow"} {author.username}
+                    </span>
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
 
@@ -120,7 +188,7 @@ const Home: React.FC = () => {
         </div>
 
         {/* Posts */}
-        {filteredPosts.map((post) => (
+        {/* {filteredPosts.map((post) => (
           <div
             key={post.id}
             className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
@@ -137,11 +205,11 @@ const Home: React.FC = () => {
               <span>{post.likes} likes</span>
             </div>
           </div>
-        ))}
+        ))} */}
       </div>
 
       {/* Right column - Book clubs */}
-      <div className="w-full lg:w-1/4 bg-amber-50 p-4 overflow-y-auto">
+      {/* <div className="w-full lg:w-1/4 bg-amber-50 p-4 overflow-y-auto">
         <h2 className="text-2xl font-serif font-bold mb-4 text-amber-900">
           Book Clubs
         </h2>
@@ -172,7 +240,7 @@ const Home: React.FC = () => {
             View All Clubs
           </Link>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
