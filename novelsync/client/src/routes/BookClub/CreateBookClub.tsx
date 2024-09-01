@@ -3,7 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import { IClub } from "../../types/IClub";
 import { AuthUser } from "../../types/IUser";
 import { Book, X } from "lucide-react";
-import { auth } from "../../config/firebase";
+
+import { IBook } from "../../types/IBook";
+import BookSearch from "../../components/BookSearch";
 
 const CreateBookClub = ({
   user,
@@ -14,6 +16,17 @@ const CreateBookClub = ({
   onCreate: (newClub: IClub) => void;
   onCancel: () => void;
 }) => {
+  const [bookOfTheMonth, setBookOfTheMonth] = useState<IBook>({
+    id: "",
+    volumeInfo: {
+      title: "",
+      authors: [],
+      description: "",
+      imageLinks: {
+        thumbnail: "",
+      },
+    },
+  });
   const [newClub, setNewClub] = useState<IClub>({
     id: "",
     name: "",
@@ -24,9 +37,15 @@ const CreateBookClub = ({
     activity: "",
     creatorId: "",
     bookOfTheMonth: {
-      title: "",
-      author: "",
-      description: "",
+      id: "",
+      volumeInfo: {
+        title: "",
+        authors: [],
+        description: "",
+        imageLinks: {
+          thumbnail: "",
+        },
+      },
     },
     meetUp: "",
   });
@@ -40,13 +59,15 @@ const CreateBookClub = ({
     });
   };
 
-  const handleCreateClub = () => {
-    const bookOfTheMonth = {
-      title: newClub.bookOfTheMonth?.title || "",
-      author: newClub.bookOfTheMonth?.author || "",
-      description: newClub.bookOfTheMonth?.description || "",
-    };
+  const handleBookSelect = (book: IBook) => {
+    setBookOfTheMonth(book);
+    setNewClub({
+      ...newClub,
+      bookOfTheMonth: book,
+    });
+  };
 
+  const handleCreateClub = () => {
     const clubWithDefaults = {
       ...newClub,
       id: uuidv4(),
@@ -54,8 +75,18 @@ const CreateBookClub = ({
       activity: "New",
       image: "/api/placeholder/400/250",
       creatorId: user.uid,
-      bookOfTheMonth,
-      meetUp: newClub.meetUp || "TBD",
+      bookOfTheMonth: {
+        id: bookOfTheMonth.id,
+        volumeInfo: {
+          title: bookOfTheMonth.volumeInfo.title,
+          authors: bookOfTheMonth.volumeInfo.authors,
+          description: bookOfTheMonth.volumeInfo.description,
+          imageLinks: {
+            thumbnail: bookOfTheMonth.volumeInfo.imageLinks?.thumbnail || "",
+          },
+        },
+      },
+      meetUp: newClub.meetUp,
     };
     onCreate(clubWithDefaults);
   };
@@ -148,57 +179,13 @@ const CreateBookClub = ({
               placeholder="Location"
             />
           </div>
-          <div>
-            <label
-              className="block text-amber-800 font-semibold mb-2"
-              htmlFor="bookOfTheMonth"
-            >
-              Book of the Month
-            </label>
-            <input
-              type="text"
-              id="meetUp"
-              name="meetUp"
-              value={newClub.bookOfTheMonth?.title}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-              placeholder="Name of the Book"
-            />
-          </div>
-          <div>
-            <label
-              className="block text-amber-800 font-semibold mb-2"
-              htmlFor="bookOfTheMonth"
-            >
-              Author
-            </label>
-            <input
-              type="text"
-              id="author"
-              name="author"
-              value={newClub.bookOfTheMonth?.author}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-              placeholder="Enter Author Name"
-            />
-          </div>
-          <div>
-            <label
-              className="block text-amber-800 font-semibold mb-2"
-              htmlFor="bookOfTheMonth"
-            >
-              Book Description
-            </label>
-            <input
-              type="text"
-              id="description"
-              name="description"
-              value={newClub.bookOfTheMonth?.description}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-              placeholder="Description"
-            />
-          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-amber-800 font-semibold mb-2">
+            Book of the Month
+          </h3>
+          <BookSearch onBookSelect={handleBookSelect} />
         </div>
 
         <div className="flex justify-end mt-8 space-x-4">

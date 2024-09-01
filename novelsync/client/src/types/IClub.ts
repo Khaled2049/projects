@@ -1,3 +1,5 @@
+import { IBook } from "./IBook";
+
 export interface IClub {
   id: string;
   name: string;
@@ -28,9 +30,15 @@ export interface IComment {
 }
 
 export interface IBookOfTheMonth {
-  title: string;
-  author: string;
-  description: string;
+  id: string;
+  volumeInfo: {
+    title: string;
+    authors?: string[];
+    description?: string;
+    imageLinks?: {
+      thumbnail: string;
+    };
+  };
 }
 
 export interface IBookClub {

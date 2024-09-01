@@ -2,19 +2,11 @@ import { useState } from "react";
 import { SearchIcon } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-interface Book {
-  id: string;
-  volumeInfo: {
-    title: string;
-    authors?: string[];
-    description?: string;
-  };
-}
+import { IBook } from "../../types/IBook";
 
 const Library = () => {
   const [query, setQuery] = useState<string>("");
-  const [books, setBooks] = useState<Book[]>([]);
+  const [books, setBooks] = useState<IBook[]>([]);
   const navigate = useNavigate();
 
   const handleBookClick = (id: string) => {

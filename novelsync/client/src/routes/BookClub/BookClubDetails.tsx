@@ -59,15 +59,20 @@ const BookClubDetails: React.FC = () => {
               <Book className="mr-2" /> Book of the Month
             </h2>
             {club.bookOfTheMonth ? (
-              <div className="bg-amber-100 p-4 rounded-lg">
-                <h3 className="text-xl font-semibold text-amber-900">
-                  {club.bookOfTheMonth.title}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-amber-900">
+                  {club.bookOfTheMonth.volumeInfo.title}
                 </h3>
-                <p className="text-amber-700 italic">
-                  by {club.bookOfTheMonth.author}
+                <img
+                  src={club.bookOfTheMonth.volumeInfo.imageLinks?.thumbnail}
+                  alt={club.bookOfTheMonth.volumeInfo.title}
+                  className="w-32 h-32 rounded-lg"
+                />
+                <p className="text-amber-800">
+                  {club.bookOfTheMonth.volumeInfo.authors?.join(", ")}
                 </p>
-                <p className="text-amber-800 mt-2">
-                  {club.bookOfTheMonth.description}
+                <p className="text-sm text-amber-600">
+                  {club.bookOfTheMonth.volumeInfo.description}
                 </p>
               </div>
             ) : (
