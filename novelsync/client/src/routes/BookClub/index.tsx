@@ -5,7 +5,7 @@ import { IClub } from "../../types/IClub";
 import CreateBookClub from "./CreateBookClub";
 import UpdateBookClub from "./UpdateBookClub";
 import { useBookClub } from "../../contexts/BookClubContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
 const BookClubs = () => {
@@ -17,7 +17,7 @@ const BookClubs = () => {
     joinBookClub,
     leaveBookClub,
   } = useBookClub();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);

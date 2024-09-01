@@ -30,7 +30,7 @@ import {
   ref,
   uploadString,
 } from "firebase/storage";
-import { AuthUser } from "../types/IUser";
+import { IUser } from "../types/IUser";
 
 interface EditorContextType {
   title: string;
@@ -50,7 +50,7 @@ interface EditorContextType {
   clearCurrentStory: () => void;
   publishStory: (params: CreateStoryParams) => Promise<string | null>;
   publishLoading: boolean;
-  fetchUserStories: (user: AuthUser) => Promise<void>;
+  fetchUserStories: (user: IUser) => Promise<void>;
   fetchLoading: boolean;
   userStories: Story[];
   userDrafts: Draft[];
@@ -58,18 +58,18 @@ interface EditorContextType {
   fetchDraftById: (story: Draft) => Promise<Draft | null>;
   updateStoryById: (params: {
     storyId: string;
-    user: AuthUser;
+    user: IUser;
     newTitle: string;
     chapters: Chapter[];
   }) => Promise<boolean | null | string>;
-  deleteStoryById: (story: Story, user: AuthUser) => Promise<boolean | null>;
+  deleteStoryById: (story: Story, user: IUser) => Promise<boolean | null>;
   fetchAllStories: () => Promise<Story[]>;
   saveDraft: (params: CreateDraftParams) => Promise<string | null>;
-  fetchUserDrafts: (user: AuthUser) => Promise<void>;
-  deleteDraftById: (draft: Draft, user: AuthUser) => Promise<boolean | null>;
+  fetchUserDrafts: (user: IUser) => Promise<void>;
+  deleteDraftById: (draft: Draft, user: IUser) => Promise<boolean | null>;
   updateDraftById: (params: {
     draftId: string;
-    user: AuthUser;
+    user: IUser;
     newTitle: string;
     chapters: Chapter[];
   }) => Promise<boolean | null | string>;
@@ -390,7 +390,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteStoryById = async (story: Story, user: AuthUser) => {
+  const deleteStoryById = async (story: Story, user: IUser) => {
     if (!user) {
       console.error("User is not logged in");
       return null;
@@ -429,7 +429,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
   };
-  const deleteDraftById = async (draft: Draft, user: AuthUser) => {
+  const deleteDraftById = async (draft: Draft, user: IUser) => {
     if (!user) {
       console.error("User is not logged in");
       return null;
@@ -589,7 +589,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     chapters,
   }: {
     storyId: string;
-    user: AuthUser;
+    user: IUser;
     newTitle: string;
     chapters: Chapter[];
   }) => {
@@ -706,7 +706,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     chapters,
   }: {
     draftId: string;
-    user: AuthUser;
+    user: IUser;
     newTitle: string;
     chapters: Chapter[];
   }) => {
@@ -817,7 +817,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const fetchUserDrafts = async (user: AuthUser) => {
+  const fetchUserDrafts = async (user: IUser) => {
     setFetchLoading(true);
 
     try {
@@ -875,7 +875,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       setFetchLoading(false);
     }
   };
-  const fetchUserStories = async (user: AuthUser) => {
+  const fetchUserStories = async (user: IUser) => {
     setFetchLoading(true);
 
     try {
@@ -937,7 +937,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // check if current user has liked the story
-  const checkUserLiked = async (storyId: string, user: AuthUser) => {
+  const checkUserLiked = async (storyId: string, user: IUser) => {
     const novelDocRef = doc(firestore, "novels", storyId);
     const novelDoc = await getDoc(novelDocRef);
 

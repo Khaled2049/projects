@@ -23,7 +23,7 @@ import EditorHeader from "../../components/EditorHeader";
 import { useAI } from "../../contexts/AIContext";
 import { Loader } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 import { v4 as uuidv4 } from "uuid";
 import { useEditorContext } from "../../contexts/EditorContext";
@@ -53,7 +53,7 @@ const DraftEditor = () => {
     suggestion,
     setsuggestion,
   } = useEditorContext();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
 
   const addChapter = () => {
     const content = editor.getHTML();

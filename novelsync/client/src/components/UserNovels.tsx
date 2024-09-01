@@ -2,14 +2,14 @@ import { FaBook, FaEdit, FaTrashAlt } from "react-icons/fa";
 // import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-import { AuthUser } from "../types/IUser";
+import { IUser } from "../types/IUser";
 import { useEditorContext } from "../contexts/EditorContext";
 import { Story } from "../types/IStory";
 
 interface UserNovelsProps {
   onDelete: (story: Story) => void;
   onEdit: (story: Story) => void;
-  user: AuthUser;
+  user: IUser;
 }
 
 const UserNovels: React.FC<UserNovelsProps> = ({ onDelete, onEdit, user }) => {

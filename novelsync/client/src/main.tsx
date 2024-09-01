@@ -8,7 +8,7 @@ import {
   CreateStory,
   StoryDetail,
   BookClubs,
-  Community,
+  Home,
   DraftEditor,
   UserStories,
   AllStories,
@@ -55,7 +55,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/Home",
-        element: <Community />,
+        element: <Home />,
       },
       {
         path: "/sign-in",

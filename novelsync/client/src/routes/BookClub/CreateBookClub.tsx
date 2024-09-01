@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IClub } from "../../types/IClub";
-import { AuthUser } from "../../types/IUser";
+import { IUser } from "../../types/IUser";
 import { Book, X } from "lucide-react";
 
 import { IBook } from "../../types/IBook";
@@ -12,7 +12,7 @@ const CreateBookClub = ({
   onCreate,
   onCancel,
 }: {
-  user: AuthUser;
+  user: IUser;
   onCreate: (newClub: IClub) => void;
   onCancel: () => void;
 }) => {

@@ -1,18 +1,29 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { AuthUser, AuthContextType } from "../types/IUser";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+} from "firebase/firestore";
+import { IUser } from "../types/IUser";
+import { collection } from "firebase/firestore";
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-});
+interface AuthContextType {
+  user: IUser | null;
+  loading: boolean;
+  fetchUsersOrderedByLastLogin: (userLimit: number) => Promise<IUser[]>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,10 +37,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const userData = userDoc.data();
           setUser({
             ...firebaseUser,
+            ...userData,
+            createdAt: userData.createdAt,
             username: userData.username,
+            followers: userData.followers,
+            following: userData.following,
+            stories: userData.posts,
+            likedPosts: userData.likedPosts,
+            savedPosts: userData.savedPosts,
+            lastLogin: userData.lastLogin,
           });
         } else {
-          setUser(firebaseUser);
+          const newUser: IUser = {
+            ...firebaseUser,
+            createdAt: new Date().toISOString(),
+            username: user?.displayName || "",
+            followers: [],
+            following: [],
+            stories: [],
+            likedPosts: [],
+            savedPosts: [],
+            lastLogin: new Date().toISOString(),
+          };
+          // Here you would typically save this new user to Firestore
+          setUser(newUser);
         }
       } else {
         setUser(null);
@@ -40,11 +71,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => unsubscribe();
   }, []);
 
+  // fetches last 5 logedin users
+  const fetchUsersOrderedByLastLogin = async (
+    userLimit: number
+  ): Promise<IUser[]> => {
+    try {
+      const usersCollection = collection(firestore, "users");
+      const usersQuery = query(
+        usersCollection,
+        orderBy("lastLogin", "desc"), // Order by lastLogin descending
+        limit(userLimit) // Limit the number of returned users
+      );
+      const usersSnapshot = await getDocs(usersQuery);
+
+      const users: IUser[] = usersSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          uid: doc.id, // Assuming you want to use Firestore's document ID as the user's UID
+        } as IUser;
+      });
+
+      return users;
+    } catch (error) {
+      console.error("Error fetching users ordered by last login:", error);
+      throw new Error("Failed to fetch users");
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider
+      value={{ user, loading, fetchUsersOrderedByLastLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuthContext must be used within an EditorProvider");
+  }
+  return context;
+};

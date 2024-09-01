@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuthContext } from "../contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { Menu, Search, User } from "lucide-react";
 
 const Navbar = () => {
   const { signout } = useFirebaseAuth();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

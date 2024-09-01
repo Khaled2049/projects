@@ -1,4 +1,4 @@
-import { AuthUser } from "./IUser";
+import { IUser } from "./IUser";
 
 export interface Chapter {
   chapterId: string;
@@ -25,14 +25,14 @@ export interface Draft {
 
 export interface CreateStoryParams {
   storyId: string;
-  user: AuthUser | null;
+  user: IUser | null;
   title: string;
   chapters: Chapter[];
 }
 
 export interface CreateDraftParams {
   draftId: string;
-  user: AuthUser | null;
+  user: IUser | null;
   title: string;
   chapters: Chapter[];
 }

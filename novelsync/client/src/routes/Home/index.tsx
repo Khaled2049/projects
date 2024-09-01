@@ -1,15 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { User, BookIcon, Send, UserPlus, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-
-// Mock data
-const authors = [
-  { id: 1, name: "Jane Austen" },
-  { id: 2, name: "George Orwell" },
-  { id: 3, name: "Virginia Woolf" },
-  { id: 4, name: "F. Scott Fitzgerald" },
-  { id: 5, name: "Toni Morrison" },
-];
+import { useAuthContext } from "../../contexts/AuthContext";
+import { IUser } from "../../types/IUser";
 
 const bookClubs = [
   { id: 1, name: "Classic Literature Club" },
@@ -17,8 +10,17 @@ const bookClubs = [
   { id: 3, name: "Poetry Corner" },
 ];
 
-const Community: React.FC = () => {
+const Home: React.FC = () => {
   const [status, setStatus] = useState("");
+  const [users, setUsers] = useState<IUser[]>([]);
+
+  const { fetchUsersOrderedByLastLogin } = useAuthContext();
+
+  useEffect(() => {
+    fetchUsersOrderedByLastLogin(5).then((users) => {
+      setUsers(users);
+    });
+  }, []);
 
   const handleStatusSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,13 +61,15 @@ const Community: React.FC = () => {
           Authors
         </h2>
         <ul>
-          {authors.map((author) => (
+          {users.map((author) => (
             <li
-              key={author.id}
+              key={author.uid}
               className="flex items-center mb-2 p-2 hover:bg-amber-200 rounded transition duration-300"
             >
               <User className="mr-2 text-amber-700" />
-              <span className="font-serif text-amber-800">{author.name}</span>
+              <span className="font-serif text-amber-800">
+                {author.username}
+              </span>
             </li>
           ))}
         </ul>
@@ -173,4 +177,4 @@ const Community: React.FC = () => {
   );
 };
 
-export default Community;
+export default Home;

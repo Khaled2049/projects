@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEditorContext } from "../../contexts/EditorContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Draft, Story } from "../../types/IStory";
 
 const UserStories = () => {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const {
     fetchUserStories,
     fetchUserDrafts,

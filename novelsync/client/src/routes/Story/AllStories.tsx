@@ -1,4 +1,4 @@
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 import { FaArrowRight, FaEye, FaThumbsUp } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -8,7 +8,7 @@ import { useEditorContext } from "../../contexts/EditorContext";
 import { Story } from "../../types/IStory";
 
 const AllStories: React.FC = () => {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
 
