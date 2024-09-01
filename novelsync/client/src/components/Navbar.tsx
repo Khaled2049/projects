@@ -68,7 +68,7 @@ const Navbar = () => {
         {/* Middle Section - Navigation Links */}
         <div className="hidden lg:flex flex-1 justify-center space-x-6">
           <Link
-            to="/"
+            to="/home"
             className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
           >
             Home
