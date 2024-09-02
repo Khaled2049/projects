@@ -11,19 +11,10 @@ const Posts = () => {
   });
 
   useEffect(() => {
-    console.log("InfiniteScrollPostsFeed mounted");
-  }, []);
-
-  useEffect(() => {
-    console.log("inView changed", { inView, loading, hasMore });
     if (inView && !loading && hasMore) {
       loadMorePosts();
     }
   }, [inView, loading, hasMore]);
-
-  useEffect(() => {
-    console.log("Posts updated", posts);
-  }, [posts]);
 
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -93,16 +93,8 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
     }
   };
-  useEffect(() => {
-    console.log("PostsProvider mounted or isMyFeed changed");
-    setPosts([]);
-    setLastDoc(null);
-    setHasMore(true);
-    loadMorePosts();
-  }, []);
 
   useEffect(() => {
-    console.log("User state changed", user);
     if (user) {
       setPosts([]);
       setLastDoc(null);
