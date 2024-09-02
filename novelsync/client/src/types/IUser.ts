@@ -6,7 +6,7 @@ export interface IUser extends FirebaseUser {
   following: string[];
   createdAt: string;
   lastLogin: string;
-  stories: string[]; // Array of post IDs
-  likedPosts: string[]; // Array of liked post IDs
-  savedPosts: string[]; // Array of saved post IDs
+  stories: string[];
+  likedPosts: string[];
+  savedPosts: string[];
 }

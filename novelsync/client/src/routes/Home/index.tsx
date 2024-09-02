@@ -4,15 +4,14 @@ import { Link } from "react-router-dom";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { IUser } from "../../types/IUser";
 import { AiOutlineLoading3Quarters, AiOutlinePlus } from "react-icons/ai";
+import Posts from "./posts";
 
 const Home: React.FC = () => {
-  const [status, setStatus] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
   const [following, setFollowing] = useState([] as string[]);
 
   const [bookClubs, setBookClubs] = useState([]);
-  const [currentTab, setCurrentTab] = useState("discover");
-  const [posts, setPosts] = useState([]);
+
   const [loading, setLoading] = useState<string | null>(null);
 
   const { fetchUsersOrderedByLastLogin, user, followUser, unfollowUser } =
@@ -28,12 +27,6 @@ const Home: React.FC = () => {
       );
     });
   }, [fetchUsersOrderedByLastLogin, user?.uid]);
-
-  const handleStatusSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Status submitted:", status);
-    setStatus("");
-  };
 
   const handleFollow = async (uid: string) => {
     setLoading(uid); // Set loading state
@@ -143,70 +136,7 @@ const Home: React.FC = () => {
         </ul>
       </div>
 
-      {/* Middle column - User feed */}
-      <div className="w-full lg:w-1/2 bg-amber-50 p-4 overflow-y-auto  border-amber-200">
-        {/* Status update form */}
-        <form onSubmit={handleStatusSubmit} className="mb-6">
-          <div className="flex items-center bg-amber-50 rounded-lg p-2 border border-amber-200">
-            <input
-              type="text"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              placeholder="Share your literary thoughts..."
-              className="flex-grow bg-transparent outline-none font-serif text-amber-900 p-3"
-            />
-            <button
-              type="submit"
-              className="ml-2 text-amber-700 hover:text-amber-900"
-            >
-              <Send size={20} />
-            </button>
-          </div>
-        </form>
-
-        <div className="flex justify-between mb-4">
-          <button
-            onClick={() => setCurrentTab("discover")}
-            className={`w-full py-2 px-4 text-center font-serif font-bold ${
-              currentTab === "discover"
-                ? "bg-amber-600 text-white"
-                : "bg-amber-200 text-amber-900"
-            }`}
-          >
-            Discover
-          </button>
-          <button
-            onClick={() => setCurrentTab("myFeed")}
-            className={`w-full py-2 px-4 text-center font-serif font-bold ${
-              currentTab === "myFeed"
-                ? "bg-amber-600 text-white"
-                : "bg-amber-200 text-amber-900"
-            }`}
-          >
-            My Feed
-          </button>
-        </div>
-
-        {/* Posts */}
-        {/* {filteredPosts.map((post) => (
-          <div
-            key={post.id}
-            className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
-          >
-            <div className="flex items-center mb-2">
-              <User className="mr-2 text-amber-700" />
-              <span className="font-serif font-bold text-amber-900">
-                {post.author}
-              </span>
-            </div>
-            <p className="mb-2 font-serif text-amber-800">{post.content}</p>
-            <div className="flex items-center text-amber-600">
-              <BookOpen size={16} className="mr-1" />
-              <span>{post.likes} likes</span>
-            </div>
-          </div>
-        ))} */}
-      </div>
+      <Posts />
 
       {/* Right column - Book clubs */}
       {/* <div className="w-full lg:w-1/4 bg-amber-50 p-4 overflow-y-auto">

@@ -23,6 +23,7 @@ import { NavbarWrapper } from "./NavbarWrapper";
 import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 import { BookClubProvider } from "./contexts/BookClubContext";
+import { PostsProvider } from "./contexts/PostsContext";
 
 const router = createBrowserRouter([
   {
@@ -88,11 +89,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
       <AIProvider>
-        <BookClubProvider>
-          <EditorProvider>
-            <RouterProvider router={router} />
-          </EditorProvider>
-        </BookClubProvider>
+        <PostsProvider>
+          <BookClubProvider>
+            <EditorProvider>
+              <RouterProvider router={router} />
+            </EditorProvider>
+          </BookClubProvider>
+        </PostsProvider>
       </AIProvider>
     </AuthProvider>
   </React.StrictMode>
