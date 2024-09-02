@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Book, Plus } from "lucide-react";
 import BookClubCard from "../../components/BookClubCard";
 import { IClub } from "../../types/IClub";
@@ -16,18 +16,23 @@ const BookClubs = () => {
     deleteBookClub,
     joinBookClub,
     leaveBookClub,
+    getBookClubs,
   } = useBookClub();
   const { user } = useAuthContext();
+
+  useEffect(() => {
+    getBookClubs();
+  }, [getBookClubs]);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [selectedClub, setSelectedClub] = useState<IClub | null>(null);
 
-  const handleCreateClub = (newClub: IClub) => {
+  const handleCreateClub = async (newClub: IClub) => {
     if (user) {
       newClub.creatorId = user.uid;
     }
-    createBookClub(newClub);
+    await createBookClub(newClub);
     setShowCreateForm(false);
   };
 
@@ -57,7 +62,7 @@ const BookClubs = () => {
   const handleJoinClub = (clubId: string) => {
     if (user) {
       console.log(user.uid, "Joining club", clubId);
-      joinBookClub(clubId, user.uid);
+      joinBookClub(clubId, user.username);
     } else {
       alert("You must be logged in to join a club.");
     }
@@ -105,11 +110,7 @@ const BookClubs = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {bookClubs.map((club) => (
-                <Link
-                  to={`/book-clubs/${club.id}`}
-                  key={club.id}
-                  className="block transition duration-300 ease-in-out transform hover:scale-105"
-                >
+                <div key={club.id}>
                   <BookClubCard
                     joined={user ? club.members.includes(user.uid) : false}
                     club={club}
@@ -118,7 +119,7 @@ const BookClubs = () => {
                     onJoin={() => handleJoinClub(club.id)}
                     onLeave={() => handleLeaveClub(club.id)}
                   />
-                </Link>
+                </div>
               ))}
             </div>
           </div>

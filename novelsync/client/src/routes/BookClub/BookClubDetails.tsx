@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useBookClub } from "../../contexts/BookClubContext";
 import { Users, Book, Calendar, MessageCircle, User } from "lucide-react";
+import { IClub } from "../../types/IClub";
 
 const BookClubDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { getBookClub } = useBookClub();
-  const club = getBookClub(id!);
+  const [club, setClub] = useState<IClub | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchClub = async () => {
+      if (!id) return;
+      const club = await getBookClub(id);
+      setClub(club);
+    };
+    fetchClub();
+  }, [id, getBookClub]);
 
   if (!club) {
     return (

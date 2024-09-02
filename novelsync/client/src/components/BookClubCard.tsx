@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { IClub } from "../types/IClub";
 import {
   BookOpen,
@@ -35,9 +36,15 @@ const BookClubCard = ({
   /> */}
       <div className="p-4 h-full flex flex-col justify-between">
         <div>
-          <h2 className="text-2xl font-serif font-bold mb-2 text-amber-900 truncate">
-            {club.name}
-          </h2>
+          <Link
+            to={`/book-clubs/${club.id}`}
+            key={club.id}
+            className="block transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            <h2 className="text-2xl font-serif font-bold mb-2 text-amber-900 truncate">
+              {club.name}
+            </h2>
+          </Link>
           <p className="text-amber-700 mb-3 font-serif overflow-hidden text-ellipsis">
             {club.description}
           </p>

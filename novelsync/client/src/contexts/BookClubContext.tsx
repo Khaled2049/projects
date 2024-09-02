@@ -1,14 +1,28 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { IClub } from "../types/IClub"; // Define your BookClub type here
+import { firestore } from "../config/firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  deleteDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  DocumentReference,
+  getDocs,
+} from "firebase/firestore";
 
 interface BookClubContextProps {
   bookClubs: IClub[];
   createBookClub: (club: IClub) => Promise<void>;
-  getBookClub: (id: string) => IClub | undefined;
-  updateBookClub: (id: string, IClub: IClub) => Promise<void>;
+  getBookClub: (id: string) => Promise<IClub | undefined>;
+  updateBookClub: (id: string, updatedClub: IClub) => Promise<void>;
   deleteBookClub: (id: string) => Promise<void>;
-  joinBookClub: (clubId: string, userId: string) => Promise<void>;
+  joinBookClub: (clubId: string, userName: string) => Promise<void>;
   leaveBookClub: (clubId: string, userId: string) => Promise<void>;
+  getBookClubs: () => Promise<void>;
 }
 
 const BookClubContext = createContext<BookClubContextProps | undefined>(
@@ -26,64 +40,116 @@ export const useBookClub = () => {
 export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [bookClubs, setBookClubs] = useState<IClub[]>([
-    {
-      creatorId: "1",
-      id: "1",
-      name: "Classic Literature Lovers",
-      members: ["Khaled", "Jane Doe", "John Doe"],
-      description:
-        "Dive into the world of classic literature with fellow book enthusiasts.",
-      category: "Classics",
-      activity: "Very Active",
-      image: "/api/placeholder/400/250",
-      bookOfTheMonth: {
-        title: "Pride and Prejudice",
-        author: "Jane Austen",
-        description:
-          "Austen's best-loved tale of love, marriage, and society in class-conscious Georgian England.",
-      },
-      meetUp: "Every Saturday at 3pm virtually",
-    },
-  ]);
+  const [bookClubs, setBookClubs] = useState<IClub[]>([]);
 
   const createBookClub = async (club: IClub) => {
-    console.log("club", club);
-    setBookClubs([...bookClubs, club]);
+    console.log("Creating book club", club);
+    try {
+      const clubRef: DocumentReference = doc(
+        collection(firestore, "bookClubs")
+      );
+      await setDoc(clubRef, { ...club, id: clubRef.id });
+      setBookClubs([...bookClubs, { ...club, id: clubRef.id }]);
+    } catch (error) {
+      console.error("Error creating book club:", error);
+    }
   };
 
-  const getBookClub = (id: string) => {
-    return bookClubs.find((club) => club.id === id);
+  const getBookClubs = async () => {
+    try {
+      const bookClubsSnapshot = await getDocs(
+        collection(firestore, "bookClubs")
+      );
+      const bookClubsData = bookClubsSnapshot.docs.map(
+        (doc) => doc.data() as IClub
+      );
+      setBookClubs(bookClubsData);
+    } catch (error) {
+      console.error("Error getting book clubs:", error);
+    }
+  };
+
+  const getBookClub = async (id: string): Promise<IClub | undefined> => {
+    try {
+      const clubDoc = await getDoc(doc(firestore, "bookClubs", id));
+      if (clubDoc.exists()) {
+        return clubDoc.data() as IClub;
+      }
+    } catch (error) {
+      console.error("Error getting book club:", error);
+    }
+    return undefined;
   };
 
   const updateBookClub = async (id: string, updatedClub: IClub) => {
-    setBookClubs(
-      bookClubs.map((club) => (club.id === id ? updatedClub : club))
-    );
+    try {
+      const clubRef = doc(firestore, "bookClubs", id);
+      const clubDoc = await getDoc(clubRef);
+
+      const clubDocData = clubDoc.data();
+
+      if (!clubDoc.exists() || !clubDocData) {
+        throw new Error("Club does not exist");
+      }
+
+      const newClub = { ...clubDocData, ...updatedClub };
+
+      await updateDoc(clubRef, newClub);
+
+      // Update the local state with the updated club information
+      setBookClubs(
+        bookClubs.map((club) =>
+          club.id === id ? { ...club, ...updatedClub } : club
+        )
+      );
+    } catch (error) {
+      console.error("Error updating book club:", error);
+    }
   };
 
   const deleteBookClub = async (id: string) => {
-    setBookClubs(bookClubs.filter((club) => club.id !== id));
+    try {
+      await deleteDoc(doc(firestore, "bookClubs", id));
+      setBookClubs(bookClubs.filter((club) => club.id !== id));
+    } catch (error) {
+      console.error("Error deleting book club:", error);
+    }
   };
 
-  const joinBookClub = async (clubId: string, userId: string) => {
-    setBookClubs(
-      bookClubs.map((club) =>
-        club.id === clubId
-          ? { ...club, members: [...club.members, userId] }
-          : club
-      )
-    );
+  const joinBookClub = async (clubId: string, userName: string) => {
+    try {
+      const clubRef = doc(firestore, "bookClubs", clubId);
+      await updateDoc(clubRef, {
+        members: arrayUnion(userName),
+      });
+      setBookClubs(
+        bookClubs.map((club) =>
+          club.id === clubId
+            ? { ...club, members: [...club.members, userName] }
+            : club
+        )
+      );
+    } catch (error) {
+      console.error("Error joining book club:", error);
+    }
   };
 
   const leaveBookClub = async (clubId: string, userId: string) => {
-    setBookClubs(
-      bookClubs.map((club) =>
-        club.id === clubId
-          ? { ...club, members: club.members.filter((id) => id !== userId) }
-          : club
-      )
-    );
+    try {
+      const clubRef = doc(firestore, "bookClubs", clubId);
+      await updateDoc(clubRef, {
+        members: arrayRemove(userId),
+      });
+      setBookClubs(
+        bookClubs.map((club) =>
+          club.id === clubId
+            ? { ...club, members: club.members.filter((id) => id !== userId) }
+            : club
+        )
+      );
+    } catch (error) {
+      console.error("Error leaving book club:", error);
+    }
   };
 
   return (
@@ -96,6 +162,7 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
         deleteBookClub,
         joinBookClub,
         leaveBookClub,
+        getBookClubs,
       }}
     >
       {children}

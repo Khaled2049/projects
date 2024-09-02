@@ -5,6 +5,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import { IUser } from "../../types/IUser";
 import { AiOutlineLoading3Quarters, AiOutlinePlus } from "react-icons/ai";
 import Posts from "./posts";
+import Clubs from "./clubs";
 
 const Home: React.FC = () => {
   const [users, setUsers] = useState<IUser[]>([]);
@@ -138,39 +139,7 @@ const Home: React.FC = () => {
 
       <Posts />
 
-      {/* Right column - Book clubs */}
-      {/* <div className="w-full lg:w-1/4 bg-amber-50 p-4 overflow-y-auto">
-        <h2 className="text-2xl font-serif font-bold mb-4 text-amber-900">
-          Book Clubs
-        </h2>
-        <ul>
-          {bookClubs.map((club) => (
-            <li
-              key={club.id}
-              className="mb-4 p-3 bg-white rounded-lg border border-amber-200"
-            >
-              <div className="flex justify-between items-center">
-                <span className="font-serif font-semibold text-amber-900">
-                  {club.name}
-                </span>
-                <button className="bg-amber-600 text-white px-3 py-1 rounded-full flex items-center hover:bg-amber-700 transition duration-300">
-                  <UserPlus size={16} className="mr-1" />
-                  Join
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div className="flex justify-center items-center">
-          <Link
-            to="/book-clubs"
-            className="w-full mt-4 text-center bg-amber-700 text-white py-2 px-4 rounded-full hover:bg-amber-800 transition duration-300 font-serif mx-auto"
-            style={{ maxWidth: "200px" }} // Optional: Set a max width if you want a specific size
-          >
-            View All Clubs
-          </Link>
-        </div>
-      </div> */}
+      <Clubs />
     </div>
   );
 };
