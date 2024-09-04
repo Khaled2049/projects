@@ -5,17 +5,17 @@ import {
   orderBy,
   limit,
   startAfter,
-  getDocs,
   DocumentData,
   QueryDocumentSnapshot,
   addDoc,
   doc,
   deleteDoc,
   where,
+  onSnapshot,
 } from "firebase/firestore";
 import { useAuthContext } from "./AuthContext";
 import { firestore } from "../config/firebase";
-import { IUser } from "../types/IUser";
+
 // Define the type for a post
 interface IPost {
   id: string;
@@ -27,10 +27,11 @@ interface IPost {
 
 // Define the type for the context state
 interface PostsContextState {
-  posts: IPost[];
+  allPosts: IPost[];
+  followingPosts: IPost[];
   loading: boolean;
   hasMore: boolean;
-  loadMorePosts: () => Promise<void>;
+  loadMorePosts: () => void;
   createPost: (content: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
 }
@@ -41,62 +42,108 @@ const POSTS_PER_PAGE = 10;
 export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastDoc, setLastDoc] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [allPosts, setAllPosts] = useState<IPost[]>([]);
+  const [followingPosts, setFollowingPosts] = useState<IPost[]>([]);
 
   const { user } = useAuthContext();
 
-  const loadMorePosts = async () => {
+  const loadMorePosts = () => {
     if (loading || !hasMore || !user) return;
-    setLoading(true);
 
+    setLoading(true);
     console.log("Loading more posts...");
 
-    try {
-      const postsCollection = collection(firestore, "posts");
-      let postsQuery;
-      postsQuery = query(
-        postsCollection,
-        orderBy("createdAt", "desc"),
-        limit(POSTS_PER_PAGE)
-      );
+    // All posts listener
+    const allPostsQuery = query(
+      collection(firestore, "posts"),
+      orderBy("createdAt", "desc"),
+      // startAfter(lastDoc || 0),
+      limit(POSTS_PER_PAGE)
+    );
 
-      if (lastDoc) {
-        postsQuery = query(postsQuery, startAfter(lastDoc));
+    const unsubscribeAllPosts = onSnapshot(
+      allPostsQuery,
+      (snapshot) => {
+        const newPosts = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          authorId: doc.data().authorId,
+          authorName: doc.data().authorName,
+          content: doc.data().content,
+          createdAt: doc.data().createdAt.toDate(),
+          ...doc.data(),
+        }));
+
+        console.log("New posts:", newPosts);
+
+        setAllPosts((prevPosts) => {
+          const existingIds = new Set(prevPosts.map((post) => post.id));
+          const uniqueNewPosts = newPosts.filter(
+            (post) => !existingIds.has(post.id)
+          );
+          return [...prevPosts, ...uniqueNewPosts];
+        });
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+        setHasMore(snapshot.docs.length === POSTS_PER_PAGE);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error loading more posts:", error);
+        setLoading(false);
       }
+    );
 
-      const querySnapshot = await getDocs(postsQuery);
-      const newPosts = querySnapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as IPost)
-      );
+    // Following posts listener
+    const followingPostsQuery = query(
+      collection(firestore, "posts"),
+      where("authorId", "in", user.following || []),
+      orderBy("createdAt", "desc"),
+      limit(POSTS_PER_PAGE)
+    );
 
-      setPosts((prevPosts) => {
-        const existingIds = new Set(prevPosts.map((post) => post.id));
-        const uniqueNewPosts = newPosts.filter(
-          (post) => !existingIds.has(post.id)
-        );
-        return [...prevPosts, ...uniqueNewPosts];
-      });
+    const unsubscribeFollowingPosts = onSnapshot(
+      followingPostsQuery,
+      (snapshot) => {
+        const newPosts = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          authorId: doc.data().authorId,
+          authorName: doc.data().authorName,
+          content: doc.data().content,
+          createdAt: doc.data().createdAt.toDate(),
+          ...doc.data(),
+        }));
 
-      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
-      setHasMore(querySnapshot.docs.length === POSTS_PER_PAGE);
-    } catch (error) {
-      console.error("Error loading posts:", error);
-    } finally {
-      setLoading(false);
-    }
+        console.log("New following posts:", newPosts);
+
+        setFollowingPosts((prevPosts) => {
+          const existingIds = new Set(prevPosts.map((post) => post.id));
+          const uniqueNewPosts = newPosts.filter(
+            (post) => !existingIds.has(post.id)
+          );
+          return [...prevPosts, ...uniqueNewPosts];
+        });
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+        setHasMore(snapshot.docs.length === POSTS_PER_PAGE);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error loading more followed author posts:", error);
+        setLoading(false);
+      }
+    );
+
+    // Cleanup function
+    return () => {
+      unsubscribeAllPosts();
+      unsubscribeFollowingPosts();
+    };
   };
 
   useEffect(() => {
     if (user) {
-      setPosts([]);
       setLastDoc(null);
       setHasMore(true);
       loadMorePosts();
@@ -122,7 +169,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
         id: docRef.id,
       };
 
-      setPosts((prevPosts) => [...prevPosts, createdPost]);
+      setAllPosts((prevPosts) => [...prevPosts, createdPost]);
     } catch (error) {
       console.error("Error creating post:", error);
       throw error;
@@ -138,7 +185,9 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
       await deleteDoc(postRef);
 
       // Remove the post from local state
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+      setAllPosts((prevPosts) =>
+        prevPosts.filter((post) => post.id !== postId)
+      );
     } catch (error) {
       console.error("Error deleting post:", error);
       throw error;
@@ -148,7 +197,8 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <PostsContext.Provider
       value={{
-        posts,
+        followingPosts,
+        allPosts,
         createPost,
         deletePost,
         loadMorePosts,

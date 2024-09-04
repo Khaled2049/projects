@@ -5,7 +5,15 @@ import { useInView } from "react-intersection-observer";
 
 const Posts = () => {
   const [post, setPost] = useState("");
-  const { createPost, posts, loading, hasMore, loadMorePosts } = usePosts();
+  const {
+    createPost,
+    allPosts,
+    followingPosts,
+    loading,
+    hasMore,
+    loadMorePosts,
+  } = usePosts();
+  const [isMyFeed, setIsMyFeed] = useState(true);
   const { ref, inView } = useInView({
     threshold: 0,
   });
@@ -42,7 +50,15 @@ const Posts = () => {
         </div>
       </form>
 
-      {/* <div className="flex justify-between mb-4">
+      <div className="flex justify-between mb-4">
+        <button
+          onClick={() => setIsMyFeed(true)}
+          className={`w-full py-2 px-4 text-center font-serif font-bold ${
+            isMyFeed ? "bg-amber-600 text-white" : "bg-amber-200 text-amber-900"
+          }`}
+        >
+          My Feed
+        </button>
         <button
           onClick={() => setIsMyFeed(false)}
           className={`w-full py-2 px-4 text-center font-serif font-bold ${
@@ -53,38 +69,60 @@ const Posts = () => {
         >
           Discover
         </button>
-        <button
-          onClick={() => setIsMyFeed(true)}
-          className={`w-full py-2 px-4 text-center font-serif font-bold ${
-            isMyFeed ? "bg-amber-600 text-white" : "bg-amber-200 text-amber-900"
-          }`}
-        >
-          My Feed
-        </button>
-      </div> */}
+      </div>
 
-      {/* Posts */}
-      {posts.map((post, index) => (
-        <div
-          key={post.id}
-          className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
-        >
-          <div className="flex items-center mb-2 justify-between">
-            <div className="flex items-center">
-              <User className="mr-2 text-amber-700" />
-              <span className="font-serif font-bold text-amber-900">
-                {post.authorName}
-              </span>
+      {/* All Posts */}
+
+      {isMyFeed
+        ? followingPosts.map((post, index) => (
+            <div
+              key={post.id}
+              className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
+            >
+              <div className="flex items-center mb-2 justify-between">
+                <div className="flex items-center">
+                  <User className="mr-2 text-amber-700" />
+                  <span className="font-serif font-bold text-amber-900">
+                    {post.authorName}
+                  </span>
+                </div>
+                <span className="text-amber-600 text-sm">
+                  Post #{index + 1}
+                </span>
+              </div>
+              <p className="mb-2 font-serif text-amber-800">{post.content}</p>
+              <div className="flex items-center text-amber-600">
+                <BookOpen size={16} className="mr-1" />
+                <span>100 likes</span>
+              </div>
             </div>
-            <span className="text-amber-600 text-sm">Post #{index + 1}</span>
-          </div>
-          <p className="mb-2 font-serif text-amber-800">{post.content}</p>
-          <div className="flex items-center text-amber-600">
-            <BookOpen size={16} className="mr-1" />
-            <span>100 likes</span>
-          </div>
-        </div>
-      ))}
+          ))
+        : allPosts.map((post, index) => (
+            <div
+              key={post.id}
+              className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
+            >
+              <div className="flex items-center mb-2 justify-between">
+                <div className="flex items-center">
+                  <User className="mr-2 text-amber-700" />
+                  <span className="font-serif font-bold text-amber-900">
+                    {post.authorName}
+                  </span>
+                </div>
+                <span className="text-amber-600 text-sm">
+                  Post #{index + 1}
+                </span>
+              </div>
+              <p className="mb-2 font-serif text-amber-800">{post.content}</p>
+              <div className="flex items-center text-amber-600">
+                <BookOpen size={16} className="mr-1" />
+                <span>100 likes</span>
+              </div>
+            </div>
+          ))}
+
+      {}
+
       {loading && (
         <div className="text-center p-4 bg-amber-100 rounded">
           Loading more posts...
