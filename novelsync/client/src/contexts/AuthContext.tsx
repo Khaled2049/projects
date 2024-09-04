@@ -119,8 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await updateDoc(doc(firestore, "users", user.uid), {
         following: arrayUnion(uid),
       });
-
-      console.log(`User with UID ${user.uid} followed user with UID ${uid}`);
     } catch (error) {
       console.error("Error following user:", error);
       throw new Error("Failed to follow user");
@@ -142,8 +140,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await updateDoc(doc(firestore, "users", user.uid), {
         following: arrayRemove(uid),
       });
-
-      console.log(`User with UID ${user.uid} unfollowed user with UID ${uid}`);
     } catch (error) {
       console.error("Error unfollowing user:", error);
       throw new Error("Failed to unfollow user");

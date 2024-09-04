@@ -55,7 +55,6 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
     if (loading || !hasMore || !user) return;
 
     setLoading(true);
-    console.log("Loading more posts...");
 
     // All posts listener
     const allPostsQuery = query(
@@ -76,8 +75,6 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
           createdAt: doc.data().createdAt.toDate(),
           ...doc.data(),
         }));
-
-        console.log("New posts:", newPosts);
 
         setAllPosts((prevPosts) => {
           const existingIds = new Set(prevPosts.map((post) => post.id));
@@ -115,8 +112,6 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
           createdAt: doc.data().createdAt.toDate(),
           ...doc.data(),
         }));
-
-        console.log("New following posts:", newPosts);
 
         setFollowingPosts((prevPosts) => {
           const existingIds = new Set(prevPosts.map((post) => post.id));

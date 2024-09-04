@@ -61,7 +61,6 @@ const BookClubs = () => {
 
   const handleJoinClub = (clubId: string) => {
     if (user) {
-      console.log(user.uid, "Joining club", clubId);
       joinBookClub(clubId, user.username);
     } else {
       alert("You must be logged in to join a club.");
@@ -80,7 +79,6 @@ const BookClubs = () => {
 
   const handleLeaveClub = (clubId: string) => {
     if (user) {
-      console.log(user.uid, "Leaving club", clubId);
       leaveBookClub(clubId, user.uid);
     }
   };
