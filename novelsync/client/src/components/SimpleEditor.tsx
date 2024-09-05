@@ -19,11 +19,10 @@ import ListItem from "@tiptap/extension-list-item";
 import CollapsibleDiv from "./CollapsibleDiv";
 
 const limit = 5000;
-import { Book, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { Book, Trash2 } from "lucide-react";
 
 import EditorHeader from "./EditorHeader";
 import { useAI } from "../contexts/AIContext";
-import { Loader } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
 
@@ -35,6 +34,8 @@ import AIPartners from "./AIPartners";
 export function SimpleEditor() {
   const [isEditing, setIsEditing] = useState(false);
   const [rightColumnVisible, setRightColumnVisible] = useState(true);
+  const [aitoolsVisible, setAitoolsVisible] = useState(true);
+  const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
   const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
   const {
     title,
@@ -420,10 +421,42 @@ export function SimpleEditor() {
             </button>
           )}
         </div>
+        <div
+          className={`transition-all duration-300 bg-amber-100 mx-2 ${
+            aitoolsVisible ? "w-1/3" : "w-24"
+          } flex flex-col`}
+        >
+          <div className="p-2 bg-amber-500 text-white rounded-t-lg hover:bg-amber-600 flex justify-center">
+            {aitoolsVisible ? (
+              <button
+                onClick={toggleAiTools}
+                className="flex items-center h-12 justify-center w-full"
+              >
+                <span className="flex items-center space-x-2">
+                  <span>Hide AI Tools</span>
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={toggleAiTools}
+                className="flex items-center h-12 justify-center w-full"
+              >
+                <span className="flex items-center space-x-2">
+                  <span>Show AI Tools</span>
+                </span>
+              </button>
+            )}
+          </div>
+          {aitoolsVisible && (
+            <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
+              <AIPartners />
+            </div>
+          )}
+        </div>
 
         {/* Right Column */}
         <div
-          className={`transition-all duration-300 bg-gray-100 mx-2 ${
+          className={`transition-all duration-300 bg-amber-100 mx-2 ${
             rightColumnVisible ? "w-1/3" : "w-24"
           } flex flex-col`}
         >
@@ -434,7 +467,7 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Hide</span>
+                  <span>Hide Organizer</span>
                 </span>
               </button>
             ) : (
@@ -443,11 +476,12 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Show</span>
+                  <span>Show Organizer</span>
                 </span>
               </button>
             )}
           </div>
+
           {rightColumnVisible && (
             <div className="p-6 bg-gray-100 transition-all duration-300 flex-1">
               <CollapsibleDiv title="Chapters">
@@ -490,8 +524,32 @@ export function SimpleEditor() {
                   )}
                 </div>
               </CollapsibleDiv>
-              <CollapsibleDiv title="AI Partners">
-                <AIPartners />
+              <CollapsibleDiv title="Outline">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Plot">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Characters">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Places">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Objects">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Themes">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Magic System">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Rules">
+                <div>Working on it :)</div>
+              </CollapsibleDiv>
+              <CollapsibleDiv title="Notes">
+                <div>Working on it :)</div>
               </CollapsibleDiv>
             </div>
           )}
