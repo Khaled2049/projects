@@ -16,9 +16,10 @@ import BulletList from "@tiptap/extension-bullet-list";
 import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./AITextGenerator";
 import ListItem from "@tiptap/extension-list-item";
+import CollapsibleDiv from "./CollapsibleDiv";
 
 const limit = 5000;
-import { Book, Trash2 } from "lucide-react";
+import { Book, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
 import EditorHeader from "./EditorHeader";
 import { useAI } from "../contexts/AIContext";
@@ -29,10 +30,12 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 import { useEditorContext } from "../contexts/EditorContext";
 import { Chapter, Draft, Story } from "../types/IStory";
+import AIPartners from "./AIPartners";
 
 export function SimpleEditor() {
   const [isEditing, setIsEditing] = useState(false);
-
+  const [rightColumnVisible, setRightColumnVisible] = useState(true);
+  const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
   const {
     title,
     setTitle,
@@ -328,166 +331,172 @@ export function SimpleEditor() {
     setsuggestion("");
   }, [selectedAI, user]);
   const [savingMessage, setSavingMessage] = useState("");
+
   return (
     <div className="flex p-2 mt-4 justify-center overflow-auto w-full">
-      {publishLoading && <div>Loading...</div>}
-      <div className="w-[70%] p-4 bg-amber-50 rounded-lg shadow-lg overflow-y-auto">
-        {publishLoading && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-4">
-              <Loader className="animate-spin" size={24} />
-              <span className="text-lg font-semibold">Publishing...</span>
-            </div>
-          </div>
-        )}
-        <h1 className="mb-4 text-3xl font-bold text-slate-800 italic">
-          Summon your ultimate writing muse by pressing{" "}
-          <span className="underline decoration-wavy text-blue-600">TAB</span>
-        </h1>
-        <div className="bg-white p-4 rounded-lg border border-gray-300">
-          <input
-            type="text"
-            placeholder="Story Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-3xl font-bold mb-6 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
-          />
-
-          <input
-            type="text"
-            placeholder="Chapter Title"
-            value={currentChapterTitle}
-            onChange={(e) => setCurrentChapterTitle(e.target.value)}
-            className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
-          />
-
-          <div className="min-h-[24rem] w-full flex justify-center">
-            <EditorContent
-              onClick={() => editor?.commands.focus()}
-              className="w-full focus:outline-none bg-white selection:bg-blue-100"
-              editor={editor}
+      <div className="flex h-screen w-full">
+        {publishLoading && <div>Loading...</div>}
+        <div
+          className={`p-4 bg-amber-50 rounded-lg shadow-lg overflow-y-auto transition-all duration-300 ${
+            rightColumnVisible ? "w-2/3" : "w-full"
+          }`}
+        >
+          <h1 className="mb-4 text-3xl font-bold text-slate-800 italic">
+            Summon your ultimate writing muse by pressing{" "}
+            <span className="underline decoration-wavy text-blue-600">TAB</span>
+          </h1>
+          <div className="bg-white p-4 rounded-lg border border-gray-300">
+            <input
+              type="text"
+              placeholder="Story Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full text-3xl font-bold mb-6 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
             />
-          </div>
-          {savingMessage && (
-            <div className="mt-2 text-center text-gray-500">
-              {savingMessage}
+
+            <input
+              type="text"
+              placeholder="Chapter Title"
+              value={currentChapterTitle}
+              onChange={(e) => setCurrentChapterTitle(e.target.value)}
+              className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
+            />
+
+            <div className="min-h-[28rem] w-full flex justify-center">
+              <div className="w-full focus:outline-none bg-white selection:bg-blue-100">
+                <EditorContent
+                  onClick={() => editor?.commands.focus()}
+                  className="w-full focus:outline-none bg-white selection:bg-blue-100"
+                  editor={editor}
+                />
+                <EditorContent editor={editor} />
+              </div>
+              {savingMessage && (
+                <div className="mt-2 text-center text-gray-500">
+                  {savingMessage}
+                </div>
+              )}
             </div>
+          </div>
+          <div className="flex my-3">
+            <EditorHeader editor={editor} />
+          </div>
+
+          {editingChapterId ? (
+            <button
+              onClick={updateChapter}
+              className="w-full p-2 mb-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              Update Chapter
+            </button>
+          ) : (
+            <button
+              onClick={addChapter}
+              className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Add Chapter
+            </button>
+          )}
+          <button
+            onClick={addDraft}
+            className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
+          >
+            Save as Draft
+          </button>
+
+          {editingStoryId ? (
+            <button
+              onClick={editStory}
+              className="w-full mt-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              Update story
+            </button>
+          ) : (
+            <button
+              onClick={addStory}
+              className="w-full p-2 mt-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Publish Story
+            </button>
           )}
         </div>
 
-        <div className="flex my-3">
-          <EditorHeader editor={editor} />
-        </div>
-
-        {editingChapterId ? (
-          <button
-            onClick={updateChapter}
-            className="w-full p-2 mb-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            Update Chapter
-          </button>
-        ) : (
-          <button
-            onClick={addChapter}
-            className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Add Chapter
-          </button>
-        )}
-        <button
-          onClick={addDraft}
-          className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
+        {/* Right Column */}
+        <div
+          className={`transition-all duration-300 bg-gray-100 mx-2 ${
+            rightColumnVisible ? "w-1/3" : "w-24"
+          } flex flex-col`}
         >
-          Save as Draft
-        </button>
-
-        {editingStoryId ? (
-          <button
-            onClick={editStory}
-            className="w-full mt-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            Update story
-          </button>
-        ) : (
-          <button
-            onClick={addStory}
-            className="w-full p-2 mt-2 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            Publish Story
-          </button>
-        )}
-      </div>
-
-      <div className="w-full md:w-1/4 p-6 bg-amber-50 rounded-lg shadow-lg ml-5">
-        <h2 className="text-2xl font-bold mb-4 text-amber-800">
-          {title || "Untitled Masterpiece"}
-        </h2>
-
-        {currentChapters.length === 0 ? (
-          <p className="text-amber-700 italic">
-            No chapters added yet. Start your journey!
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {currentChapters.map((chapter) => (
-              <li
-                key={chapter.chapterId}
-                className="bg-white rounded-md shadow transition-all hover:shadow-md"
+          <div className="p-2 bg-amber-500 text-white rounded-t-lg hover:bg-amber-600 flex justify-center">
+            {rightColumnVisible ? (
+              <button
+                onClick={toggleRightColumn}
+                className="flex items-center h-12 justify-center w-full"
               >
-                <div className="flex items-center justify-between p-3">
-                  <div
-                    className="flex items-center space-x-3 cursor-pointer"
-                    onClick={() => loadChapterForEditing(chapter)}
-                  >
-                    <Book className="w-5 h-5 text-amber-600" />
-                    <span className="font-medium text-amber-900">
-                      {chapter.title}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => deleteChapter(chapter.chapterId)}
-                    className="p-1 text-red-500 hover:text-red-700 transition-colors"
-                    aria-label="Delete chapter"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                <span className="flex items-center space-x-2">
+                  <span>Hide</span>
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={toggleRightColumn}
+                className="flex items-center h-12 justify-center w-full"
+              >
+                <span className="flex items-center space-x-2">
+                  <span>Show</span>
+                </span>
+              </button>
+            )}
+          </div>
+          {rightColumnVisible && (
+            <div className="p-6 bg-gray-100 transition-all duration-300 flex-1">
+              <CollapsibleDiv title="Chapters">
+                <div className="p-6 bg-amber-50 rounded-lg shadow-lg">
+                  <h2 className="text-2xl font-bold mb-4 text-amber-800">
+                    {title || "Untitled Masterpiece"}
+                  </h2>
+                  {currentChapters.length === 0 ? (
+                    <p className="text-amber-700 italic">
+                      No chapters added yet. Start your journey!
+                    </p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {currentChapters.map((chapter) => (
+                        <li
+                          key={chapter.chapterId}
+                          className="bg-white rounded-md shadow transition-all hover:shadow-md"
+                        >
+                          <div className="flex items-center justify-between p-3">
+                            <div
+                              className="flex items-center space-x-3 cursor-pointer"
+                              onClick={() => loadChapterForEditing(chapter)}
+                            >
+                              <Book className="w-5 h-5 text-amber-600" />
+                              <span className="font-medium text-amber-900">
+                                {chapter.title}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => deleteChapter(chapter.chapterId)}
+                              className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                              aria-label="Delete chapter"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
+              </CollapsibleDiv>
+              <CollapsibleDiv title="AI Partners">
+                <AIPartners />
+              </CollapsibleDiv>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
-}
-
-{
-  /* <div className="w-[20%] p-4 bg-white border border-gray-400 rounded shadow-lg">
-  <h2 className="text-xl font-semibold mb-4">User Stories</h2>
-  {userStories.length === 0 && <p>No stories added yet.</p>}
-  {userStories.map((story) => (
-    <div key={story.storyId}>
-      <h2 className="text-xl font-semibold mb-4">{story.title}</h2>
-      {story.chapters.map((chapter) => (
-        <li
-          key={chapter.chapterId}
-          className={`p-1 rounded ${
-            isEditing
-              ? "cursor-pointer hover:bg-gray-100"
-              : "text-gray-400 cursor-not-allowed"
-          }`}
-          onClick={() => isEditing && loadChapterForEditing(chapter)}
-        >
-          <strong>{chapter.title}</strong>
-        </li>
-      ))}
-      <button
-        onClick={() => loadStoryForEditing(story)}
-        className="w-full p-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Edit Story
-      </button>
-    </div>
-  ))}
-</div> */
 }

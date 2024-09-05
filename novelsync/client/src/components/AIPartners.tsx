@@ -14,7 +14,7 @@ const AIPartners: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center flex-col justify-center bg-amber-50 p-2 shadow-lg border border-amber-200">
+    <div className="flex items-center flex-col justify-center bg-amber-50 p-2">
       <h2 className="text-2xl font-serif mb-4 text-amber-800">AI Partners</h2>
       <div className="flex flex-wrap justify-center gap-8">
         {profiles.map((profile) => (
