@@ -102,7 +102,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [editingStoryId, setEditingStoryId] = useState<string | null>(null);
   const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
 
-  const [likes, setLikes] = useState<number>(0);
+  const [likes, _setLikes] = useState<number>(0);
   const [publishLoading, setpublishLoading] = useState<boolean>(false);
   const [fetchLoading, setFetchLoading] = useState<boolean>(false);
 
@@ -937,21 +937,21 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // check if current user has liked the story
-  const checkUserLiked = async (storyId: string, user: IUser) => {
-    const novelDocRef = doc(firestore, "novels", storyId);
-    const novelDoc = await getDoc(novelDocRef);
+  // const checkUserLiked = async (storyId: string, user: IUser) => {
+  //   const novelDocRef = doc(firestore, "novels", storyId);
+  //   const novelDoc = await getDoc(novelDocRef);
 
-    if (!novelDoc.exists()) {
-      console.error("Story not found");
-      return null;
-    }
+  //   if (!novelDoc.exists()) {
+  //     console.error("Story not found");
+  //     return null;
+  //   }
 
-    const novelData = novelDoc.data();
-    const likes = novelData?.likes;
-    const liked = likes?.includes(user.uid);
+  //   const novelData = novelDoc.data();
+  //   const likes = novelData?.likes;
+  //   const liked = likes?.includes(user.uid);
 
-    return liked;
-  };
+  //   return liked;
+  // };
 
   const incrementLikes = async (storyId: string) => {
     const storyRef = doc(firestore, "novels", storyId);

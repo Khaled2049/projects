@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { User, BookIcon, Send, UserPlus, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { User } from "lucide-react";
+
 import { useAuthContext } from "../../contexts/AuthContext";
 import { IUser } from "../../types/IUser";
 import { AiOutlineLoading3Quarters, AiOutlinePlus } from "react-icons/ai";
@@ -10,8 +10,6 @@ import Clubs from "./clubs";
 const Home: React.FC = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [following, setFollowing] = useState([] as string[]);
-
-  const [bookClubs, setBookClubs] = useState([]);
 
   const [loading, setLoading] = useState<string | null>(null);
 

@@ -1,5 +1,3 @@
-import { IBook } from "./IBook";
-
 export interface IClub {
   id: string;
   name: string;

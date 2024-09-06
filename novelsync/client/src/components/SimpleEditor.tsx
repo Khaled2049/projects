@@ -344,9 +344,9 @@ export function SimpleEditor() {
     );
   };
 
-  const applyChanges = (newText: string) => {
-    editor.chain().focus().setContent(newText, false).run();
-  };
+  // const applyChanges = (newText: string) => {
+  //   editor.chain().focus().setContent(newText, false).run();
+  // };
 
   const handleAction = async (actionType: string) => {
     const selectedText = getSelectedText();

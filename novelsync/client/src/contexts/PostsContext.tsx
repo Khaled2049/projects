@@ -4,7 +4,6 @@ import {
   query,
   orderBy,
   limit,
-  startAfter,
   DocumentData,
   QueryDocumentSnapshot,
   addDoc,
@@ -44,7 +43,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [lastDoc, setLastDoc] =
+  const [_lastDoc, setLastDoc] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [followingPosts, setFollowingPosts] = useState<IPost[]>([]);

@@ -6,7 +6,6 @@ import CreateBookClub from "./CreateBookClub";
 import UpdateBookClub from "./UpdateBookClub";
 import { useBookClub } from "../../contexts/BookClubContext";
 import { useAuthContext } from "../../contexts/AuthContext";
-import { Link } from "react-router-dom";
 
 const BookClubs = () => {
   const {

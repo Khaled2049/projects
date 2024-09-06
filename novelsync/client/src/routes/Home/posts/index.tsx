@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { User, BookIcon, Send, UserPlus, BookOpen } from "lucide-react";
+import { User, Send, BookOpen } from "lucide-react";
 import { usePosts } from "../../../contexts/PostsContext";
 import { useInView } from "react-intersection-observer";
 

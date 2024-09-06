@@ -22,7 +22,7 @@ import EditorHeader from "../../components/EditorHeader";
 
 import { useAI } from "../../contexts/AIContext";
 import { Loader } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useAuthContext } from "../../contexts/AuthContext";
 
 import { v4 as uuidv4 } from "uuid";
@@ -161,7 +161,7 @@ const DraftEditor = () => {
     setEditingChapterId(chapter.chapterId);
   };
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const { selectedAI } = useAI();
   const aiGeneratorRef = useRef<AITextGenerator | null>(null);
