@@ -37,6 +37,16 @@ export class AITextGenerator {
     });
   }
 
+  private async generateContent(prompt: string): Promise<string> {
+    try {
+      const result = await this.model.generateContent(prompt);
+      return result.response.text().trim();
+    } catch (error) {
+      console.error("Error:", error);
+      throw new Error("Error generating content");
+    }
+  }
+
   async generateRandomTopic(): Promise<string> {
     const prompt = "Generate a random topic for a story.";
 
@@ -49,6 +59,39 @@ export class AITextGenerator {
       console.error("Error:", error);
       return "Error generating random topic";
     }
+  }
+
+  async extpandText(text: string): Promise<string> {
+    const prompt = `Expand the following sentence into a paragraph: ${text}`;
+    return this.generateContent(prompt);
+  }
+
+  async paraphraseText(text: string): Promise<string> {
+    const prompt = `Paraphrase the following: ${text}`;
+    return this.generateContent(prompt);
+  }
+
+  async summarizePlotOrScene(text: string): Promise<string> {
+    const prompt = `Provide a concise summary of the following plot or scene: ${text}`;
+    return this.generateContent(prompt);
+  }
+
+  async adjustToneAndStyle(text: string, desiredTone: string): Promise<string> {
+    const prompt = `Adjust the tone and style of the following text to be ${desiredTone}: ${text}`;
+    return this.generateContent(prompt);
+  }
+
+  async enhanceCharacterDialogue(
+    dialogue: string,
+    character: string
+  ): Promise<string> {
+    const prompt = `Enhance the following dialogue to better reflect ${character}'s personality and manner of speaking: ${dialogue}`;
+    return this.generateContent(prompt);
+  }
+
+  async exploreTheme(text: string, theme: string): Promise<string> {
+    const prompt = `Analyze and enhance the exploration of the theme "${theme}" in the following text: ${text}`;
+    return this.generateContent(prompt);
   }
 
   async generateLine(prevText: string): Promise<string> {

@@ -1,6 +1,6 @@
 import "./style.css";
 import { useEffect, useRef, useState } from "react";
-import { useEditor, EditorContent, Editor } from "@tiptap/react";
+import { useEditor, EditorContent, Editor, BubbleMenu } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
@@ -30,11 +30,15 @@ import { v4 as uuidv4 } from "uuid";
 import { useEditorContext } from "../contexts/EditorContext";
 import { Chapter, Draft, Story } from "../types/IStory";
 import AIPartners from "./AIPartners";
+import AITools from "./AITools";
 
 export function SimpleEditor() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [_isEditing, setIsEditing] = useState(false);
   const [rightColumnVisible, setRightColumnVisible] = useState(true);
   const [aitoolsVisible, setAitoolsVisible] = useState(true);
+
+  const [selectedText, setSelectedText] = useState("");
+
   const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
   const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
   const {
@@ -333,8 +337,76 @@ export function SimpleEditor() {
   }, [selectedAI, user]);
   const [savingMessage, setSavingMessage] = useState("");
 
+  const getSelectedText = () => {
+    return editor.state.doc.textBetween(
+      editor.state.selection.from,
+      editor.state.selection.to
+    );
+  };
+
+  const applyChanges = (newText: string) => {
+    editor.chain().focus().setContent(newText, false).run();
+  };
+
+  const handleAction = async (actionType: string) => {
+    const selectedText = getSelectedText();
+    setSelectedText(selectedText);
+    try {
+      let result: string;
+      switch (actionType) {
+        case "summarize":
+          result = await aiGenerator.summarizePlotOrScene(selectedText);
+          break;
+        case "paraphraseText":
+          result = await aiGenerator.paraphraseText(selectedText);
+          break;
+        case "expandText":
+          result = await aiGenerator.extpandText(selectedText);
+          break;
+        default:
+          throw new Error("Unknown action type");
+      }
+      console.log(result);
+      // applyChanges(result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
-    <div className="flex p-2 mt-4 justify-center overflow-auto w-full">
+    <div className="flex p-2 mt-4 justify-center overflow-auto">
+      <BubbleMenu
+        pluginKey="bubbleMenuText"
+        className="bg-gray-800 text-white rounded-lg shadow-lg"
+        tippyOptions={{ duration: 150 }}
+        editor={editor}
+        shouldShow={({ from, to }) => {
+          // only show if range is selected.
+          setSelectedText(editor.state.doc.textBetween(from, to));
+          return from !== to;
+        }}
+      >
+        <div className="flex min-w-[18rem] justify-center bg-gray-800 p-1 rounded-lg shadow-lg">
+          <button
+            className="py-1 px-3 m-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={() => handleAction("expandText")}
+          >
+            Expand
+          </button>
+          <button
+            className="py-1 px-3 m-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={() => handleAction("paraphraseText")}
+          >
+            Paraphrase
+          </button>
+          <button
+            className="py-1 px-3 m-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            onClick={() => handleAction("summarize")}
+          >
+            Summarize
+          </button>
+        </div>
+      </BubbleMenu>
       <div className="flex h-screen w-full">
         {publishLoading && <div>Loading...</div>}
         <div
@@ -346,6 +418,10 @@ export function SimpleEditor() {
             Summon your ultimate writing muse by pressing{" "}
             <span className="underline decoration-wavy text-blue-600">TAB</span>
           </h1>
+
+          <div className="text-2xl mb-2">
+            Authenticity Score: {Math.floor(Math.random() * 100)}%
+          </div>
           <div className="bg-white p-4 rounded-lg border border-gray-300">
             <input
               type="text"
@@ -382,7 +458,6 @@ export function SimpleEditor() {
           <div className="flex my-3">
             <EditorHeader editor={editor} />
           </div>
-
           {editingChapterId ? (
             <button
               onClick={updateChapter}
@@ -404,7 +479,6 @@ export function SimpleEditor() {
           >
             Save as Draft
           </button>
-
           {editingStoryId ? (
             <button
               onClick={editStory}
@@ -433,7 +507,7 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Hide AI Tools</span>
+                  <span>Hide Tools</span>
                 </span>
               </button>
             ) : (
@@ -442,7 +516,7 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Show AI Tools</span>
+                  <span>Show Tools</span>
                 </span>
               </button>
             )}
@@ -450,6 +524,7 @@ export function SimpleEditor() {
           {aitoolsVisible && (
             <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
               <AIPartners />
+              <AITools text={selectedText} />
             </div>
           )}
         </div>
@@ -483,7 +558,7 @@ export function SimpleEditor() {
           </div>
 
           {rightColumnVisible && (
-            <div className="p-6 bg-gray-100 transition-all duration-300 flex-1">
+            <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
               <CollapsibleDiv title="Chapters">
                 <div className="p-6 bg-amber-50 rounded-lg shadow-lg">
                   <h2 className="text-2xl font-bold mb-4 text-amber-800">
