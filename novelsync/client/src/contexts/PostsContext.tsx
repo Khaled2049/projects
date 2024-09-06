@@ -95,7 +95,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
     // Following posts listener
     const followingPostsQuery = query(
       collection(firestore, "posts"),
-      where("authorId", "in", user.following || []),
+      where("authorId", "in", user.following),
       orderBy("createdAt", "desc"),
       limit(POSTS_PER_PAGE)
     );
