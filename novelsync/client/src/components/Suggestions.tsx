@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { AITextGenerator } from "./gemin";
+import { AITextGenerator } from "./AITextGenerator";
 import { Book, Feather, Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import NovelsContext from "../contexts/NovelsContext";
+
+import { useEditorContext } from "../contexts/EditorContext";
 
 const Suggestions = () => {
   const [desire, setDesire] = useState("");
@@ -13,13 +13,7 @@ const Suggestions = () => {
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const novelsContext = useContext(NovelsContext);
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
-
-  // Destructure the setsuggestion function from the novelsContext
-  const { setsuggestion } = novelsContext;
+  const { setsuggestion } = useEditorContext();
 
   const aiGenerator = new AITextGenerator(0);
 

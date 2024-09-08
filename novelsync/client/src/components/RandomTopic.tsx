@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { AITextGenerator } from "./gemin";
+import { AITextGenerator } from "./AITextGenerator";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import NovelsContext from "../contexts/NovelsContext";
+
 import { Loader } from "lucide-react";
+import { useEditorContext } from "../contexts/EditorContext";
 
 const RandomTopic = () => {
   const [randomTopic, setRandomTopic] = useState<string>("");
@@ -12,13 +12,7 @@ const RandomTopic = () => {
   const randomTopicsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const novelsContext = useContext(NovelsContext);
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
-
-  const { setsuggestion } = novelsContext;
-
+  const { setsuggestion } = useEditorContext();
   const aiGenerator = new AITextGenerator(0);
 
   const getTopic = async () => {
@@ -47,6 +41,7 @@ const RandomTopic = () => {
           Write a story about
         </h2>
       </div>
+      {error && <div>{error}</div>}
       {isLoading ? (
         <Loader className="m-auto" size="2rem" />
       ) : (

@@ -1,50 +1,27 @@
 import { FaBook, FaEdit, FaTrashAlt } from "react-icons/fa";
 // import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { INovelWithChapters } from "../types/INovel";
-import { useContext, useEffect, useState } from "react";
-import NovelsContext from "../contexts/NovelsContext";
-import { AuthUser } from "../types/IUser";
+import { useEffect } from "react";
+import { IUser } from "../types/IUser";
+import { useEditorContext } from "../contexts/EditorContext";
+import { Story } from "../types/IStory";
 
 interface UserNovelsProps {
-  loading: boolean;
-  error: string | null;
-  onDelete: (novel: INovelWithChapters) => void;
-  user: AuthUser;
+  onDelete: (story: Story) => void;
+  onEdit: (story: Story) => void;
+  user: IUser;
 }
 
-const UserNovels: React.FC<UserNovelsProps> = ({
-  loading,
-  error,
-  onDelete,
-  user,
-}) => {
+const UserNovels: React.FC<UserNovelsProps> = ({ onDelete, onEdit, user }) => {
   // const navigate = useNavigate();
 
-  const [showMsg, setShowMsg] = useState(false);
-  const novelsContext = useContext(NovelsContext);
-
-  if (!novelsContext) {
-    throw new Error("useNovels must be used within a NovelsProvider");
-  }
-
-  const { userNovels, fetchNovelsByUserId } = novelsContext;
+  const { userStories, fetchUserStories } = useEditorContext();
 
   useEffect(() => {
     if (user) {
-      fetchNovelsByUserId(user.uid);
+      fetchUserStories(user);
     }
   }, [user]);
-
-  const handleEdit = (novelId: string) => {
-    console.log("novelId", novelId);
-    console.log("Editing is currently disabled");
-    setShowMsg(true);
-    // navigate(`/edit/${novelId}`);
-    setTimeout(() => {
-      setShowMsg(false);
-    }, 2000);
-  };
 
   return (
     <>
@@ -66,41 +43,31 @@ const UserNovels: React.FC<UserNovelsProps> = ({
           </h2>
         )}
 
-        {loading && <p className="text-gray-600">Loading your novels...</p>}
-        {error && <p className="text-red-500">Error: {error}</p>}
-
-        {userNovels.length === 0 && !loading && (
+        {userStories.length === 0 && (
           <p className="text-gray-600">Write something first silly!</p>
         )}
         <div className="space-y-6 max-h-96 overflow-y-auto">
-          {showMsg && (
-            <p className="text-amber-600 bg-amber-100 p-3 rounded-lg">
-              Editing is currently disabled
-            </p>
-          )}
-
-          {userNovels.map((novel) => (
+          {userStories.map((story) => (
             <div
-              key={novel.id}
+              key={story.storyId}
               className="bg-amber-50 p-4 rounded-lg shadow-sm mb-4"
             >
               <h3 className="font-serif text-xl text-amber-900 mb-2">
-                {novel.title}
+                {story.title}
               </h3>
-              <p className="text-gray-600 mb-1">By {novel.author}</p>
+              <p className="text-gray-600 mb-1">By {story.author}</p>
               <p className="text-gray-500 text-sm mb-4">
-                Last Updated: {new Date(novel.lastUpdated).toLocaleDateString()}
+                Last Updated: {new Date(story.lastUpdated).toLocaleDateString()}
               </p>
               <div className="flex space-x-3 mt-2">
                 <button
-                  onClick={() => handleEdit(novel.id)}
-                  disabled={true}
-                  className="flex items-center text-white px-3 py-2 rounded-full bg-gray-400 cursor-not-allowed"
+                  onClick={() => onEdit(story)}
+                  className="flex items-center text-white px-3 py-2 rounded-full bg-gray-400"
                 >
                   <FaEdit className="mr-1" /> Edit
                 </button>
                 <button
-                  onClick={() => onDelete(novel)}
+                  onClick={() => onDelete(story)}
                   className="flex items-center bg-red-500 text-white px-3 py-2 rounded-full hover:bg-red-600 transition-colors duration-200"
                 >
                   <FaTrashAlt className="mr-1" /> Delete

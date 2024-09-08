@@ -27,6 +27,12 @@ export const useFirebaseAuth = () => {
         username: username,
         email: email,
         createdAt: new Date().toISOString(),
+        followers: ["default"],
+        following: ["default"],
+        stories: [],
+        likedPosts: [],
+        savedPosts: [],
+        lastLogin: new Date().toISOString(),
       };
 
       // Store additional user data in Firestore
@@ -41,6 +47,17 @@ export const useFirebaseAuth = () => {
   const signin = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      // Update last login time
+      const user = auth.currentUser;
+      if (user) {
+        await setDoc(
+          doc(firestore, "users", user.uid),
+          {
+            lastLogin: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      }
       setError(null);
       return { status: 200 };
     } catch (err) {
@@ -48,7 +65,6 @@ export const useFirebaseAuth = () => {
       setError((err as Error).message);
       return { status: "error" };
     }
-    return {};
   };
 
   const signout = async () => {

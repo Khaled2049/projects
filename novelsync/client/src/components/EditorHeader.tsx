@@ -4,6 +4,7 @@ import { Editor } from "@tiptap/react";
 import { LinkModal } from "./LinkModal";
 import axiosInstance from "../api";
 // import { RiAiGenerate } from "react-icons/ri";
+import { List } from "lucide-react";
 interface EditorHeaderProps {
   editor: Editor;
 }
@@ -128,6 +129,30 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({ editor }) => {
       >
         H2
       </button>
+      <button
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={editor.isActive("bulletList") ? "is-active" : ""}
+      >
+        <List />
+      </button>
+      {/* <button
+        onClick={() => editor.chain().focus().splitListItem("listItem").run()}
+        disabled={!editor.can().splitListItem("listItem")}
+      >
+        Split list item
+      </button>
+      <button
+        onClick={() => editor.chain().focus().sinkListItem("listItem").run()}
+        disabled={!editor.can().sinkListItem("listItem")}
+      >
+        Sink list item
+      </button>
+      <button
+        onClick={() => editor.chain().focus().liftListItem("listItem").run()}
+        disabled={!editor.can().liftListItem("listItem")}
+      >
+        Lift list item
+      </button> */}
       <div className="flex items-center justify-center h-12 p-2 rounded-md">
         {editor.storage.characterCount.words()} words
       </div>
