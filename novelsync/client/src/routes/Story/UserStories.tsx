@@ -32,7 +32,7 @@ const UserStories = () => {
   }, [user]);
 
   const handleEdit = (story: Story) => {
-    navigate("/create", { state: { story } });
+    navigate("/create-story", { state: { story } });
   };
   const handleDraftEdit = (draft: Draft) => {
     navigate("/draft", { state: { draft } });

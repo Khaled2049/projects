@@ -42,7 +42,7 @@ const AllStories: React.FC = () => {
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
               <span>Welcome back, {user.username}!</span>
               <Link
-                to="/create"
+                to="/create-story"
                 className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
               >
                 Start Writing

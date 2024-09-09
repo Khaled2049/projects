@@ -5,7 +5,7 @@ import {
   Root,
   Signin,
   Signup,
-  CreateStory,
+  Story,
   StoryDetail,
   BookClubs,
   Home,
@@ -15,6 +15,12 @@ import {
   BookClubDetails,
   Library,
   BookDetails,
+  Characters,
+  Plot,
+  Places,
+  Objects,
+  CreateStory,
+  Dashboard,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -71,8 +77,16 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: "/create",
-        element: <CreateStory />,
+        path: "/create-story",
+        element: <Story />,
+        children: [
+          { index: true, element: <Dashboard /> },
+          { path: "characters", element: <Characters /> },
+          { path: "plot", element: <Plot /> },
+          { path: "places", element: <Places /> },
+          // { path: "objects", element: <Objects /> },
+          { path: "editor", element: <CreateStory /> },
+        ],
       },
       {
         path: "/user-stories",

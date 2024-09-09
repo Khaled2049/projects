@@ -53,7 +53,7 @@ const RandomTopic = () => {
             className="p-2 sm:p-3 bg-amber-50 rounded-md hover:bg-amber-100 cursor-pointer transition-colors duration-200"
             onClick={() => {
               setsuggestion(randomTopic);
-              navigate("/create");
+              navigate("/create-story");
             }}
           >
             <p className="text-xs sm:text-sm text-amber-900 font-serif">

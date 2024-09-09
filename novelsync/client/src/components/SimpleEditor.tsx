@@ -16,7 +16,6 @@ import BulletList from "@tiptap/extension-bullet-list";
 import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./AITextGenerator";
 import ListItem from "@tiptap/extension-list-item";
-import CollapsibleDiv from "./CollapsibleDiv";
 
 const limit = 5000;
 import { Book, Trash2 } from "lucide-react";
@@ -439,14 +438,15 @@ export function SimpleEditor() {
               className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
             />
 
-            <div className="min-h-[28rem] w-full flex justify-center">
-              <div className="w-full focus:outline-none bg-white selection:bg-blue-100">
-                <EditorContent
-                  onClick={() => editor?.commands.focus()}
-                  className="w-full focus:outline-none bg-white selection:bg-blue-100"
-                  editor={editor}
-                />
-                <EditorContent editor={editor} />
+            <div className="min-h-full w-full flex flex-col">
+              <div className="flex-grow overflow-auto">
+                <div className="h-full w-full focus:outline-none bg-white selection:bg-blue-100">
+                  <EditorContent
+                    onClick={() => editor?.commands.focus()}
+                    className="w-full min-h-[40rem] max-h-[40rem] overflow-auto focus:outline-none bg-white selection:bg-blue-100"
+                    editor={editor}
+                  />
+                </div>
               </div>
               {savingMessage && (
                 <div className="mt-2 text-center text-gray-500">
@@ -542,7 +542,7 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Hide Organizer</span>
+                  <span>Hide Chapters</span>
                 </span>
               </button>
             ) : (
@@ -551,81 +551,50 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Show Organizer</span>
+                  <span>Show Chapters</span>
                 </span>
               </button>
             )}
           </div>
 
           {rightColumnVisible && (
-            <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
-              <CollapsibleDiv title="Chapters">
-                <div className="p-6 bg-amber-50 rounded-lg shadow-lg">
-                  <h2 className="text-2xl font-bold mb-4 text-amber-800">
-                    {title || "Untitled Masterpiece"}
-                  </h2>
-                  {currentChapters.length === 0 ? (
-                    <p className="text-amber-700 italic">
-                      No chapters added yet. Start your journey!
-                    </p>
-                  ) : (
-                    <ul className="space-y-2">
-                      {currentChapters.map((chapter) => (
-                        <li
-                          key={chapter.chapterId}
-                          className="bg-white rounded-md shadow transition-all hover:shadow-md"
+            <div className="m-2 p-6 ">
+              <h2 className="text-2xl font-bold mb-4 text-center text-amber-800">
+                {title || "Untitled Masterpiece"}
+              </h2>
+              {currentChapters.length === 0 ? (
+                <p className="text-amber-700 italic">
+                  No chapters added yet. Start your journey!
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {currentChapters.map((chapter) => (
+                    <li
+                      key={chapter.chapterId}
+                      className="bg-white rounded-md shadow transition-all hover:shadow-md"
+                    >
+                      <div className="flex items-center justify-between p-3">
+                        <div
+                          className="flex items-center space-x-3 cursor-pointer"
+                          onClick={() => loadChapterForEditing(chapter)}
                         >
-                          <div className="flex items-center justify-between p-3">
-                            <div
-                              className="flex items-center space-x-3 cursor-pointer"
-                              onClick={() => loadChapterForEditing(chapter)}
-                            >
-                              <Book className="w-5 h-5 text-amber-600" />
-                              <span className="font-medium text-amber-900">
-                                {chapter.title}
-                              </span>
-                            </div>
-                            <button
-                              onClick={() => deleteChapter(chapter.chapterId)}
-                              className="p-1 text-red-500 hover:text-red-700 transition-colors"
-                              aria-label="Delete chapter"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Outline">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Plot">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Characters">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Places">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Objects">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Themes">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Magic System">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Rules">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Notes">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
+                          <Book className="w-5 h-5 text-amber-600" />
+                          <span className="font-medium text-amber-900">
+                            {chapter.title}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => deleteChapter(chapter.chapterId)}
+                          className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                          aria-label="Delete chapter"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>
