@@ -37,7 +37,7 @@ const AllStories: React.FC = () => {
   return (
     <div className="bg-amber-50 min-h-screen py-8 relative ">
       <div className="container mx-auto px-4">
-        {user && (
+        {user ? (
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
               <span>Welcome back, {user.username}!</span>
@@ -46,6 +46,19 @@ const AllStories: React.FC = () => {
                 className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
               >
                 Start Writing
+                <FaArrowRight className="ml-2" />
+              </Link>
+            </h1>
+          </div>
+        ) : (
+          <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
+            <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
+              <span>Welcome to NovelSync!</span>
+              <Link
+                to="/sign-in"
+                className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
+              >
+                Sign In
                 <FaArrowRight className="ml-2" />
               </Link>
             </h1>
