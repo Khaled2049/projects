@@ -18,7 +18,6 @@ import {
   Characters,
   Plot,
   Places,
-  Objects,
   CreateStory,
   Dashboard,
 } from "./routes/index";

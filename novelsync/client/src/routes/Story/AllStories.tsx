@@ -5,14 +5,16 @@ import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { useEditorContext } from "../../contexts/EditorContext";
-import { Story } from "../../types/IStory";
+import { Draft, Story } from "../../types/IStory";
+import { v4 as uuidv4 } from "uuid";
 
 const AllStories: React.FC = () => {
   const { user } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { stories, fetchAllStories, incrementViewCount } = useEditorContext();
+  const { stories, fetchAllStories, incrementViewCount, saveDraft } =
+    useEditorContext();
 
   const novelsPerPage = 9;
   const indexOfLastNovel = currentPage * novelsPerPage;
@@ -20,6 +22,7 @@ const AllStories: React.FC = () => {
   const currentNovels = stories.slice(indexOfFirstNovel, indexOfLastNovel);
   const totalPages = Math.ceil(stories.length / novelsPerPage);
   const navigate = useNavigate();
+  const [isCreatingDraft, setIsCreatingDraft] = useState(false);
 
   useEffect(() => {
     fetchAllStories();
@@ -34,6 +37,36 @@ const AllStories: React.FC = () => {
     navigate(`/novel/${story.storyId}`, { state: { story } });
   };
 
+  const handleStartWriting = async () => {
+    if (!user) return "Please login to save a draft";
+    if (isCreatingDraft) return;
+
+    setIsCreatingDraft(true);
+
+    const newDraft = {
+      draftId: uuidv4(),
+      title: "Untitled Masterpiece",
+      chapters: [],
+      author: user.uid,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    try {
+      await saveDraft({
+        draftId: newDraft.draftId,
+        user: user,
+        title: newDraft.title,
+        chapters: newDraft.chapters,
+      });
+
+      navigate("/draft", { state: { newDraft } });
+    } catch (error) {
+      console.error("Error saving draft", error);
+    } finally {
+      setIsCreatingDraft(false);
+    }
+  };
+
   return (
     <div className="bg-amber-50 min-h-screen py-8 relative ">
       <div className="container mx-auto px-4">
@@ -41,13 +74,14 @@ const AllStories: React.FC = () => {
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
               <span>Welcome back, {user.username}!</span>
-              <Link
-                to="/create-story"
+              <button
+                onClick={handleStartWriting}
+                disabled={isCreatingDraft}
                 className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
               >
-                Start Writing
+                {isCreatingDraft ? "Creating Draft..." : "Start Writing"}
                 <FaArrowRight className="ml-2" />
-              </Link>
+              </button>
             </h1>
           </div>
         ) : (

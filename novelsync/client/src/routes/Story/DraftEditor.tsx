@@ -142,6 +142,7 @@ const DraftEditor = () => {
   };
 
   const loadDraftForEditing = async (draft: Draft) => {
+    console.log("draftid in loadDraftForEditing", draft.draftId);
     const s = await fetchDraftById(draft);
 
     if (!s) return;
@@ -258,6 +259,14 @@ const DraftEditor = () => {
     if (location.state?.draft) {
       console.log("Loading draft for editing", location.state?.draft);
       loadDraftForEditing(location.state?.draft);
+    }
+
+    if (location.state?.newDraft) {
+      console.log("Loading new draft for editing", location.state?.newDraft);
+      const { title, chapters, draftId } = location.state?.newDraft;
+      setTitle(title);
+      setCurrentChapters(chapters);
+      setEditingStoryId(draftId);
     }
 
     if (selectedAI) {

@@ -197,6 +197,7 @@ export function SimpleEditor() {
     }
   };
   const loadDraftForEditing = async (draft: Draft) => {
+    console.log("loading draft for editing", draft);
     const s = await fetchDraftById(draft);
 
     if (!s) return;
@@ -317,6 +318,9 @@ export function SimpleEditor() {
   const location = useLocation();
 
   useEffect(() => {
+    if (location.state?.newDraft) {
+      console.log("test");
+    }
     if (location.state?.draft) {
       loadDraftForEditing(location.state?.draft);
     } else if (location.state?.story) {

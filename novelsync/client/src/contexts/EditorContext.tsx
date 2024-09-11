@@ -529,6 +529,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const fetchDraftById = async (draft: Draft) => {
     try {
       // Fetch story by ID from Firestore
+      console.log("draft id in context", draft.draftId);
       const novelDoc = await getDoc(doc(firestore, "drafts", draft.draftId));
       if (!novelDoc.exists()) {
         console.error("Story not found");
