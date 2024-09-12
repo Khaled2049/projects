@@ -35,11 +35,13 @@ export function SimpleEditor() {
   const [_isEditing, setIsEditing] = useState(false);
   const [rightColumnVisible, setRightColumnVisible] = useState(true);
   const [aitoolsVisible, setAitoolsVisible] = useState(true);
-
+  const [savingMessage, setSavingMessage] = useState("");
   const [selectedText, setSelectedText] = useState("");
+  const [updateMsg, setUpdateMsg] = useState(false);
 
-  const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
-  const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
+  const navigate = useNavigate();
+
+  const { user } = useAuthContext();
   const {
     title,
     setTitle,
@@ -59,11 +61,44 @@ export function SimpleEditor() {
     userStories,
     updateStoryById,
     saveDraft,
+    userDrafts,
+    updateDraftById,
     fetchDraftById,
+    setDrafts,
     suggestion,
     setsuggestion,
   } = useEditorContext();
-  const { user } = useAuthContext();
+  const { selectedAI } = useAI();
+  const location = useLocation();
+
+  const aiGeneratorRef = useRef<AITextGenerator | null>(null);
+
+  const aiGenerator = new AITextGenerator(selectedAI?.id || 0);
+
+  useEffect(() => {
+    clearCurrentStory();
+    if (location.state?.draft) {
+      loadDraftForEditing(location.state?.draft);
+    } else if (location.state?.story) {
+      loadStoryForEditing(location.state?.story);
+    } else if (location.state?.newDraft) {
+      const { title, chapters, draftId } = location.state?.newDraft;
+      setTitle(title);
+      setCurrentChapters(chapters);
+      setEditingStoryId(draftId);
+    }
+
+    if (selectedAI) {
+      aiGeneratorRef.current = selectedAI;
+    }
+    if (suggestion) {
+      aiGenerator.generateFromSuggestion(suggestion).then((generatedText) => {
+        editor.chain().focus().insertContent(generatedText).run();
+      });
+    }
+
+    setsuggestion("");
+  }, [selectedAI, user]);
 
   const addChapter = () => {
     const content = editor.getHTML();
@@ -182,6 +217,33 @@ export function SimpleEditor() {
     }
   };
 
+  const editDraft = async () => {
+    if (editingStoryId && title && currentChapters.length > 0) {
+      const updatedDrafts = userDrafts.map((draft) =>
+        draft.draftId === editingStoryId
+          ? { ...draft, title, chapters: currentChapters }
+          : draft
+      );
+      if (!user) return "Please login to update draft";
+
+      setUpdateMsg(true);
+      try {
+        await updateDraftById({
+          draftId: editingStoryId,
+          user,
+          newTitle: title,
+          chapters: currentChapters,
+        });
+        setDrafts(updatedDrafts);
+      } catch (error) {
+        console.log("Error updating draft", error);
+      }
+      setUpdateMsg(false);
+    } else {
+      alert("Please enter a title and at least one chapter.");
+    }
+  };
+
   const loadStoryForEditing = async (story: Story) => {
     const s = await fetchStoryById(story);
 
@@ -196,6 +258,7 @@ export function SimpleEditor() {
       editor.commands.clearContent();
     }
   };
+
   const loadDraftForEditing = async (draft: Draft) => {
     console.log("loading draft for editing", draft);
     const s = await fetchDraftById(draft);
@@ -218,12 +281,8 @@ export function SimpleEditor() {
     setEditingChapterId(chapter.chapterId);
   };
 
-  const navigate = useNavigate();
-
-  const { selectedAI } = useAI();
-  const aiGeneratorRef = useRef<AITextGenerator | null>(null);
-
-  const aiGenerator = new AITextGenerator(selectedAI?.id || 0);
+  const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
+  const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
 
   const LiteralTab = Extension.create({
     name: "literalTab",
@@ -315,31 +374,6 @@ export function SimpleEditor() {
     content: "",
   }) as Editor;
 
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.state?.newDraft) {
-      console.log("test");
-    }
-    if (location.state?.draft) {
-      loadDraftForEditing(location.state?.draft);
-    } else if (location.state?.story) {
-      loadStoryForEditing(location.state?.story);
-    }
-
-    if (selectedAI) {
-      aiGeneratorRef.current = selectedAI;
-    }
-    if (suggestion) {
-      aiGenerator.generateFromSuggestion(suggestion).then((generatedText) => {
-        editor.chain().focus().insertContent(generatedText).run();
-      });
-    }
-
-    setsuggestion("");
-  }, [selectedAI, user]);
-  const [savingMessage, setSavingMessage] = useState("");
-
   const getSelectedText = () => {
     return editor.state.doc.textBetween(
       editor.state.selection.from,
@@ -347,9 +381,9 @@ export function SimpleEditor() {
     );
   };
 
-  // const applyChanges = (newText: string) => {
-  //   editor.chain().focus().setContent(newText, false).run();
-  // };
+  const applyChanges = (newText: string) => {
+    editor.chain().focus().setContent(newText, false).run();
+  };
 
   const handleAction = async (actionType: string) => {
     const selectedText = getSelectedText();
@@ -370,7 +404,7 @@ export function SimpleEditor() {
           throw new Error("Unknown action type");
       }
       console.log(result);
-      // applyChanges(result);
+      applyChanges(result);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -478,6 +512,12 @@ export function SimpleEditor() {
             </button>
           )}
           <button
+            onClick={editDraft}
+            className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
+          >
+            {updateMsg ? "Updating..." : "Update Draft"}
+          </button>
+          <button
             onClick={addDraft}
             className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
           >
@@ -499,6 +539,8 @@ export function SimpleEditor() {
             </button>
           )}
         </div>
+
+        {/* AI Tools */}
         <div
           className={`transition-all duration-300 bg-amber-100 mx-2 ${
             aitoolsVisible ? "w-1/3" : "w-24"
@@ -533,7 +575,7 @@ export function SimpleEditor() {
           )}
         </div>
 
-        {/* Right Column */}
+        {/* Chapters */}
         <div
           className={`transition-all duration-300 bg-amber-100 mx-2 ${
             rightColumnVisible ? "w-1/3" : "w-24"

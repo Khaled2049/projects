@@ -112,7 +112,7 @@ const UserStories = () => {
         </div>
 
         {/* Published Stories Column */}
-        <div className="w-1/2 space-y-6 max-h-96 overflow-y-auto">
+        <div className="w-1/2 space-y-6 max-h-96">
           <h2 className="text-2xl font-bold mb-4">Published Stories</h2>
           {userStories.length === 0 ? (
             <p className="text-gray-600">No stories published yet.</p>

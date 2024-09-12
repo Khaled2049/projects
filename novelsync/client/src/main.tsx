@@ -20,6 +20,7 @@ import {
   Places,
   CreateStory,
   Dashboard,
+  Drafts,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -68,7 +69,7 @@ const router = createBrowserRouter([
         element: <Signin />,
       },
       {
-        path: "/draft",
+        path: "/draft/:id",
         element: <DraftEditor />,
       },
       {
@@ -83,7 +84,7 @@ const router = createBrowserRouter([
           { path: "characters", element: <Characters /> },
           { path: "plot", element: <Plot /> },
           { path: "places", element: <Places /> },
-          // { path: "objects", element: <Objects /> },
+          { path: "drafts", element: <Drafts /> },
           { path: "editor", element: <CreateStory /> },
         ],
       },

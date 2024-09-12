@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { useEditorContext } from "../../contexts/EditorContext";
-import { Draft, Story } from "../../types/IStory";
+import { Story } from "../../types/IStory";
 import { v4 as uuidv4 } from "uuid";
 
 const AllStories: React.FC = () => {
@@ -52,14 +52,18 @@ const AllStories: React.FC = () => {
     };
 
     try {
-      await saveDraft({
+      const res = await saveDraft({
         draftId: newDraft.draftId,
         user: user,
         title: newDraft.title,
         chapters: newDraft.chapters,
       });
 
-      navigate("/draft", { state: { newDraft } });
+      console.log("Draft saved", res);
+
+      navigate(`/create-story/editor`, {
+        state: { newDraft: res },
+      });
     } catch (error) {
       console.error("Error saving draft", error);
     } finally {

@@ -1,5 +1,5 @@
 import "../../components/style.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -30,6 +30,8 @@ import { useEditorContext } from "../../contexts/EditorContext";
 import { Chapter, Draft } from "../../types/IStory";
 
 const DraftEditor = () => {
+  const [updateMsg, setUpdateMsg] = useState(false);
+  const { user } = useAuthContext();
   const {
     title,
     setTitle,
@@ -37,7 +39,6 @@ const DraftEditor = () => {
     setCurrentChapterTitle,
     currentChapters,
     setCurrentChapters,
-
     setDrafts,
     editingStoryId,
     setEditingStoryId,
@@ -47,13 +48,44 @@ const DraftEditor = () => {
     publishStory,
     publishLoading,
     userDrafts,
-
     updateDraftById,
     fetchDraftById,
     suggestion,
     setsuggestion,
   } = useEditorContext();
-  const { user } = useAuthContext();
+
+  const location = useLocation();
+
+  const { selectedAI } = useAI();
+
+  const aiGeneratorRef = useRef<AITextGenerator | null>(null);
+
+  const aiGenerator = new AITextGenerator(selectedAI?.id || 0);
+
+  useEffect(() => {
+    clearCurrentStory();
+    if (location.state?.draft) {
+      loadDraftForEditing(location.state?.draft);
+    }
+
+    if (location.state?.newDraft) {
+      const { title, chapters, draftId } = location.state?.newDraft;
+      setTitle(title);
+      setCurrentChapters(chapters);
+      setEditingStoryId(draftId);
+    }
+
+    if (selectedAI) {
+      aiGeneratorRef.current = selectedAI;
+    }
+    if (suggestion) {
+      aiGenerator.generateFromSuggestion(suggestion).then((generatedText) => {
+        editor.chain().focus().insertContent(generatedText).run();
+      });
+    }
+
+    setsuggestion("");
+  }, [selectedAI, user]);
 
   const addChapter = () => {
     const content = editor.getHTML();
@@ -119,7 +151,7 @@ const DraftEditor = () => {
     }
   };
 
-  const editDraft = () => {
+  const editDraft = async () => {
     if (editingStoryId && title && currentChapters.length > 0) {
       const updatedDrafts = userDrafts.map((draft) =>
         draft.draftId === editingStoryId
@@ -128,21 +160,25 @@ const DraftEditor = () => {
       );
       if (!user) return "Please login to update draft";
 
-      updateDraftById({
-        draftId: editingStoryId,
-        user,
-        newTitle: title,
-        chapters: currentChapters,
-      });
-      setDrafts(updatedDrafts);
-      // clearCurrentStory();
+      setUpdateMsg(true);
+      try {
+        await updateDraftById({
+          draftId: editingStoryId,
+          user,
+          newTitle: title,
+          chapters: currentChapters,
+        });
+        setDrafts(updatedDrafts);
+      } catch (error) {
+        console.log("Error updating draft", error);
+      }
+      setUpdateMsg(false);
     } else {
       alert("Please enter a title and at least one chapter.");
     }
   };
 
   const loadDraftForEditing = async (draft: Draft) => {
-    console.log("draftid in loadDraftForEditing", draft.draftId);
     const s = await fetchDraftById(draft);
 
     if (!s) return;
@@ -161,13 +197,6 @@ const DraftEditor = () => {
     setCurrentChapterTitle(chapter.title);
     setEditingChapterId(chapter.chapterId);
   };
-
-  // const navigate = useNavigate();
-
-  const { selectedAI } = useAI();
-  const aiGeneratorRef = useRef<AITextGenerator | null>(null);
-
-  const aiGenerator = new AITextGenerator(selectedAI?.id || 0);
 
   const LiteralTab = Extension.create({
     name: "literalTab",
@@ -253,34 +282,6 @@ const DraftEditor = () => {
     content: "",
   }) as Editor;
 
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.state?.draft) {
-      console.log("Loading draft for editing", location.state?.draft);
-      loadDraftForEditing(location.state?.draft);
-    }
-
-    if (location.state?.newDraft) {
-      console.log("Loading new draft for editing", location.state?.newDraft);
-      const { title, chapters, draftId } = location.state?.newDraft;
-      setTitle(title);
-      setCurrentChapters(chapters);
-      setEditingStoryId(draftId);
-    }
-
-    if (selectedAI) {
-      aiGeneratorRef.current = selectedAI;
-    }
-    if (suggestion) {
-      aiGenerator.generateFromSuggestion(suggestion).then((generatedText) => {
-        editor.chain().focus().insertContent(generatedText).run();
-      });
-    }
-
-    setsuggestion("");
-  }, [selectedAI, user]);
-
   return (
     <div className="flex p-2 mt-4 justify-center overflow-auto w-full">
       {publishLoading && <div>Loading...</div>}
@@ -347,7 +348,7 @@ const DraftEditor = () => {
           onClick={editDraft}
           className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
         >
-          Update Draft
+          {updateMsg ? "Updating..." : "Update Draft"}
         </button>
 
         <button
