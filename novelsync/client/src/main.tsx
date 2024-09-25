@@ -24,6 +24,7 @@ import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 import { BookClubProvider } from "./contexts/BookClubContext";
 import { PostsProvider } from "./contexts/PostsContext";
+import NewEditor from "./components/NewEditor";
 
 const router = createBrowserRouter([
   {
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
       {
         path: "/novel/:id",
         element: <StoryDetail />, // Add the route for the novel detail
+      },
+      {
+        path: "/test",
+        element: <NewEditor />,
       },
     ],
   },
