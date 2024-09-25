@@ -24,7 +24,7 @@ import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 import { BookClubProvider } from "./contexts/BookClubContext";
 import { PostsProvider } from "./contexts/PostsContext";
-import NewEditor from "./components/NewEditor";
+import StoryEditor from "./components/StoryEditor";
 
 const router = createBrowserRouter([
   {
@@ -85,7 +85,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/test",
-        element: <NewEditor />,
+        element: <StoryEditor />,
       },
     ],
   },
