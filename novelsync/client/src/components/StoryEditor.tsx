@@ -22,8 +22,6 @@ const StoryEditor: React.FC = () => {
   const [storyDescription, setStoryDescription] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
-  const [wordCount, setWordCount] = useState(0);
-  const [editorContent, setEditorContent] = useState("");
 
   const { user } = useAuthContext();
   const editor = useEditor({
@@ -41,13 +39,9 @@ const StoryEditor: React.FC = () => {
     ],
     content: "",
     onUpdate: ({ editor }) => {
-      const newWordCount = editor.state.doc.textContent
-        .trim()
-        .split(/\s+/).length;
-      setWordCount(newWordCount);
-      const newContent = editor.getHTML();
-      setEditorContent(newContent);
-      debouncedSave();
+      const content = editor.getHTML();
+
+      debouncedSave(chapterTitle, content);
     },
   });
 
@@ -62,7 +56,7 @@ const StoryEditor: React.FC = () => {
 
   const loadStory = async (storyId: string) => {
     const story = await storiesRepo.getStory(storyId);
-    console.log("Loaded story:", story);
+
     if (story) {
       setCurrentStory(story);
       setStoryTitle(story.title);
@@ -81,63 +75,76 @@ const StoryEditor: React.FC = () => {
     }
   };
 
-  const handleSave = useCallback(async () => {
-    console.log("Saving...", currentStory, currentChapter);
-    if (!currentStory) {
-      console.error("No story selected");
-      return;
-    }
-
-    setSaveStatus("Saving...");
-
-    try {
-      if (currentChapter) {
-        // Update existing chapter
-        console.log("Updating chapter");
-        await storiesRepo.updateChapter(
-          currentStory.id,
-          currentChapter.id,
-          chapterTitle,
-          editorContent
-        );
-      } else if (editorContent.trim() !== "" || chapterTitle.trim() !== "") {
-        console.log("Adding new chapter");
-        const newChapterId = await storiesRepo.addChapter(
-          currentStory.id,
-          chapterTitle
-        );
-        await storiesRepo.updateChapter(
-          currentStory.id,
-          newChapterId,
-          chapterTitle,
-          editorContent
-        );
-        const newChapter = await storiesRepo.getChapter(
-          currentStory.id,
-          newChapterId
-        );
-        if (newChapter) {
-          setCurrentChapter(newChapter);
-          setChapters([...chapters, newChapter]);
-        }
+  const handleSave = useCallback(
+    async (chapterTitle: string, content: any) => {
+      console.log("Saving...", currentStory, currentChapter, content);
+      if (!currentStory) {
+        console.error("No story selected");
+        return;
       }
+      setSaveStatus("Saving...");
+      try {
+        try {
+          if (currentChapter) {
+            // Update existing chapter
+            console.log("Updating chapter");
+            await storiesRepo.updateChapter(
+              currentStory.id,
+              currentChapter.id,
+              chapterTitle,
+              content
+            );
+          } else if (content.trim() !== "" || chapterTitle.trim() !== "") {
+            console.log("Adding new chapter");
+            const newChapterId = await storiesRepo.addChapter(
+              currentStory.id,
+              chapterTitle
+            );
+            await storiesRepo.updateChapter(
+              currentStory.id,
+              newChapterId,
+              chapterTitle,
+              content
+            );
+            const newChapter = await storiesRepo.getChapter(
+              currentStory.id,
+              newChapterId
+            );
+            if (newChapter) {
+              setCurrentChapter(newChapter);
+              setChapters([...chapters, newChapter]);
+            }
+          }
 
-      await storiesRepo.updateStory(
-        currentStory.id,
-        storyTitle,
-        storyDescription
-      );
+          await storiesRepo.updateStory(
+            currentStory.id,
+            storyTitle,
+            storyDescription
+          );
 
-      setSaveStatus("Saved");
-    } catch (error) {
-      console.error("Error saving:", error);
-      setSaveStatus(error instanceof Error ? error.message : "Error saving");
-    }
+          setSaveStatus("Saved");
+        } catch (error) {
+          console.error("Error saving:", error);
+          setSaveStatus(
+            error instanceof Error ? error.message : "Error saving"
+          );
+        }
+        setSaveStatus("Saved");
+      } catch (error) {
+        console.error("Error saving:", error);
+        setSaveStatus(error instanceof Error ? error.message : "Error saving");
+      }
+      setTimeout(() => setSaveStatus(""), 2000);
+    },
+    [currentStory, currentChapter]
+  );
 
-    setTimeout(() => setSaveStatus(""), 2000);
-  }, [editorContent]);
-
-  const debouncedSave = useCallback(debounce(handleSave, 2000), [handleSave]);
+  const debouncedSave = useCallback(
+    debounce((chapterTitle, content: any) => {
+      handleSave(chapterTitle, content);
+    }, 2000),
+    [handleSave]
+  );
 
   const handleNewStory = async () => {
     if (user) {
@@ -242,12 +249,6 @@ const StoryEditor: React.FC = () => {
               />
             )}
             <div className="mt-2 flex items-center justify-between">
-              <div className="text-sm text-gray-400">
-                Word count: {wordCount} / {storiesRepo.getWordLimit()}
-                {wordCount > storiesRepo.getWordLimit() && (
-                  <span className="text-red-500 ml-2">Exceeds word limit!</span>
-                )}
-              </div>
               <div className="text-sm text-gray-400">{saveStatus}</div>
             </div>
             <div className="flex justify-between mb-4">
@@ -257,6 +258,12 @@ const StoryEditor: React.FC = () => {
                 disabled={currentStory.isPublished}
               >
                 {currentStory.isPublished ? "Published" : "Publish"}
+              </button>
+              <button
+                className="p-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
+                onClick={() => handleSave(chapterTitle, editor?.getHTML())}
+              >
+                Save
               </button>
             </div>
           </>
@@ -272,7 +279,7 @@ const StoryEditor: React.FC = () => {
         <h2 className="text-xl font-bold mb-4">Chapters</h2>
         <div className="flex justify-center">
           <button
-            className="p-2 rounded bg-blue-600 hover:bg-blue-700 transition-colors"
+            className="p-2 rounded bg-blue-600 hover:bg-blue-700 transition-colors m-3"
             onClick={handleNewChapter}
           >
             New Chapter
