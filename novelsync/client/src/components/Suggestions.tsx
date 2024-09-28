@@ -109,7 +109,7 @@ const Suggestions = () => {
               onClick={() => {
                 // setsuggestion in context
                 setsuggestion(suggestion);
-                navigate("/create");
+                navigate("/create-story");
               }}
             >
               <p className="text-xs sm:text-sm text-amber-900 font-serif">

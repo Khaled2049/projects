@@ -34,8 +34,9 @@ export function SimpleEditor() {
   const { storyId } = useParams<{ storyId: string }>();
   const [rightColumnVisible, setRightColumnVisible] = useState(true);
   const [aitoolsVisible, setAitoolsVisible] = useState(true);
-
+  const [savingMessage, setSavingMessage] = useState("");
   const [selectedText, setSelectedText] = useState("");
+  const [updateMsg, setUpdateMsg] = useState(false);
 
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -444,6 +445,8 @@ export function SimpleEditor() {
             New Chapter
           </button>
         </div>
+
+        {/* AI Tools */}
         <div
           className={`transition-all duration-300 bg-amber-100 mx-2 ${
             aitoolsVisible ? "w-1/3" : "w-24"
@@ -478,7 +481,7 @@ export function SimpleEditor() {
           )}
         </div>
 
-        {/* Right Column */}
+        {/* Chapters */}
         <div
           className={`transition-all duration-300 bg-amber-100 mx-2 ${
             rightColumnVisible ? "w-1/3" : "w-24"

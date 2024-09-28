@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { profiles } from "../profiles";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   useEffect(() => {
@@ -82,9 +83,12 @@ const HomePage = () => {
           <p className="text-xl md:text-2xl mb-8 font-light">
             Your gateway to amazing stories and novels.
           </p>
-          <button className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">
-            Start Your Journey
-          </button>
+          <Link
+            to="/stories"
+            className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
+          >
+            Explore NovelSync
+          </Link>
         </div>
       </header>
 

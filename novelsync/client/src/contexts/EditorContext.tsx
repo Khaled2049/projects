@@ -64,7 +64,7 @@ interface EditorContextType {
   }) => Promise<boolean | null | string>;
   deleteStoryById: (story: Story, user: IUser) => Promise<boolean | null>;
   fetchAllStories: () => Promise<Story[]>;
-  saveDraft: (params: CreateDraftParams) => Promise<string | null>;
+  saveDraft: (params: CreateDraftParams) => Promise<Draft | string | null>;
   fetchUserDrafts: (user: IUser) => Promise<void>;
   deleteDraftById: (draft: Draft, user: IUser) => Promise<boolean | null>;
   updateDraftById: (params: {
@@ -371,19 +371,19 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         console.error("Error draft document:", err);
       }
 
-      // Update the state
-      setDrafts([
-        ...drafts,
-        {
-          draftId: newDraftRef.id,
-          title,
-          chapters: chapterRefs,
-          author: user.username || "Unknown Author",
-          lastUpdated: new Date().toISOString(),
-        },
-      ]);
+      const d = {
+        draftId: newDraftRef.id,
+        title,
+        chapters: chapterRefs,
+        author: user.username || "Unknown Author",
+        lastUpdated: new Date().toISOString(),
+      };
 
-      return newDraftRef.id;
+      // Update the state
+      setDrafts([...drafts, d]);
+
+      // Return the draft
+      return d;
     } catch (err) {
       console.error("Error creating novel:", err);
       return null;
@@ -529,6 +529,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const fetchDraftById = async (draft: Draft) => {
     try {
       // Fetch story by ID from Firestore
+
       const novelDoc = await getDoc(doc(firestore, "drafts", draft.draftId));
       if (!novelDoc.exists()) {
         console.error("Story not found");
