@@ -1,5 +1,5 @@
 import "./style.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, Editor, BubbleMenu } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -17,208 +17,39 @@ import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./AITextGenerator";
 import ListItem from "@tiptap/extension-list-item";
 import CollapsibleDiv from "./CollapsibleDiv";
+import { storiesRepo, Story, StoryMetadata, Chapter } from "./StoriesRepo";
 
 const limit = 5000;
-import { Book, Trash2 } from "lucide-react";
+import { Book } from "lucide-react";
 
 import EditorHeader from "./EditorHeader";
 import { useAI } from "../contexts/AIContext";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
 
-import { v4 as uuidv4 } from "uuid";
 import { useEditorContext } from "../contexts/EditorContext";
-import { Chapter, Draft, Story } from "../types/IStory";
 import AIPartners from "./AIPartners";
 import AITools from "./AITools";
+import { useParams } from "react-router-dom";
 
 export function SimpleEditor() {
-  const [_isEditing, setIsEditing] = useState(false);
+  const { storyId } = useParams<{ storyId: string }>();
   const [rightColumnVisible, setRightColumnVisible] = useState(true);
   const [aitoolsVisible, setAitoolsVisible] = useState(true);
 
   const [selectedText, setSelectedText] = useState("");
+  const [stories, setStories] = useState<StoryMetadata[]>([]);
+  const [currentStory, setCurrentStory] = useState<Story | null>(null);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [currentChapter, setCurrentChapter] = useState<Chapter | null>(null);
+  const [storyTitle, setStoryTitle] = useState("");
+  const [storyDescription, setStoryDescription] = useState("");
+  const [chapterTitle, setChapterTitle] = useState("");
+  const [saveStatus, setSaveStatus] = useState("");
 
   const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
   const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
-  const {
-    title,
-    setTitle,
-    currentChapterTitle,
-    setCurrentChapterTitle,
-    currentChapters,
-    setCurrentChapters,
-    fetchStoryById,
-    setStories,
-    editingStoryId,
-    setEditingStoryId,
-    editingChapterId,
-    setEditingChapterId,
-    clearCurrentStory,
-    publishStory,
-    publishLoading,
-    userStories,
-    updateStoryById,
-    saveDraft,
-    fetchDraftById,
-    suggestion,
-    setsuggestion,
-  } = useEditorContext();
+  const { suggestion, setsuggestion } = useEditorContext();
   const { user } = useAuthContext();
-
-  const addChapter = () => {
-    const content = editor.getHTML();
-    const newChapter = {
-      chapterId: uuidv4(),
-      title: currentChapterTitle,
-      content,
-    };
-    setCurrentChapters([...currentChapters, newChapter]);
-    editor.commands.clearContent();
-    setCurrentChapterTitle("");
-    setEditingChapterId(null);
-  };
-
-  const updateChapter = () => {
-    if (editingChapterId) {
-      const updatedChapters = currentChapters.map((chapter) =>
-        chapter.chapterId === editingChapterId
-          ? {
-              ...chapter,
-              title: currentChapterTitle,
-              content: editor.getHTML(),
-            }
-          : chapter
-      );
-      setCurrentChapters(updatedChapters);
-      editor.commands.clearContent();
-      setCurrentChapterTitle("");
-      setEditingChapterId(null);
-    }
-  };
-
-  const deleteChapter = (chapterId: string) => {
-    const updatedChapters = currentChapters.filter(
-      (chapter) => chapter.chapterId !== chapterId
-    );
-    setCurrentChapters(updatedChapters);
-
-    if (editingChapterId === chapterId) {
-      editor.commands.clearContent();
-      setCurrentChapterTitle("");
-      setEditingChapterId(null);
-    }
-  };
-
-  const addStory = () => {
-    if (!user) return "Please login to create a story";
-    if (title && currentChapters.length > 0) {
-      const newStory = {
-        storyId: uuidv4(),
-        user,
-        title,
-        chapters: currentChapters,
-      };
-      try {
-        publishStory(newStory);
-      } catch (error) {
-        console.log("Error publishing story", error);
-      }
-      clearCurrentStory();
-    } else {
-      alert("Please enter a title and at least one chapter.");
-    }
-  };
-
-  const addDraft = async () => {
-    if (!user) return "Please login to save a draft";
-    if (title && currentChapters.length > 0) {
-      const newDraft = {
-        draftId: uuidv4(),
-        user,
-        title,
-        chapters: currentChapters,
-      };
-
-      setSavingMessage("Saving...");
-
-      try {
-        await saveDraft(newDraft);
-        setSavingMessage("Saved!");
-        setTimeout(() => {
-          setSavingMessage(""); // Clear the message after 3 seconds
-        }, 3000);
-      } catch (error) {
-        console.log("Error publishing draft", error);
-        setSavingMessage("Failed to save draft.");
-        setTimeout(() => {
-          setSavingMessage(""); // Clear the message after 3 seconds
-        }, 3000);
-      }
-    } else {
-      alert("Please enter a title and at least one chapter.");
-    }
-    navigate("/user-stories");
-  };
-
-  const editStory = () => {
-    if (editingStoryId && title && currentChapters.length > 0) {
-      const updatedStories = userStories.map((story) =>
-        story.storyId === editingStoryId
-          ? { ...story, title, chapters: currentChapters }
-          : story
-      );
-      if (!user) return "Please login to update a story";
-
-      updateStoryById({
-        storyId: editingStoryId,
-        user,
-        newTitle: title,
-        chapters: currentChapters,
-      });
-      setStories(updatedStories);
-      clearCurrentStory();
-    } else {
-      alert("Please enter a title and at least one chapter.");
-    }
-  };
-
-  const loadStoryForEditing = async (story: Story) => {
-    const s = await fetchStoryById(story);
-
-    if (!s) return;
-    setTitle(s.title);
-    setCurrentChapters(s.chapters);
-    setEditingStoryId(s.storyId);
-    setIsEditing(true);
-    if (s.chapters.length > 0) {
-      loadChapterForEditing(s.chapters[0]);
-    } else {
-      editor.commands.clearContent();
-    }
-  };
-  const loadDraftForEditing = async (draft: Draft) => {
-    const s = await fetchDraftById(draft);
-
-    if (!s) return;
-    setTitle(s.title);
-    setCurrentChapters(s.chapters);
-    setEditingStoryId(s.draftId);
-    setIsEditing(true);
-    if (s.chapters.length > 0) {
-      loadChapterForEditing(s.chapters[0]);
-    } else {
-      editor.commands.clearContent();
-    }
-  };
-
-  const loadChapterForEditing = (chapter: Chapter) => {
-    editor.commands.setContent(chapter.content);
-    setCurrentChapterTitle(chapter.title);
-    setEditingChapterId(chapter.chapterId);
-  };
-
-  const navigate = useNavigate();
 
   const { selectedAI } = useAI();
   const aiGeneratorRef = useRef<AITextGenerator | null>(null);
@@ -313,17 +144,156 @@ export function SimpleEditor() {
       ListItem,
     ],
     content: "",
+    onUpdate: ({ editor }) => {
+      const content = editor.getHTML();
+
+      debouncedSave(storyTitle, storyDescription, chapterTitle, content);
+    },
   }) as Editor;
 
-  const location = useLocation();
+  const loadStories = async () => {
+    const storyList = await storiesRepo.getStoryList();
+    setStories(storyList);
+  };
+
+  const loadStory = async (storyId: string) => {
+    const story = await storiesRepo.getStory(storyId);
+
+    if (story) {
+      setCurrentStory(story);
+      setStoryTitle(story.title);
+      setStoryDescription(story.description);
+      const storyChapters = await storiesRepo.getChapters(storyId);
+      setChapters(storyChapters);
+      if (storyChapters.length > 0) {
+        setCurrentChapter(storyChapters[0]);
+        setChapterTitle(storyChapters[0].title);
+        editor?.commands.setContent(storyChapters[0].content);
+      } else {
+        setCurrentChapter(null);
+        setChapterTitle("");
+        editor?.commands.setContent("");
+      }
+    }
+  };
+
+  const handleSave = useCallback(
+    async (
+      storyTitle: string,
+      storyDescription: string,
+      chapterTitle: string,
+      content: any
+    ) => {
+      console.log("Saving...", currentStory, currentChapter, content);
+      if (!currentStory) {
+        console.error("No story selected");
+        return;
+      }
+      setSaveStatus("Saving...");
+      try {
+        try {
+          if (currentChapter) {
+            // Update existing chapter
+            console.log("Updating chapter");
+            await storiesRepo.updateChapter(
+              currentStory.id,
+              currentChapter.id,
+              chapterTitle,
+              content
+            );
+          } else if (content.trim() !== "" || chapterTitle.trim() !== "") {
+            console.log("Adding new chapter");
+            const newChapterId = await storiesRepo.addChapter(
+              currentStory.id,
+              chapterTitle
+            );
+            await storiesRepo.updateChapter(
+              currentStory.id,
+              newChapterId,
+              chapterTitle,
+              content
+            );
+            const newChapter = await storiesRepo.getChapter(
+              currentStory.id,
+              newChapterId
+            );
+            if (newChapter) {
+              setCurrentChapter(newChapter);
+              setChapters([...chapters, newChapter]);
+            }
+          }
+
+          // Update story title and description
+          console.log("story title and desc", storyTitle, storyDescription);
+
+          await storiesRepo.updateStory(
+            currentStory.id,
+            storyTitle,
+            storyDescription
+          );
+
+          setSaveStatus("Saved");
+        } catch (error) {
+          console.error("Error saving:", error);
+          setSaveStatus(
+            error instanceof Error ? error.message : "Error saving"
+          );
+        }
+        setSaveStatus("Saved");
+      } catch (error) {
+        console.error("Error saving:", error);
+        setSaveStatus(error instanceof Error ? error.message : "Error saving");
+      }
+      setTimeout(() => setSaveStatus(""), 2000);
+    },
+    [currentStory, currentChapter]
+  );
+
+  const debouncedSave = useCallback(
+    debounce((storyTitle, storyDescription, chapterTitle, content: any) => {
+      handleSave(storyTitle, storyDescription, chapterTitle, content);
+    }, 2000),
+    [handleSave]
+  );
+
+  function debounce<T extends (...args: any[]) => any>(
+    func: T,
+    delay: number
+  ): T {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return ((...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    }) as T;
+  }
+
+  const handleNewChapter = async () => {
+    if (!currentStory) return;
+    const newChapterId = await storiesRepo.addChapter(
+      currentStory.id,
+      "New Chapter"
+    );
+    await loadStory(currentStory.id); // This will refresh the chapters list
+    const newChapter = await storiesRepo.getChapter(
+      currentStory.id,
+      newChapterId
+    );
+    if (newChapter) {
+      setCurrentChapter(newChapter);
+      setChapterTitle(newChapter.title);
+      editor?.commands.setContent(newChapter.content);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!currentStory) return;
+    await storiesRepo.publishStory(currentStory.id);
+    setSaveStatus("Published");
+    setTimeout(() => setSaveStatus(""), 2000);
+    loadStories();
+  };
 
   useEffect(() => {
-    if (location.state?.draft) {
-      loadDraftForEditing(location.state?.draft);
-    } else if (location.state?.story) {
-      loadStoryForEditing(location.state?.story);
-    }
-
     if (selectedAI) {
       aiGeneratorRef.current = selectedAI;
     }
@@ -332,10 +302,11 @@ export function SimpleEditor() {
         editor.chain().focus().insertContent(generatedText).run();
       });
     }
-
     setsuggestion("");
+    if (storyId) {
+      loadStory(storyId);
+    }
   }, [selectedAI, user]);
-  const [savingMessage, setSavingMessage] = useState("");
 
   const getSelectedText = () => {
     return editor.state.doc.textBetween(
@@ -344,9 +315,9 @@ export function SimpleEditor() {
     );
   };
 
-  // const applyChanges = (newText: string) => {
-  //   editor.chain().focus().setContent(newText, false).run();
-  // };
+  const applyChanges = (newText: string) => {
+    editor.chain().focus().setContent(newText, false).run();
+  };
 
   const handleAction = async (actionType: string) => {
     const selectedText = getSelectedText();
@@ -366,8 +337,7 @@ export function SimpleEditor() {
         default:
           throw new Error("Unknown action type");
       }
-      console.log(result);
-      // applyChanges(result);
+      applyChanges(result);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -407,8 +377,8 @@ export function SimpleEditor() {
           </button>
         </div>
       </BubbleMenu>
+
       <div className="flex h-screen w-full">
-        {publishLoading && <div>Loading...</div>}
         <div
           className={`p-4 bg-amber-50 rounded-lg shadow-lg overflow-y-auto transition-all duration-300 ${
             rightColumnVisible ? "w-2/3" : "w-full"
@@ -418,27 +388,28 @@ export function SimpleEditor() {
             Summon your ultimate writing muse by pressing{" "}
             <span className="underline decoration-wavy text-blue-600">TAB</span>
           </h1>
-
-          <div className="text-2xl mb-2">
-            Authenticity Score: {Math.floor(Math.random() * 100)}%
-          </div>
+          <input
+            type="text"
+            value={storyTitle}
+            onChange={(e) => setStoryTitle(e.target.value)}
+            placeholder="Story Title"
+            className="w-full p-2 mb-2 border border-gray-700 rounded"
+          />
+          <textarea
+            value={storyDescription}
+            onChange={(e) => setStoryDescription(e.target.value)}
+            placeholder="Story Description"
+            className="w-full p-2 mb-4 border border-gray-700 rounded"
+            rows={3}
+          />
+          <input
+            type="text"
+            value={chapterTitle}
+            onChange={(e) => setChapterTitle(e.target.value)}
+            placeholder="Chapter Title"
+            className="w-full p-2 mb-4 border border-gray-700 rounded"
+          />
           <div className="bg-white p-4 rounded-lg border border-gray-300">
-            <input
-              type="text"
-              placeholder="Story Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full text-3xl font-bold mb-6 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
-            />
-
-            <input
-              type="text"
-              placeholder="Chapter Title"
-              value={currentChapterTitle}
-              onChange={(e) => setCurrentChapterTitle(e.target.value)}
-              className="w-full text-2xl font-semibold mb-8 p-2 focus:outline-none border-b-2 border-gray-200 focus:border-blue-500 transition-colors"
-            />
-
             <div className="min-h-[28rem] w-full flex justify-center">
               <div className="w-full focus:outline-none bg-white selection:bg-blue-100">
                 <EditorContent
@@ -446,54 +417,45 @@ export function SimpleEditor() {
                   className="w-full focus:outline-none bg-white selection:bg-blue-100"
                   editor={editor}
                 />
-                <EditorContent editor={editor} />
-              </div>
-              {savingMessage && (
-                <div className="mt-2 text-center text-gray-500">
-                  {savingMessage}
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="text-sm text-gray-400">{saveStatus}</div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
           <div className="flex my-3">
             <EditorHeader editor={editor} />
           </div>
-          {editingChapterId ? (
+
+          {currentStory && (
             <button
-              onClick={updateChapter}
-              className="w-full p-2 mb-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              className="p-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
+              onClick={handlePublish}
+              disabled={currentStory.isPublished}
             >
-              Update Chapter
-            </button>
-          ) : (
-            <button
-              onClick={addChapter}
-              className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Add Chapter
+              {currentStory.isPublished ? "Published" : "Publish"}
             </button>
           )}
           <button
-            onClick={addDraft}
-            className="w-full mt-2 p-2 bg-slate-400 text-white rounded hover:bg-slate-500"
+            onClick={handleNewChapter}
+            className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Save as Draft
+            New Chapter
           </button>
-          {editingStoryId ? (
-            <button
-              onClick={editStory}
-              className="w-full mt-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-            >
-              Update story
-            </button>
-          ) : (
-            <button
-              onClick={addStory}
-              className="w-full p-2 mt-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              Publish Story
-            </button>
-          )}
+
+          <button
+            className="w-full p-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
+            onClick={() =>
+              handleSave(
+                storyTitle,
+                storyDescription,
+                chapterTitle,
+                editor?.getHTML()
+              )
+            }
+          >
+            Save
+          </button>
         </div>
         <div
           className={`transition-all duration-300 bg-amber-100 mx-2 ${
@@ -562,36 +524,33 @@ export function SimpleEditor() {
               <CollapsibleDiv title="Chapters">
                 <div className="p-6 bg-amber-50 rounded-lg shadow-lg">
                   <h2 className="text-2xl font-bold mb-4 text-amber-800">
-                    {title || "Untitled Masterpiece"}
+                    {chapterTitle || "Untitled Masterpiece"}
                   </h2>
-                  {currentChapters.length === 0 ? (
+                  {chapters.length === 0 ? (
                     <p className="text-amber-700 italic">
                       No chapters added yet. Start your journey!
                     </p>
                   ) : (
                     <ul className="space-y-2">
-                      {currentChapters.map((chapter) => (
+                      {chapters.map((chapter) => (
                         <li
-                          key={chapter.chapterId}
+                          key={chapter.id}
                           className="bg-white rounded-md shadow transition-all hover:shadow-md"
                         >
                           <div className="flex items-center justify-between p-3">
                             <div
                               className="flex items-center space-x-3 cursor-pointer"
-                              onClick={() => loadChapterForEditing(chapter)}
+                              onClick={() => {
+                                setCurrentChapter(chapter);
+                                setChapterTitle(chapter.title);
+                                editor?.commands.setContent(chapter.content);
+                              }}
                             >
                               <Book className="w-5 h-5 text-amber-600" />
                               <span className="font-medium text-amber-900">
                                 {chapter.title}
                               </span>
                             </div>
-                            <button
-                              onClick={() => deleteChapter(chapter.chapterId)}
-                              className="p-1 text-red-500 hover:text-red-700 transition-colors"
-                              aria-label="Delete chapter"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
                           </div>
                         </li>
                       ))}
@@ -599,9 +558,7 @@ export function SimpleEditor() {
                   )}
                 </div>
               </CollapsibleDiv>
-              <CollapsibleDiv title="Outline">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
+
               <CollapsibleDiv title="Plot">
                 <div>Working on it :)</div>
               </CollapsibleDiv>

@@ -6,6 +6,7 @@ import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { useEditorContext } from "../../contexts/EditorContext";
 import { Story } from "../../types/IStory";
+import { storiesRepo } from "../../components/StoriesRepo";
 
 const AllStories: React.FC = () => {
   const { user } = useAuthContext();
@@ -34,6 +35,20 @@ const AllStories: React.FC = () => {
     navigate(`/novel/${story.storyId}`, { state: { story } });
   };
 
+  const handleNewStory = async () => {
+    if (user) {
+      const newStoryId = await storiesRepo.createStory(
+        "New Story",
+        "",
+        user.uid
+      );
+      navigate(`/create/${newStoryId}`);
+    } else {
+      // Handle the case where the user is not authenticated
+      console.error("User not authenticated");
+    }
+  };
+
   return (
     <div className="bg-amber-50 min-h-screen py-8 relative ">
       <div className="container mx-auto px-4">
@@ -41,13 +56,13 @@ const AllStories: React.FC = () => {
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
               <span>Welcome back, {user.username}!</span>
-              <Link
-                to="/create"
+              <button
+                onClick={handleNewStory}
                 className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
               >
                 Start Writing
                 <FaArrowRight className="ml-2" />
-              </Link>
+              </button>
             </h1>
           </div>
         )}

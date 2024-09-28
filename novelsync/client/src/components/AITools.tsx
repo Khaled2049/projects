@@ -13,8 +13,6 @@ const AITools = ({ text }: AIToolsProps) => {
   const [generatedText, setGeneratedText] = useState("");
   const aiGenerator = new AITextGenerator(0);
 
-  console.log(text);
-
   const DropdownButton = ({
     label,
     options,

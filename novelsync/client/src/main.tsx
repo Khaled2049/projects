@@ -72,7 +72,7 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: "/create",
+        path: "/create/:storyId",
         element: <CreateStory />,
       },
       {
@@ -91,17 +91,15 @@ const router = createBrowserRouter([
   },
 ]);
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <AIProvider>
-        <PostsProvider>
-          <BookClubProvider>
-            <EditorProvider>
-              <RouterProvider router={router} />
-            </EditorProvider>
-          </BookClubProvider>
-        </PostsProvider>
-      </AIProvider>
-    </AuthProvider>
-  </React.StrictMode>
+  <AuthProvider>
+    <AIProvider>
+      <PostsProvider>
+        <BookClubProvider>
+          <EditorProvider>
+            <RouterProvider router={router} />
+          </EditorProvider>
+        </BookClubProvider>
+      </PostsProvider>
+    </AIProvider>
+  </AuthProvider>
 );
