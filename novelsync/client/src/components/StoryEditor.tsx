@@ -41,7 +41,7 @@ const StoryEditor: React.FC = () => {
     onUpdate: ({ editor }) => {
       const content = editor.getHTML();
 
-      debouncedSave(chapterTitle, content);
+      debouncedSave(storyTitle, storyDescription, chapterTitle, content);
     },
   });
 
@@ -76,7 +76,12 @@ const StoryEditor: React.FC = () => {
   };
 
   const handleSave = useCallback(
-    async (chapterTitle: string, content: any) => {
+    async (
+      storyTitle: string,
+      storyDescription: string,
+      chapterTitle: string,
+      content: any
+    ) => {
       console.log("Saving...", currentStory, currentChapter, content);
       if (!currentStory) {
         console.error("No story selected");
@@ -116,6 +121,9 @@ const StoryEditor: React.FC = () => {
             }
           }
 
+          // Update story title and description
+          console.log("story title and desc", storyTitle, storyDescription);
+
           await storiesRepo.updateStory(
             currentStory.id,
             storyTitle,
@@ -140,8 +148,8 @@ const StoryEditor: React.FC = () => {
   );
 
   const debouncedSave = useCallback(
-    debounce((chapterTitle, content: any) => {
-      handleSave(chapterTitle, content);
+    debounce((storyTitle, storyDescription, chapterTitle, content: any) => {
+      handleSave(storyTitle, storyDescription, chapterTitle, content);
     }, 2000),
     [handleSave]
   );
@@ -261,7 +269,14 @@ const StoryEditor: React.FC = () => {
               </button>
               <button
                 className="p-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
-                onClick={() => handleSave(chapterTitle, editor?.getHTML())}
+                onClick={() =>
+                  handleSave(
+                    storyTitle,
+                    storyDescription,
+                    chapterTitle,
+                    editor?.getHTML()
+                  )
+                }
               >
                 Save
               </button>
