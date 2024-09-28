@@ -1,5 +1,4 @@
 import "./index.css";
-import React from "react";
 import ReactDOM from "react-dom/client";
 import {
   Root,
@@ -9,7 +8,6 @@ import {
   StoryDetail,
   BookClubs,
   Home,
-  DraftEditor,
   UserStories,
   AllStories,
   BookClubDetails,
@@ -24,7 +22,6 @@ import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 import { BookClubProvider } from "./contexts/BookClubContext";
 import { PostsProvider } from "./contexts/PostsContext";
-import StoryEditor from "./components/StoryEditor";
 
 const router = createBrowserRouter([
   {
@@ -64,10 +61,6 @@ const router = createBrowserRouter([
         element: <Signin />,
       },
       {
-        path: "/draft",
-        element: <DraftEditor />,
-      },
-      {
         path: "/sign-up",
         element: <Signup />,
       },
@@ -80,12 +73,8 @@ const router = createBrowserRouter([
         element: <UserStories />,
       },
       {
-        path: "/novel/:id",
+        path: "/story/:id",
         element: <StoryDetail />, // Add the route for the novel detail
-      },
-      {
-        path: "/test",
-        element: <StoryEditor />,
       },
     ],
   },

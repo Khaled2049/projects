@@ -33,7 +33,7 @@ const BookDetails: React.FC<BookDetailsProps> = () => {
 
       try {
         const response = await axios.get(url);
-        console.log("Book details:", response.data);
+
         setBook(response.data);
       } catch (error) {
         console.error("Error fetching book details:", error);

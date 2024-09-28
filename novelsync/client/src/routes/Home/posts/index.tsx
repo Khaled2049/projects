@@ -26,7 +26,7 @@ const Posts = () => {
 
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Post submitted:", post);
+
     createPost(post);
     setPost("");
   };

@@ -16,8 +16,7 @@ import BulletList from "@tiptap/extension-bullet-list";
 import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./AITextGenerator";
 import ListItem from "@tiptap/extension-list-item";
-import CollapsibleDiv from "./CollapsibleDiv";
-import { storiesRepo, Story, StoryMetadata, Chapter } from "./StoriesRepo";
+import { storiesRepo, Story, Chapter } from "./StoriesRepo";
 
 const limit = 5000;
 import { Book } from "lucide-react";
@@ -37,7 +36,7 @@ export function SimpleEditor() {
   const [aitoolsVisible, setAitoolsVisible] = useState(true);
 
   const [selectedText, setSelectedText] = useState("");
-  const [stories, setStories] = useState<StoryMetadata[]>([]);
+
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [currentChapter, setCurrentChapter] = useState<Chapter | null>(null);
@@ -151,11 +150,6 @@ export function SimpleEditor() {
     },
   }) as Editor;
 
-  const loadStories = async () => {
-    const storyList = await storiesRepo.getStoryList();
-    setStories(storyList);
-  };
-
   const loadStory = async (storyId: string) => {
     const story = await storiesRepo.getStory(storyId);
 
@@ -184,7 +178,6 @@ export function SimpleEditor() {
       chapterTitle: string,
       content: any
     ) => {
-      console.log("Saving...", currentStory, currentChapter, content);
       if (!currentStory) {
         console.error("No story selected");
         return;
@@ -194,7 +187,7 @@ export function SimpleEditor() {
         try {
           if (currentChapter) {
             // Update existing chapter
-            console.log("Updating chapter");
+
             await storiesRepo.updateChapter(
               currentStory.id,
               currentChapter.id,
@@ -202,7 +195,6 @@ export function SimpleEditor() {
               content
             );
           } else if (content.trim() !== "" || chapterTitle.trim() !== "") {
-            console.log("Adding new chapter");
             const newChapterId = await storiesRepo.addChapter(
               currentStory.id,
               chapterTitle
@@ -222,9 +214,6 @@ export function SimpleEditor() {
               setChapters([...chapters, newChapter]);
             }
           }
-
-          // Update story title and description
-          console.log("story title and desc", storyTitle, storyDescription);
 
           await storiesRepo.updateStory(
             currentStory.id,
@@ -290,7 +279,6 @@ export function SimpleEditor() {
     await storiesRepo.publishStory(currentStory.id);
     setSaveStatus("Published");
     setTimeout(() => setSaveStatus(""), 2000);
-    loadStories();
   };
 
   useEffect(() => {
@@ -426,10 +414,23 @@ export function SimpleEditor() {
           <div className="flex my-3">
             <EditorHeader editor={editor} />
           </div>
+          <button
+            className="w-full p-2 mb-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
+            onClick={() =>
+              handleSave(
+                storyTitle,
+                storyDescription,
+                chapterTitle,
+                editor?.getHTML()
+              )
+            }
+          >
+            Save
+          </button>
 
           {currentStory && (
             <button
-              className="p-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
+              className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={handlePublish}
               disabled={currentStory.isPublished}
             >
@@ -441,20 +442,6 @@ export function SimpleEditor() {
             className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             New Chapter
-          </button>
-
-          <button
-            className="w-full p-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
-            onClick={() =>
-              handleSave(
-                storyTitle,
-                storyDescription,
-                chapterTitle,
-                editor?.getHTML()
-              )
-            }
-          >
-            Save
           </button>
         </div>
         <div
@@ -504,7 +491,7 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Hide Organizer</span>
+                  <span>Hide Chapters</span>
                 </span>
               </button>
             ) : (
@@ -513,76 +500,47 @@ export function SimpleEditor() {
                 className="flex items-center h-12 justify-center w-full"
               >
                 <span className="flex items-center space-x-2">
-                  <span>Show Organizer</span>
+                  <span>Show Chapters</span>
                 </span>
               </button>
             )}
           </div>
 
           {rightColumnVisible && (
-            <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
-              <CollapsibleDiv title="Chapters">
-                <div className="p-6 bg-amber-50 rounded-lg shadow-lg">
-                  <h2 className="text-2xl font-bold mb-4 text-amber-800">
-                    {chapterTitle || "Untitled Masterpiece"}
-                  </h2>
-                  {chapters.length === 0 ? (
-                    <p className="text-amber-700 italic">
-                      No chapters added yet. Start your journey!
-                    </p>
-                  ) : (
-                    <ul className="space-y-2">
-                      {chapters.map((chapter) => (
-                        <li
-                          key={chapter.id}
-                          className="bg-white rounded-md shadow transition-all hover:shadow-md"
+            <div className="p-6 rounded-lg ">
+              <h2 className="text-2xl font-bold mb-4 text-amber-800">
+                Editing: {chapterTitle || "Untitled Masterpiece"}
+              </h2>
+              {chapters.length === 0 ? (
+                <p className="text-amber-700 italic">
+                  No chapters added yet. Start your journey!
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {chapters.map((chapter) => (
+                    <li
+                      key={chapter.id}
+                      className="bg-white rounded-md shadow transition-all hover:shadow-md"
+                    >
+                      <div className="flex items-center justify-between p-3">
+                        <div
+                          className="flex items-center space-x-3 cursor-pointer"
+                          onClick={() => {
+                            setCurrentChapter(chapter);
+                            setChapterTitle(chapter.title);
+                            editor?.commands.setContent(chapter.content);
+                          }}
                         >
-                          <div className="flex items-center justify-between p-3">
-                            <div
-                              className="flex items-center space-x-3 cursor-pointer"
-                              onClick={() => {
-                                setCurrentChapter(chapter);
-                                setChapterTitle(chapter.title);
-                                editor?.commands.setContent(chapter.content);
-                              }}
-                            >
-                              <Book className="w-5 h-5 text-amber-600" />
-                              <span className="font-medium text-amber-900">
-                                {chapter.title}
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </CollapsibleDiv>
-
-              <CollapsibleDiv title="Plot">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Characters">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Places">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Objects">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Themes">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Magic System">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Rules">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
-              <CollapsibleDiv title="Notes">
-                <div>Working on it :)</div>
-              </CollapsibleDiv>
+                          <Book className="w-5 h-5 text-amber-600" />
+                          <span className="font-medium text-amber-900">
+                            {chapter.title}
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>

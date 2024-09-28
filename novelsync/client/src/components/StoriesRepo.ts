@@ -8,9 +8,10 @@ import {
   orderBy,
   updateDoc,
   deleteDoc,
+  increment,
+  where,
 } from "firebase/firestore";
 import { firestore } from "../config/firebase";
-
 export interface Chapter {
   id: string;
   title: string;
@@ -23,11 +24,14 @@ export interface Story {
   id: string;
   title: string;
   description: string;
-  ownerId: string;
+  userId: string;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
   chapterCount: number;
+  author: string;
+  views: number;
+  likes: number;
 }
 
 export interface StoryMetadata {
@@ -37,6 +41,9 @@ export interface StoryMetadata {
   chapterCount: number;
   isPublished: boolean;
   updatedAt: Date;
+  author: string;
+  views: number;
+  likes: number;
 }
 
 const WORD_LIMIT = 5000;
@@ -56,6 +63,55 @@ class StoriesRepo {
         chapterCount: data.chapterCount,
         isPublished: data.isPublished,
         updatedAt: data.updatedAt.toDate(),
+        author: data.author,
+        views: data.views,
+        likes: data.likes,
+      };
+    });
+  }
+
+  async getPublishedStories(): Promise<StoryMetadata[]> {
+    const q = query(
+      this.storiesCollection,
+      orderBy("updatedAt", "desc"),
+      where("isPublished", "==", true)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        description: data.description,
+        chapterCount: data.chapterCount,
+        isPublished: data.isPublished,
+        updatedAt: data.updatedAt.toDate(),
+        author: data.author,
+        views: data.views,
+        likes: data.likes,
+      };
+    });
+  }
+
+  async getUserStories(userId: string): Promise<StoryMetadata[]> {
+    const q = query(
+      this.storiesCollection,
+      orderBy("updatedAt", "desc"),
+      where("userId", "==", userId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        description: data.description,
+        chapterCount: data.chapterCount,
+        isPublished: data.isPublished,
+        updatedAt: data.updatedAt.toDate(),
+        author: data.author,
+        views: data.views,
+        likes: data.likes,
       };
     });
   }
@@ -79,21 +135,66 @@ class StoriesRepo {
     return null;
   }
 
+  async getUserInfo(userId: string): Promise<string> {
+    try {
+      const userRef = doc(firestore, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        return userSnap.data().username;
+      }
+    } catch (error) {
+      console.error("Error getting user info:", error);
+    }
+    return "";
+  }
+
+  async incrementViewCount(storyId: string): Promise<void> {
+    console.log("Incrementing view count for story:", storyId);
+    const storyRef = doc(firestore, "stories", storyId);
+
+    try {
+      await updateDoc(storyRef, {
+        views: increment(1),
+      });
+    } catch (error) {
+      console.error("Error incrementing views: ", error);
+    }
+  }
+
+  async incrementLikeCount(storyId: string): Promise<void> {
+    console.log("Incrementing like count for story:", storyId);
+    const storyRef = doc(firestore, "stories", storyId);
+
+    try {
+      await updateDoc(storyRef, {
+        likes: increment(1),
+      });
+    } catch (error) {
+      console.error("Error incrementing likes: ", error);
+    }
+  }
+
   async createStory(
     title: string,
     description: string,
-    ownerId: string
+    userId: string
   ): Promise<string> {
     const newStoryRef = doc(this.storiesCollection);
+
+    const author = await this.getUserInfo(userId);
+
     const newStory: Story = {
       id: newStoryRef.id,
       title,
       description,
-      ownerId,
+      userId,
       isPublished: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       chapterCount: 0,
+      author,
+      views: 0,
+      likes: 0,
     };
     await setDoc(newStoryRef, newStory);
     return newStoryRef.id;
@@ -190,7 +291,6 @@ class StoriesRepo {
     content: string
   ): Promise<void> {
     try {
-      console.log("Updating chapter", storyId, chapterId);
       const chapterRef = doc(
         this.storiesCollection,
         storyId,

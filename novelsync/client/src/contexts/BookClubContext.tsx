@@ -43,7 +43,6 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
   const [bookClubs, setBookClubs] = useState<IClub[]>([]);
 
   const createBookClub = async (club: IClub) => {
-    console.log("Creating book club", club);
     try {
       const clubRef: DocumentReference = doc(
         collection(firestore, "bookClubs")

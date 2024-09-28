@@ -1,31 +1,19 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
-import { FaTwitter, FaEnvelope, FaShareAlt } from "react-icons/fa";
-
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-
-import { useEditorContext } from "../../contexts/EditorContext";
 import { Loader } from "lucide-react";
-import { Chapter, Story } from "../../types/IStory";
+import { useParams } from "react-router-dom";
+import { Chapter, storiesRepo } from "../../components/StoriesRepo";
 
 const StoryDetail = () => {
-  const [liked, setLiked] = useState<boolean>(false);
-  const [story, setStory] = useState<Story | null>(null);
-  const location = useLocation();
+  const [story, setStory] = useState<any>(null);
+  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
-
-  const { fetchStoryById, incrementLikes } = useEditorContext();
-
-  const [shareUrl, setShareUrl] = useState("");
+  const [chapters, setChapters] = useState<Chapter[]>([]);
 
   useEffect(() => {
     const fetchStory = async () => {
-      if (location.state?.story) {
+      if (id) {
         try {
-          const story = await fetchStoryById(location.state.story);
-          setStory(story);
-          setShareUrl(`${window.location.origin}/novel/${story?.title}`);
+          await loadStory(id);
         } catch (error) {
           console.error("Error fetching story:", error);
         } finally {
@@ -39,24 +27,14 @@ const StoryDetail = () => {
     fetchStory();
   }, []);
 
-  const handleWebShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: story?.title,
-        text: `Check out this novel by ${story?.author}`,
-        url: shareUrl,
-      });
-    }
-  };
-
-  const handleLike = async (storyId: string) => {
-    if (liked) return;
-
-    setLiked(true);
+  const loadStory = async (storyId: string) => {
     try {
-      await incrementLikes(storyId);
+      const story = await storiesRepo.getStory(storyId);
+      const storyChapters = await storiesRepo.getChapters(storyId);
+      setChapters(storyChapters);
+      setStory(story);
     } catch (error) {
-      console.error("Error liking story", error);
+      console.error("Error fetching story:", error);
     }
   };
 
@@ -106,11 +84,11 @@ const StoryDetail = () => {
               By {story.author}
             </p>
             <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6 text-center">
-              Last updated: {new Date(story.lastUpdated).toLocaleDateString()}
+              Last updated: {new Date(story.updatedAt).toLocaleDateString()}
             </p>
             <div className="prose prose-lg max-w-none bg-white p-4 md:p-6 rounded-md leading-relaxed shadow-md">
-              {story.chapters.map((chapter: Chapter) => (
-                <div key={chapter.chapterId} className="mb-6">
+              {chapters.map((chapter: Chapter) => (
+                <div key={chapter.id} className="mb-6">
                   <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-amber-900">
                     {chapter.title}
                   </h2>
@@ -119,43 +97,6 @@ const StoryDetail = () => {
                   </div>
                 </div>
               ))}
-            </div>
-            <div className="flex justify-center gap-2 md:gap-4 mt-6">
-              <button
-                className={`like-button ${liked ? "liked" : ""}`}
-                onClick={() => handleLike(story.storyId)}
-                disabled={liked}
-              >
-                {liked ? (
-                  <AiFillHeart className="icon" />
-                ) : (
-                  <AiOutlineHeart className="icon" />
-                )}
-              </button>
-              <button
-                className="flex items-center px-3 py-2 md:px-4 md:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-300"
-                onClick={handleWebShare}
-              >
-                <FaShareAlt className="mr-1 md:mr-2" /> Share
-              </button>
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `Check out this novel by ${story.author}: ${shareUrl}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center px-3 py-2 md:px-4 md:py-2 bg-slate-800 text-white rounded hover:bg-blue-500 transition-colors duration-300"
-              >
-                <FaTwitter className="mr-1 md:mr-2" /> Share on X
-              </a>
-              <a
-                href={`mailto:?subject=${encodeURIComponent(
-                  `Check out this novel by ${story.author}`
-                )}&body=${encodeURIComponent(shareUrl)}`}
-                className="flex items-center px-3 py-2 md:px-4 md:py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors duration-300"
-              >
-                <FaEnvelope className="mr-1 md:mr-2" /> Share via Email
-              </a>
             </div>
           </div>
         )}

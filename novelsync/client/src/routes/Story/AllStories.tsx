@@ -6,33 +6,28 @@ import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { useEditorContext } from "../../contexts/EditorContext";
 import { Story } from "../../types/IStory";
-import { storiesRepo } from "../../components/StoriesRepo";
+import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
 
 const AllStories: React.FC = () => {
   const { user } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { stories, fetchAllStories, incrementViewCount } = useEditorContext();
+  const [stories, setStories] = useState<StoryMetadata[]>([]);
+  const storiesPerPage = 9;
+  const indexOfLastNovel = currentPage * storiesPerPage;
+  const indexOfFirstNovel = indexOfLastNovel - storiesPerPage;
+  const currentStories = stories.slice(indexOfFirstNovel, indexOfLastNovel);
+  const totalPages = Math.ceil(stories.length / storiesPerPage);
 
-  const novelsPerPage = 9;
-  const indexOfLastNovel = currentPage * novelsPerPage;
-  const indexOfFirstNovel = indexOfLastNovel - novelsPerPage;
-  const currentNovels = stories.slice(indexOfFirstNovel, indexOfLastNovel);
-  const totalPages = Math.ceil(stories.length / novelsPerPage);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAllStories();
+    loadStories();
   }, []);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-  };
-
-  const handleStoryClick = (story: Story) => {
-    incrementViewCount(story.storyId);
-    navigate(`/novel/${story.storyId}`, { state: { story } });
   };
 
   const handleNewStory = async () => {
@@ -46,6 +41,19 @@ const AllStories: React.FC = () => {
     } else {
       // Handle the case where the user is not authenticated
       console.error("User not authenticated");
+    }
+  };
+
+  const loadStories = async () => {
+    const storyList = await storiesRepo.getPublishedStories();
+    setStories(storyList);
+  };
+
+  const handleStoryClick = async (story: StoryMetadata) => {
+    const storyData = await storiesRepo.getStory(story.id);
+    if (storyData) {
+      storiesRepo.incrementViewCount(story.id);
+      navigate(`/story/${story.id}`);
     }
   };
 
@@ -76,10 +84,10 @@ const AllStories: React.FC = () => {
             <h2 className="text-2xl font-serif text-amber-900 mb-6">Stories</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentNovels.map((story) => (
+              {currentStories.map((story) => (
                 <div
                   onClick={() => handleStoryClick(story)}
-                  key={story.storyId}
+                  key={story.id}
                   className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
                 >
                   <h3 className="font-serif text-xl text-amber-900 mb-2">
@@ -88,7 +96,7 @@ const AllStories: React.FC = () => {
                   <p className="text-gray-600 mb-1">By {story.author}</p>
                   <p className="text-gray-500 text-sm mb-4">
                     Last Updated:{" "}
-                    {new Date(story.lastUpdated).toLocaleDateString()}
+                    {new Date(story.updatedAt).toLocaleDateString()}
                   </p>
 
                   <div className="flex items-center mt-4 text-gray-600 text-sm">
@@ -102,6 +110,8 @@ const AllStories: React.FC = () => {
                 </div>
               ))}
             </div>
+
+            {/* New Stories */}
 
             {/* Pagination */}
             <div className="flex justify-center mt-8">
