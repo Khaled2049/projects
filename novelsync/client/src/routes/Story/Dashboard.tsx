@@ -20,8 +20,13 @@ import {
   Feather,
   TrendingUp,
 } from "lucide-react";
+import { useEffect } from "react";
 
 const Dashboard = () => {
+  useEffect(() => {
+    alert("This is a demo dashboard. Data is static and not real-time.");
+  }, []);
+
   // Demo data
   const salesData = [
     { month: "Jan", sales: 1200 },

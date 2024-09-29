@@ -8,7 +8,7 @@ const Story = () => {
     <div className="flex flex-col h-screen">
       <nav className="bg-amber-100 p-4">
         <ul className="flex space-x-4">
-          {["Editor", "Dashboard", "Plot", "Characters", "Places"].map(
+          {["Editor", "Plot", "Characters", "Places", "Dashboard"].map(
             (tab) => (
               <li key={tab}>
                 <NavLink

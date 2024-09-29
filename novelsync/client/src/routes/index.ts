@@ -13,7 +13,6 @@ export { default as Objects } from "./Story/Objects";
 export { default as Characters } from "./Story/Characters";
 export { default as Plot } from "./Story/Plot";
 export { default as Dashboard } from "./Story/Dashboard";
-export { default as Drafts } from "./Story/Drafts";
 
 export { default as BookClubs } from "./BookClub";
 export { default as CreateBookClub } from "./BookClub/CreateBookClub";
