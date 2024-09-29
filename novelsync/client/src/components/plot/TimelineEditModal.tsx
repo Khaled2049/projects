@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -5,23 +6,40 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
-import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-const TimelineModal = () => {
-  const handleSave = () => {
-    if (editingTimeline) {
-      setTimelines(
-        timelines.map((timeline) =>
-          timeline.id === editingTimeline.id ? editingTimeline : timeline
-        )
-      );
-      closeEditModal();
-    }
-  };
+interface TimelineEvent {
+  id: number;
+  name: string;
+  content: string;
+}
+
+interface Timeline {
+  id: number;
+  name: string;
+  description: string;
+  events: TimelineEvent[];
+}
+
+interface TimelineEditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  editingTimeline: Timeline | null;
+  setEditingTimeline: (timeline: Timeline | null) => void;
+}
+
+export const TimelineEditModal: React.FC<TimelineEditModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  editingTimeline,
+  setEditingTimeline,
+}) => {
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Timeline</DialogTitle>
@@ -69,14 +87,12 @@ const TimelineModal = () => {
           </div>
         )}
         <DialogFooter>
-          <Button onClick={closeEditModal} variant="outline">
+          <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={onSave}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
-
-export default TimelineModal;

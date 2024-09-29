@@ -1,16 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Book, ChevronDown, PlusCircle, Trash2, X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TemplateData, templateData } from "@/components/data/templateData";
+import { TimelineEditModal } from "./TimelineEditModal";
+import { EventEditModal } from "./EventEditModal";
 
 interface TimelineEvent {
   id: number;
@@ -36,10 +30,10 @@ const PlotTimeline: React.FC = () => {
   const [timelines, setTimelines] = useState<Timeline[]>([]);
   const [nextTimelineId, setNextTimelineId] = useState(1);
   const [nextEventId, setNextEventId] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingTimeline, setEditingTimeline] = useState<Timeline | null>(null);
 
-  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<{
     timelineId: number;
     event: TimelineEvent;
@@ -82,51 +76,15 @@ const PlotTimeline: React.FC = () => {
     setTimelines(timelines.filter((timeline) => timeline.id !== timelineId));
   };
 
-  const openEditModal = (timeline: Timeline) => {
-    setEditingTimeline(timeline);
-    setIsModalOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setIsModalOpen(false);
-    setEditingTimeline(null);
-  };
-
-  const handleSave = () => {
+  const handleSaveTimeline = () => {
     if (editingTimeline) {
       setTimelines(
         timelines.map((timeline) =>
           timeline.id === editingTimeline.id ? editingTimeline : timeline
         )
       );
-      closeEditModal();
+      closeEditTimelineModal();
     }
-  };
-
-  const addTimelineFromTemplate = (template: TemplateData) => {
-    const newTimeline: Timeline = {
-      id: nextTimelineId,
-      name: template.name,
-      description: `Timeline based on the ${template.name} template`,
-      events: template.items.map((item) => ({
-        id: nextEventId + item.id - 1,
-        name: item.name,
-        content: item.content,
-      })),
-    };
-    setTimelines([...timelines, newTimeline]);
-    setNextTimelineId(nextTimelineId + 1);
-    setNextEventId(nextEventId + template.items.length);
-  };
-
-  const openEditEventModal = (timelineId: number, event: TimelineEvent) => {
-    setEditingEvent({ timelineId, event: { ...event } });
-    setIsEventModalOpen(true);
-  };
-
-  const closeEditEventModal = () => {
-    setIsEventModalOpen(false);
-    setEditingEvent(null);
   };
 
   const handleSaveEvent = () => {
@@ -147,6 +105,42 @@ const PlotTimeline: React.FC = () => {
       );
       closeEditEventModal();
     }
+  };
+
+  const addTimelineFromTemplate = (template: TemplateData) => {
+    const newTimeline: Timeline = {
+      id: nextTimelineId,
+      name: template.name,
+      description: `Timeline based on the ${template.name} template`,
+      events: template.items.map((item) => ({
+        id: nextEventId + item.id - 1,
+        name: item.name,
+        content: item.content,
+      })),
+    };
+    setTimelines([...timelines, newTimeline]);
+    setNextTimelineId(nextTimelineId + 1);
+    setNextEventId(nextEventId + template.items.length);
+  };
+
+  const openEditTimelineModal = (timeline: Timeline) => {
+    setEditingTimeline(timeline);
+    setIsTimelineModalOpen(true);
+  };
+
+  const closeEditTimelineModal = () => {
+    setIsTimelineModalOpen(false);
+    setEditingTimeline(null);
+  };
+
+  const openEditEventModal = (timelineId: number, event: TimelineEvent) => {
+    setEditingEvent({ timelineId, event: { ...event } });
+    setIsEventModalOpen(true);
+  };
+
+  const closeEditEventModal = () => {
+    setIsEventModalOpen(false);
+    setEditingEvent(null);
   };
 
   return (
@@ -193,7 +187,7 @@ const PlotTimeline: React.FC = () => {
             >
               <div
                 className="flex items-center justify-between p-2 rounded cursor-pointer"
-                onClick={() => openEditModal(timeline)}
+                onClick={() => openEditTimelineModal(timeline)}
               >
                 <span>{timeline.name}</span>
                 <button
@@ -250,117 +244,21 @@ const PlotTimeline: React.FC = () => {
         </div>
       </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Timeline</DialogTitle>
-          </DialogHeader>
-          {editingTimeline && (
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Name
-                </label>
-                <Input
-                  id="name"
-                  value={editingTimeline.name}
-                  onChange={(e) =>
-                    setEditingTimeline({
-                      ...editingTimeline,
-                      name: e.target.value,
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Description
-                </label>
-                <Textarea
-                  id="description"
-                  value={editingTimeline.description}
-                  onChange={(e) =>
-                    setEditingTimeline({
-                      ...editingTimeline,
-                      description: e.target.value,
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button onClick={closeEditModal} variant="outline">
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <TimelineEditModal
+        isOpen={isTimelineModalOpen}
+        onClose={closeEditTimelineModal}
+        onSave={handleSaveTimeline}
+        editingTimeline={editingTimeline}
+        setEditingTimeline={setEditingTimeline}
+      />
 
-      <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Event</DialogTitle>
-          </DialogHeader>
-          {editingEvent && (
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="event"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Event
-                </label>
-                <Input
-                  id="event"
-                  value={editingEvent.event.name}
-                  onChange={(e) =>
-                    setEditingEvent({
-                      ...editingEvent,
-                      event: { ...editingEvent.event, name: e.target.value },
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="content"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Content
-                </label>
-                <Textarea
-                  id="content"
-                  value={editingEvent.event.content}
-                  onChange={(e) =>
-                    setEditingEvent({
-                      ...editingEvent,
-                      event: { ...editingEvent.event, content: e.target.value },
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button onClick={closeEditEventModal} variant="outline">
-              Cancel
-            </Button>
-            <Button onClick={handleSaveEvent}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EventEditModal
+        isOpen={isEventModalOpen}
+        onClose={closeEditEventModal}
+        onSave={handleSaveEvent}
+        editingEvent={editingEvent}
+        setEditingEvent={setEditingEvent}
+      />
     </div>
   );
 };
