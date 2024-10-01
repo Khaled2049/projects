@@ -10,20 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
-
-interface TimelineEvent {
-  id: number;
-  name: string;
-  content: string;
-}
+import { PlotEvent } from "@/types/IPlot";
 
 interface EventEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
-  editingEvent: { timelineId: number; event: TimelineEvent } | null;
+  editingEvent: { plotLineId: string; event: PlotEvent } | null;
   setEditingEvent: (
-    event: { timelineId: number; event: TimelineEvent } | null
+    event: { plotLineId: string; event: PlotEvent } | null
   ) => void;
 }
 

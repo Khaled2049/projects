@@ -9,34 +9,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { PlotLine } from "@/types/IPlot";
 
-interface TimelineEvent {
-  id: number;
-  name: string;
-  content: string;
-}
-
-interface Timeline {
-  id: number;
-  name: string;
-  description: string;
-  events: TimelineEvent[];
-}
-
-interface TimelineEditModalProps {
+interface PlotlineEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
-  editingTimeline: Timeline | null;
-  setEditingTimeline: (timeline: Timeline | null) => void;
+  editingPlotLine: PlotLine | null;
+  setEditingPlotLine: (timeline: PlotLine | null) => void;
 }
 
-export const TimelineEditModal: React.FC<TimelineEditModalProps> = ({
+export const PlotLineEditModal: React.FC<PlotlineEditModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  editingTimeline,
-  setEditingTimeline,
+  editingPlotLine,
+  setEditingPlotLine,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -44,7 +32,7 @@ export const TimelineEditModal: React.FC<TimelineEditModalProps> = ({
         <DialogHeader>
           <DialogTitle>Edit Timeline</DialogTitle>
         </DialogHeader>
-        {editingTimeline && (
+        {editingPlotLine && (
           <div className="space-y-4">
             <div>
               <label
@@ -55,10 +43,10 @@ export const TimelineEditModal: React.FC<TimelineEditModalProps> = ({
               </label>
               <Input
                 id="name"
-                value={editingTimeline.name}
+                value={editingPlotLine.name}
                 onChange={(e) =>
-                  setEditingTimeline({
-                    ...editingTimeline,
+                  setEditingPlotLine({
+                    ...editingPlotLine,
                     name: e.target.value,
                   })
                 }
@@ -74,10 +62,10 @@ export const TimelineEditModal: React.FC<TimelineEditModalProps> = ({
               </label>
               <Textarea
                 id="description"
-                value={editingTimeline.description}
+                value={editingPlotLine.description}
                 onChange={(e) =>
-                  setEditingTimeline({
-                    ...editingTimeline,
+                  setEditingPlotLine({
+                    ...editingPlotLine,
                     description: e.target.value,
                   })
                 }
