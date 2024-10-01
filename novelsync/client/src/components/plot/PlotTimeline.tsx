@@ -9,10 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TemplateData, templateData } from "@/components/data/templateData";
+
 import { PlotLineEditModal } from "./PlotlineEditModal";
 import { EventEditModal } from "./EventEditModal";
-import { PlotEvent, PlotLine } from "@/types/IPlot";
+import { PlotEvent, PlotLine, TemplateData } from "@/types/IPlot";
 import { plotService } from "./PlotService";
 import { useParams } from "react-router-dom";
 
@@ -20,6 +20,7 @@ const PlotTimeline: React.FC = () => {
   const [plotLines, setPlotLines] = useState<PlotLine[]>([]);
   const { storyId } = useParams<{ storyId: string }>();
 
+  const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [isPlotLineModalOpen, setisPlotLineModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingPlotLine, setEditingPlotLine] = useState<PlotLine | null>(null);
@@ -37,6 +38,9 @@ const PlotTimeline: React.FC = () => {
 
     const plots = await plotService.getPlots(storyId);
     setPlotLines(plots);
+
+    const data = await plotService.loadTemplateData();
+    setTemplates(data);
   };
 
   const addPlotLine = async () => {
@@ -162,6 +166,43 @@ const PlotTimeline: React.FC = () => {
     setEditingEvent(null);
   };
 
+  const addPlotLineFromTemplate = async (template: TemplateData) => {
+    console.log("Adding plotline from template:", template);
+
+    if (!storyId) {
+      console.error("No storyId provided");
+      return;
+    }
+
+    try {
+      // Add the plot first
+      const plotId = await plotService.addPlot(storyId, template.name);
+
+      // Prepare all events to be added
+      const eventPromises = template.events.map((e, idx) => {
+        const plotEvent = {
+          content: e.content,
+          name: e.name,
+          id: idx.toString(),
+        };
+        return plotService.addEvent(storyId, plotId, plotEvent);
+      });
+
+      // Add all events concurrently
+      await Promise.all(eventPromises);
+
+      console.log(
+        `Successfully added plot "${template.name}" with ${template.events.length} events`
+      );
+
+      // Reload the plots
+      loadPlots();
+    } catch (error) {
+      console.error("Error adding plot line from template:", error);
+      throw error;
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex space-x-4 mb-4">
@@ -171,7 +212,7 @@ const PlotTimeline: React.FC = () => {
         >
           Add Plot
         </button>
-        {/* <DropdownMenu>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
@@ -183,9 +224,9 @@ const PlotTimeline: React.FC = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="bg-amber-50 border border-amber-200 shadow-lg rounded-md p-1 min-w-[200px]">
-            {templateData.map((template) => (
+            {templates.map((template, idx) => (
               <DropdownMenuItem
-                key={template.id}
+                key={idx}
                 onSelect={() => addPlotLineFromTemplate(template)}
                 className="px-4 py-2 hover:bg-amber-100 text-amber-800 hover:text-amber-900 rounded-sm cursor-pointer transition-colors duration-150 ease-in-out"
               >
@@ -193,7 +234,7 @@ const PlotTimeline: React.FC = () => {
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
-        </DropdownMenu> */}
+        </DropdownMenu>
       </div>
 
       <div className="flex">

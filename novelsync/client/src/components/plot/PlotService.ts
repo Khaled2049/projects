@@ -8,7 +8,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { PlotEvent, PlotLine } from "../../types/IPlot";
+import { PlotEvent, PlotLine, TemplateData } from "../../types/IPlot";
 import { firestore } from "../../config/firebase";
 import { storiesRepo } from "../StoriesRepo";
 import { update } from "lodash";
@@ -130,6 +130,13 @@ class PlotService {
       console.error("Error getting plots:", error);
       throw error;
     }
+  }
+
+  async loadTemplateData() {
+    const templateCollection = collection(firestore, "plotTemplates");
+    const templateSnapshot = await getDocs(templateCollection);
+    const data = templateSnapshot.docs.map((doc) => doc.data() as TemplateData);
+    return data;
   }
 }
 

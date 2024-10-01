@@ -1,20 +1,8 @@
-export interface TemplateItem {
-  id: number;
-  name: string;
-  content: string;
-}
-
-export interface TemplateData {
-  id: number;
-  name: string;
-  items: TemplateItem[];
-}
-
 export const templateData = [
   {
     id: 1,
     name: "Linear Timeline",
-    items: [
+    events: [
       {
         id: 1,
         name: "Event 1",
@@ -48,7 +36,7 @@ export const templateData = [
   {
     id: 2,
     name: "Freytag's Pyramid",
-    items: [
+    events: [
       {
         id: 1,
         name: "Exposition",
@@ -90,7 +78,7 @@ export const templateData = [
   {
     id: 3,
     name: "The Hero's Journey",
-    items: [
+    events: [
       {
         id: 1,
         name: "Ordinary World",
@@ -167,7 +155,7 @@ export const templateData = [
   {
     id: 4,
     name: "The Three-Act Structure",
-    items: [
+    events: [
       {
         id: 1,
         name: "Act 1: Setup",
@@ -225,7 +213,7 @@ export const templateData = [
   {
     id: 5,
     name: "The Quest",
-    items: [
+    events: [
       {
         id: 1,
         name: "The Call",
@@ -261,7 +249,7 @@ export const templateData = [
   {
     id: 6,
     name: "Overcoming the Monster",
-    items: [
+    events: [
       {
         id: 1,
         name: "Anticipation",
@@ -300,7 +288,7 @@ export const templateData = [
   {
     id: 7,
     name: "Rags to Riches",
-    items: [
+    events: [
       {
         id: 1,
         name: "Initial Wretchedness",
