@@ -1,212 +1,152 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle, X } from "lucide-react";
 
-interface Place {
-  id: string;
-  name: string;
-  details: string;
-  climate: string;
-  population: string;
-}
+import AddPlaceModal from "@/components/places/AddPlaceModal";
 
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (place: Omit<Place, "id">) => void;
-}
+import { useParams } from "react-router-dom";
+import { Place } from "@/types/IPlace";
+import { placeService } from "@/components/places/PlaceService";
+import UpdatePlaceModal from "@/components/places/UpdatePlaceModal";
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [newPlace, setNewPlace] = useState<Omit<Place, "id">>({
-    name: "",
-    details: "",
-    climate: "",
-    population: "",
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(newPlace);
-    setNewPlace({ name: "", details: "", climate: "", population: "" });
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Add New Place</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={newPlace.name}
-            onChange={(e) => setNewPlace({ ...newPlace, name: e.target.value })}
-            placeholder="Place name"
-            className="w-full p-2 mb-2 border border-amber-300 rounded-md"
-            required
-          />
-          <textarea
-            value={newPlace.details}
-            onChange={(e) =>
-              setNewPlace({ ...newPlace, details: e.target.value })
-            }
-            placeholder="Details"
-            className="w-full p-2 mb-2 border border-amber-300 rounded-md"
-            required
-          />
-          <input
-            type="text"
-            value={newPlace.climate}
-            onChange={(e) =>
-              setNewPlace({ ...newPlace, climate: e.target.value })
-            }
-            placeholder="Climate"
-            className="w-full p-2 mb-2 border border-amber-300 rounded-md"
-            required
-          />
-          <input
-            type="text"
-            value={newPlace.population}
-            onChange={(e) =>
-              setNewPlace({ ...newPlace, population: e.target.value })
-            }
-            placeholder="Population"
-            className="w-full p-2 mb-4 border border-amber-300 rounded-md"
-            required
-          />
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="mr-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700"
-            >
-              Add Place
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-const Places: React.FC = () => {
-  const [places, setPlaces] = useState<Place[]>([
-    {
-      id: "1",
-      name: "Mystic Forest",
-      details: "A dense, magical forest with ancient trees.",
-      climate: "Temperate",
-      population: "Sparse",
-    },
-    {
-      id: "2",
-      name: "Crystal City",
-      details: "A futuristic city with buildings made of crystal.",
-      climate: "Controlled",
-      population: "Dense",
-    },
-  ]);
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const places: React.FC = () => {
+  const { storyId } = useParams<{ storyId: string }>();
+  const [places, setplaces] = useState<Place[]>([]);
+  const [selectedplace, setSelectedplace] = useState<Place | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [placeToUpdate, setplaceToUpdate] = useState<Place | null>(null);
 
   useEffect(() => {
-    if (places.length > 0 && !selectedPlace) {
-      setSelectedPlace(places[0]);
-    }
-  }, [places, selectedPlace]);
+    loadplaces();
+  }, [storyId]);
 
-  const addPlace = (newPlace: Omit<Place, "id">) => {
-    const place: Place = {
-      ...newPlace,
-      id: Date.now().toString(),
-    };
-    setPlaces([...places, place]);
-    setIsModalOpen(false);
+  const removePlace = async (id: string) => {
+    if (!storyId) return;
+    await placeService.deletePlace(storyId, id);
+    setplaces(places.filter((place) => place.id !== id));
   };
 
-  const deletePlace = (id: string) => {
-    setPlaces(places.filter((place) => place.id !== id));
-    if (selectedPlace?.id === id) {
-      setSelectedPlace(null);
+  const loadplaces = async () => {
+    if (!storyId) return;
+    const places = await placeService.getPlaces(storyId);
+    setplaces(places);
+  };
+
+  const handleplaceClick = (place: Place) => {
+    setSelectedplace(place);
+  };
+
+  const handleAddplace = (newplace: Place) => {
+    setplaces([...places, newplace]);
+    setIsAddModalOpen(false);
+  };
+
+  const handleUpdateplace = (updatedplace: Place) => {
+    setplaces((prevplaces) =>
+      prevplaces.map((place) =>
+        place.id === updatedplace.id ? updatedplace : place
+      )
+    );
+    setIsUpdateModalOpen(false);
+    setplaceToUpdate(null);
+    if (selectedplace?.id === updatedplace.id) {
+      setSelectedplace(updatedplace);
     }
   };
+
+  const handleDeleteplace = async (placeId: string) => {
+    if (!storyId) return;
+    try {
+      await placeService.deletePlace(storyId, placeId);
+      setplaces((prevplaces) =>
+        prevplaces.filter((place) => place.id !== placeId)
+      );
+      if (selectedplace?.id === placeId) {
+        setSelectedplace(null);
+      }
+    } catch (error) {
+      console.error("Error deleting place:", error);
+    }
+  };
+
+  if (!storyId) {
+    return (
+      <div>Story ID not found in URL. Please check the URL and try again.</div>
+    );
+  }
 
   return (
-    <div className="p-6 bg-amber-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-amber-800 mb-6">Places</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Column - Place List */}
-        <div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mb-4 bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 transition-colors flex items-center"
-          >
-            <PlusCircle size={20} className="mr-2" />
-            Add New Place
-          </button>
-
-          <ul className="space-y-2 overflow-y-auto max-h-[calc(100vh-250px)]">
-            {places.map((place) => (
-              <li
-                key={place.id}
-                className={`p-2 rounded-md cursor-pointer flex justify-between items-center ${
-                  selectedPlace?.id === place.id
-                    ? "bg-amber-200"
-                    : "bg-white hover:bg-amber-100"
-                }`}
-                onClick={() => setSelectedPlace(place)}
+    <div className="flex h-screen">
+      <div className="w-1/2 p-4 border-r">
+        <h2 className="text-xl font-bold mb-4">places</h2>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          Add place
+        </button>
+        <ul>
+          {places.map((place) => (
+            <li
+              key={place.id}
+              className="flex items-center justify-between hover:bg-gray-100 p-2"
+            >
+              <span
+                className="cursor-pointer"
+                onClick={() => handleplaceClick(place)}
               >
-                <span>{place.name}</span>
+                {place.name}
+              </span>
+              <div>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deletePlace(place.id);
+                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                  onClick={() => {
+                    setplaceToUpdate(place);
+                    setIsUpdateModalOpen(true);
                   }}
-                  className="text-red-500 hover:text-red-700 transition-colors"
                 >
-                  <X size={20} />
+                  Update
                 </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Right Column - Place Details */}
-        <div className="bg-white p-4 rounded-md shadow-md">
-          {selectedPlace ? (
-            <div>
-              <h2 className="text-2xl font-bold text-amber-800 mb-4">
-                {selectedPlace.name}
-              </h2>
-              <p className="mb-2">
-                <strong>Details:</strong> {selectedPlace.details}
-              </p>
-              <p className="mb-2">
-                <strong>Climate:</strong> {selectedPlace.climate}
-              </p>
-              <p>
-                <strong>Population:</strong> {selectedPlace.population}
-              </p>
-            </div>
-          ) : (
-            <p className="text-gray-500">Select a place to view details</p>
-          )}
-        </div>
+                <button
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                  onClick={() => handleDeleteplace(place.id)}
+                >
+                  Remove
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={addPlace}
-      />
+      <div className="w-1/2 p-4">
+        <h2 className="text-xl font-bold mb-4">place Details</h2>
+        {selectedplace ? (
+          <div>
+            <h3 className="text-lg font-semibold">{selectedplace.name}</h3>
+            <p>Description: {selectedplace.description}</p>
+            {selectedplace.notes && <p>Notes: {selectedplace.notes}</p>}
+          </div>
+        ) : (
+          <p>Select a place to view details</p>
+        )}
+      </div>
+      {isAddModalOpen && storyId && (
+        <AddPlaceModal
+          storyId={storyId}
+          onClose={() => setIsAddModalOpen(false)}
+          onAddPlace={handleAddplace}
+        />
+      )}
+      {isUpdateModalOpen && storyId && placeToUpdate && (
+        <UpdatePlaceModal
+          storyId={storyId}
+          place={placeToUpdate}
+          onClose={() => setIsUpdateModalOpen(false)}
+          onUpdateplace={handleUpdateplace}
+        />
+      )}
     </div>
   );
 };
 
-export default Places;
+export default places;
