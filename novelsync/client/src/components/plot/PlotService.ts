@@ -11,7 +11,6 @@ import {
 import { PlotEvent, PlotLine, TemplateData } from "../../types/IPlot";
 import { firestore } from "../../config/firebase";
 import { storiesRepo } from "../StoriesRepo";
-import { update } from "lodash";
 
 class PlotService {
   private storiesCollection = collection(firestore, "stories");
