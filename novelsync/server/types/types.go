@@ -21,6 +21,20 @@ type User struct {
 	CreatedAt string `json:"createdAt"` // Keep as camelCase
 }
 
+type Book struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	PublishedAt string `json:"publishedAt"`
+	CreatedAt   string `json:"createdAt"`
+}
+
+type BookStore interface {
+	GetBooks() ([]Book, error)
+	GetBookByID(id int) (*Book, error)
+	CreateBook(Book) error
+}
+
 type UserStore interface {
 	GetUserByEmail(email string) (*User, error)
 	GetUserByID(id int) (*User, error)
