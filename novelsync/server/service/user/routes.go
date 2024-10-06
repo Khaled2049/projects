@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"github.com/khaled2049/backend/config"
 	"github.com/khaled2049/backend/service/auth"
 	"github.com/khaled2049/backend/types"
 	"github.com/khaled2049/backend/utils"
@@ -20,10 +21,13 @@ func NewHandler(store types.UserStore) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(route *mux.Router) {
-	route.HandleFunc("/user", h.createUser).Methods("POST")
+	route.HandleFunc("/register", h.createUser).Methods("POST")
+	route.HandleFunc("/login", h.handleLogin).Methods("POST")
+	route.HandleFunc("/health", h.healthCheck).Methods("GET")
 }
 
 func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
+
 	var user types.RegisterUserPayload
 	if err := utils.ParseJSON(r, &user); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
@@ -62,4 +66,47 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJson(w, http.StatusCreated, nil)
+}
+
+func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
+	var user types.LoginUserPayload
+	if err := utils.ParseJSON(r, &user); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(user); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload: %v", errors))
+		return
+	}
+
+	// check if user exists
+	userData, err := h.store.GetUserByEmail(user.Email)
+	if err != nil {
+		fmt.Println("error", err)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s not found", user.Email))
+		return
+	}
+
+	// compare password
+	if !auth.ComparePassword(userData.Password, []byte(user.Password)) {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid password or email"))
+		return
+	}
+
+	// create jwt token
+	secret := []byte(config.Env.JWTSecret)
+	token, err := auth.CreateJWT([]byte(secret), userData.ID)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJson(w, http.StatusOK, map[string]string{"token": token})
+}
+
+func (h *Handler) healthCheck(w http.ResponseWriter, r *http.Request) {
+	utils.WriteJson(w, http.StatusOK, nil)
 }

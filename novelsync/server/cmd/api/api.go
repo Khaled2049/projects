@@ -23,10 +23,11 @@ func (s *APIServer) Start() error {
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
 	userStore := user.NewStore(s.db)
-
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoutes(subrouter)
 
 	log.Println("Starting server on", s.addr)
-	return http.ListenAndServe(s.addr, nil)
+
+	// Pass the router to http.ListenAndServe, not nil
+	return http.ListenAndServe(s.addr, router)
 }

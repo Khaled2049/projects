@@ -7,13 +7,18 @@ type RegisterUserPayload struct {
 	Password  string `json:"password" validate:"required,min=3,max=130"`
 }
 
+type LoginUserPayload struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
 type User struct {
 	ID        int    `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"firstName"` // Keep as camelCase
+	LastName  string `json:"lastName"`  // Keep as camelCase
 	Email     string `json:"email"`
 	Password  string `json:"password"`
-	CreatedAt string `json:"created_at"`
+	CreatedAt string `json:"createdAt"` // Keep as camelCase
 }
 
 type UserStore interface {
