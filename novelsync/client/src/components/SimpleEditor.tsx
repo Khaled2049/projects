@@ -34,9 +34,8 @@ export function SimpleEditor() {
   const { storyId } = useParams<{ storyId: string }>();
   const [rightColumnVisible, setRightColumnVisible] = useState(true);
   const [aitoolsVisible, setAitoolsVisible] = useState(true);
-  const [savingMessage, setSavingMessage] = useState("");
+
   const [selectedText, setSelectedText] = useState("");
-  const [updateMsg, setUpdateMsg] = useState(false);
 
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -415,7 +414,7 @@ export function SimpleEditor() {
           <div className="flex my-3">
             <EditorHeader editor={editor} />
           </div>
-          <button
+          {/* <button
             className="w-full p-2 mb-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
             onClick={() =>
               handleSave(
@@ -427,11 +426,11 @@ export function SimpleEditor() {
             }
           >
             Save
-          </button>
+          </button> */}
 
           {currentStory && (
             <button
-              className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="w-full p-2 mb-2 bg-green-500 text-white rounded hover:bg-green-600"
               onClick={handlePublish}
               disabled={currentStory.isPublished}
             >

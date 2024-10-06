@@ -51,7 +51,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({
   const { user } = useAuthContext();
 
   const loadMorePosts = () => {
-    if (loading || !hasMore || !user) return;
+    if (!loading || !hasMore || !user) return;
 
     setLoading(true);
 

@@ -3,11 +3,11 @@ import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
-import { Menu, Search, User } from "lucide-react";
+import { Loader, Menu, Search, User } from "lucide-react";
 
 const Navbar = () => {
   const { signout } = useFirebaseAuth();
-  const { user } = useAuthContext();
+  const { user, loading } = useAuthContext();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -103,7 +103,12 @@ const Navbar = () => {
           {/* Search Bar */}
 
           {/* User Dropdown */}
-          {user ? (
+          {loading ? (
+            <div className="flex items-center space-x-2">
+              <Loader className="w-8 h-8 animate-spin" />
+              <span>Loading...</span>
+            </div>
+          ) : user ? (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}

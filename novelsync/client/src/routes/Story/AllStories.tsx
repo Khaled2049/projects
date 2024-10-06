@@ -7,7 +7,7 @@ import RandomTopic from "../../components/RandomTopic";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
 
 const AllStories: React.FC = () => {
-  const { user } = useAuthContext();
+  const { user, loading: userLoading } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -61,7 +61,7 @@ const AllStories: React.FC = () => {
         {user ? (
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
-              <span>Welcome back, {user.username}!</span>
+              <span>Welcome back, {user.username || ""}!</span>
               <button
                 onClick={handleNewStory}
                 className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"
@@ -85,6 +85,7 @@ const AllStories: React.FC = () => {
             </h1>
           </div>
         )}
+
         <div className="flex flex-wrap mx-4">
           <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700 space-y-4">
             <RandomTopic />
