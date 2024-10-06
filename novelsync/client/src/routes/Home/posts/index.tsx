@@ -1,35 +1,52 @@
 import React, { useEffect, useState } from "react";
 import { User, Send, BookOpen } from "lucide-react";
-import { usePosts } from "../../../contexts/PostsContext";
-import { useInView } from "react-intersection-observer";
+import { IPost } from "@/types/IPost";
+import { postsService } from "@/components/posts/PostService";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { v4 as uuidv4 } from "uuid";
 
 const Posts = () => {
   const [post, setPost] = useState("");
-  const {
-    createPost,
-    allPosts,
-    followingPosts,
-    loading,
-    hasMore,
-    loadMorePosts,
-  } = usePosts();
+  const [followingPosts, setFollowingPosts] = useState<IPost[]>([]);
+  const [allPosts, setAllPosts] = useState<IPost[]>([]);
+
   const [isMyFeed, setIsMyFeed] = useState(true);
-  const { ref, inView } = useInView({
-    threshold: 0,
-  });
 
+  const { user } = useAuthContext();
   useEffect(() => {
-    if (inView && !loading && hasMore) {
-      loadMorePosts();
-    }
-  }, [inView, loading, hasMore]);
+    loadPosts();
+    getFollowedPosts();
+  }, [user]);
 
-  const handlePostSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const loadPosts = async () => {
+    if (!user) return;
+    const posts = await postsService.getAllPosts();
 
-    createPost(post);
-    setPost("");
+    setAllPosts(posts);
   };
+
+  const getFollowedPosts = async () => {
+    if (!user) return;
+    const posts = await postsService.getFollowingPosts(user.uid);
+
+    setFollowingPosts(posts);
+  };
+
+  const handlePostSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    const p: IPost = {
+      id: uuidv4(),
+      authorName: user.displayName || "",
+      content: post,
+      createdAt: new Date(),
+    };
+    await postsService.addPost(user.uid, p);
+    setPost("");
+    loadPosts();
+  };
+
   return (
     <div className="w-full lg:w-1/2 bg-amber-50 p-4 overflow-y-auto  border-amber-200">
       <form onSubmit={handlePostSubmit} className="mb-6">
@@ -76,7 +93,7 @@ const Posts = () => {
       {isMyFeed
         ? followingPosts.map((post, index) => (
             <div
-              key={post.id}
+              key={index}
               className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
             >
               <div className="flex items-center mb-2 justify-between">
@@ -99,7 +116,7 @@ const Posts = () => {
           ))
         : allPosts.map((post, index) => (
             <div
-              key={post.id}
+              key={index}
               className="bg-amber-50 shadow rounded-lg p-4 mb-4 border border-amber-200"
             >
               <div className="flex items-center mb-2 justify-between">
@@ -120,22 +137,6 @@ const Posts = () => {
               </div>
             </div>
           ))}
-
-      {}
-
-      {loading && (
-        <div className="text-center p-4 bg-amber-100 rounded">
-          Loading more posts...
-        </div>
-      )}
-      {!loading && !hasMore && (
-        <div className="text-center p-4 bg-amber-200 rounded text-amber-800">
-          No more posts to load
-        </div>
-      )}
-      <div ref={ref} className="h-10">
-        {loading && <div>Loading...</div>}
-      </div>
     </div>
   );
 };

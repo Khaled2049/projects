@@ -106,7 +106,6 @@ const Navbar = () => {
           {loading ? (
             <div className="flex items-center space-x-2">
               <Loader className="w-8 h-8 animate-spin" />
-              <span>Loading...</span>
             </div>
           ) : user ? (
             <div className="relative" ref={dropdownRef}>
