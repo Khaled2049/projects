@@ -43,7 +43,7 @@ const PrivateRoute = () => {
   const getStoryById = async (storyId: string) => {
     try {
       const storyData = await storiesRepo.getStory(storyId);
-      return storyData; // Assuming this returns the story object
+      return storyData;
     } catch (error) {
       console.error("Error fetching story:", error);
       return null;

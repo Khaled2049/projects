@@ -34,9 +34,15 @@ class PlaceService {
       const placesCollection = collection(storyRef, "places");
       const newplaceRef = doc(placesCollection);
 
+      const story = await getDoc(storyRef);
+      if (!story.exists()) {
+        throw new Error("Story not found");
+      }
+
       const newplace: Place = {
         ...place,
         id: newplaceRef.id,
+        creator: story.data().userId,
       };
 
       await setDoc(newplaceRef, newplace);

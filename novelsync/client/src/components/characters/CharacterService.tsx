@@ -38,9 +38,15 @@ class CharacterService {
       const charactersCollection = collection(storyRef, "characters");
       const newCharacterRef = doc(charactersCollection);
 
+      const story = await getDoc(storyRef);
+      if (!story.exists()) {
+        throw new Error("Story not found");
+      }
+
       const newCharacter: Character = {
         ...character,
         id: newCharacterRef.id,
+        creator: story.data().userId,
       };
 
       await setDoc(newCharacterRef, newCharacter);
