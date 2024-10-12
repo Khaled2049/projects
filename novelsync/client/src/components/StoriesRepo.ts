@@ -18,6 +18,7 @@ export interface Chapter {
   content: string;
   order: number;
   wordCount: number;
+  creator: string;
 }
 
 export interface Story {
@@ -233,6 +234,7 @@ class StoriesRepo {
         content: "",
         order: story.chapterCount,
         wordCount: 0,
+        creator: story.userId,
       };
 
       await setDoc(newChapterRef, newChapter);

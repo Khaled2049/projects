@@ -4,4 +4,5 @@ export interface Place {
   description: string;
   notes: string;
   storyId: string;
+  creator: string;
 }

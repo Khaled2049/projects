@@ -26,6 +26,7 @@ import { NavbarWrapper } from "./NavbarWrapper";
 import { AIProvider } from "./contexts/AIContext";
 import { EditorProvider } from "./contexts/EditorContext";
 import { BookClubProvider } from "./contexts/BookClubContext";
+import PrivateRoute from "./routes/PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -70,7 +71,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/create/:storyId",
-        element: <Story />,
+        element: <PrivateRoute />,
         children: [
           { index: true, element: <CreateStory /> },
           { path: "dashboard", element: <Dashboard /> },
@@ -85,7 +86,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/story/:id",
-        element: <StoryDetail />, // Add the route for the novel detail
+        element: <StoryDetail />,
       },
     ],
   },

@@ -9,6 +9,7 @@ export interface PlotLine {
   name: string;
   description: string;
   events: PlotEvent[];
+  creator: string;
 }
 
 export interface TemplateItem {
