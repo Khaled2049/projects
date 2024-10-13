@@ -18,7 +18,7 @@ export interface Chapter {
   content: string;
   order: number;
   wordCount: number;
-  creator: string;
+  userId: string;
 }
 
 export interface Story {
@@ -198,7 +198,20 @@ class StoriesRepo {
       likes: 0,
     };
     await setDoc(newStoryRef, newStory);
+
+    try {
+      await this.addChapter(newStoryRef.id, "Chapter 1");
+    } catch (error) {
+      console.error("Error adding first chapter:", error);
+      throw error;
+    }
+
     return newStoryRef.id;
+  }
+
+  async deleteStory(storyId: string): Promise<void> {
+    const storyRef = doc(this.storiesCollection, storyId);
+    await deleteDoc(storyRef);
   }
 
   async updateStory(
@@ -234,7 +247,7 @@ class StoriesRepo {
         content: "",
         order: story.chapterCount,
         wordCount: 0,
-        creator: story.userId,
+        userId: story.userId,
       };
 
       await setDoc(newChapterRef, newChapter);
@@ -342,14 +355,30 @@ class StoriesRepo {
     }
   }
 
-  async publishStory(storyId: string): Promise<void> {
-    const storyRef = doc(this.storiesCollection, storyId);
-    await updateDoc(storyRef, {
-      isPublished: true,
-      updatedAt: new Date(),
-    });
-  }
+  async handlePublish(storyId: string): Promise<void> {
+    try {
+      const storyRef = doc(this.storiesCollection, storyId);
 
+      const story = await this.getStory(storyId);
+      if (!story) {
+        throw new Error("Story not found");
+      }
+
+      await updateDoc(storyRef, {
+        isPublished: !story.isPublished,
+        updatedAt: new Date(),
+      });
+
+      console.log(
+        `Story ${storyId} successfully ${
+          story.isPublished ? "unpublished" : "published"
+        }`
+      );
+    } catch (error) {
+      console.error(`Failed to update story ${storyId}:`, error);
+      throw error; // Re-throw if you need to propagate the error
+    }
+  }
   private countWords(text: string): number {
     return text.trim().split(/\s+/).length;
   }

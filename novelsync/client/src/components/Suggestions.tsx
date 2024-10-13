@@ -4,6 +4,8 @@ import { Book, Feather, Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useEditorContext } from "../contexts/EditorContext";
+import { storiesRepo } from "./StoriesRepo";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const Suggestions = () => {
   const [desire, setDesire] = useState("");
@@ -14,7 +16,7 @@ const Suggestions = () => {
   const navigate = useNavigate();
 
   const { setsuggestion } = useEditorContext();
-
+  const { user } = useAuthContext();
   const aiGenerator = new AITextGenerator(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +39,16 @@ const Suggestions = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSuggestionClick = async (suggestion: string) => {
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+    const newStoryId = await storiesRepo.createStory("New Story", "", user.uid);
+    setsuggestion(suggestion);
+    setDesire("");
+    navigate(`/create/${newStoryId}`);
   };
 
   const handleHideSuggestions = () => {
@@ -106,11 +118,7 @@ const Suggestions = () => {
             <div
               key={index}
               className="mb-2 sm:mb-3 p-2 sm:p-3 bg-amber-50 rounded-md hover:bg-amber-100 cursor-pointer transition-colors duration-200"
-              onClick={() => {
-                // setsuggestion in context
-                setsuggestion(suggestion);
-                navigate("/create-story");
-              }}
+              onClick={() => handleSuggestionClick(suggestion)}
             >
               <p className="text-xs sm:text-sm text-amber-900 font-serif">
                 {suggestion}

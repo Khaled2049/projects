@@ -42,7 +42,7 @@ class PlaceService {
       const newplace: Place = {
         ...place,
         id: newplaceRef.id,
-        creator: story.data().userId,
+        userId: story.data().userId,
       };
 
       await setDoc(newplaceRef, newplace);

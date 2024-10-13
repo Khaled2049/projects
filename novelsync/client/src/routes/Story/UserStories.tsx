@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "../../contexts/AuthContext";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaEyeSlash, FaTrash } from "react-icons/fa";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
 
 const UserStories = () => {
@@ -29,10 +29,23 @@ const UserStories = () => {
     navigate(`/create/${storyId}`);
   };
 
+  const deleteStory = async (storyId: string) => {
+    if (!user) return;
+
+    await storiesRepo.deleteStory(storyId);
+    await loadStories();
+  };
+
   const loadStories = async () => {
     if (!user) return;
     const storyList = await storiesRepo.getUserStories(user?.uid);
     setStories(storyList);
+  };
+
+  const unPublishStory = async (storyId: string) => {
+    if (!user) return;
+    await storiesRepo.handlePublish(storyId);
+    await loadStories();
   };
 
   if (loading) {
@@ -40,7 +53,7 @@ const UserStories = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="mx-auto p-6 bg-amber-50 min-h-screen">
       <div className="flex space-x-6">
         {/* Drafts Column */}
         <div className="w-1/2 space-y-6 overflow-y-auto">
@@ -53,17 +66,25 @@ const UserStories = () => {
                 !story.isPublished && (
                   <div
                     key={story.id}
-                    className="bg-amber-50 p-4 rounded-lg shadow-sm mb-4"
+                    className="bg-amber-100 p-4 rounded-lg shadow-sm mb-4"
                   >
                     <h3 className="font-serif text-xl text-amber-900 mb-2">
                       {story.title}
                     </h3>
-                    <button
-                      onClick={() => editStory(story.id)}
-                      className="bg-green-500 flex px-3 py-2 text-white rounded hover:bg-green-700"
-                    >
-                      <FaEdit className="mr-1" /> Edit
-                    </button>
+                    <div className="flex">
+                      <button
+                        onClick={() => editStory(story.id)}
+                        className="bg-green-500 flex px-3 py-2 mx-2 text-white rounded hover:bg-green-700"
+                      >
+                        <FaEdit className="mr-1" /> Edit
+                      </button>
+                      <button
+                        onClick={() => deleteStory(story.id)}
+                        className="bg-red-500 flex px-3 py-2 text-white rounded hover:bg-red-700"
+                      >
+                        <FaTrash className="mr-1" /> Delete
+                      </button>
+                    </div>
                   </div>
                 )
             )
@@ -80,17 +101,26 @@ const UserStories = () => {
                 story.isPublished && (
                   <div
                     key={story.id}
-                    className="bg-amber-50 p-4 rounded-lg shadow-sm mb-4"
+                    className="bg-amber-100 p-4 rounded-lg shadow-sm mb-4"
                   >
                     <h3 className="font-serif text-xl text-amber-900 mb-2">
                       {story.title}
                     </h3>
-                    <button
-                      onClick={() => editStory(story.id)}
-                      className="bg-green-500 flex px-3 py-2 text-white rounded hover:bg-green-700"
-                    >
-                      <FaEdit className="mr-1" /> Edit
-                    </button>
+                    <div className="flex">
+                      <button
+                        onClick={() => editStory(story.id)}
+                        className="bg-green-500 flex px-3 py-2 text-white rounded hover:bg-green-700"
+                      >
+                        <FaEdit className="mr-1" /> Edit
+                      </button>
+                      {/* Unpublish button */}
+                      <button
+                        onClick={() => unPublishStory(story.id)}
+                        className="bg-red-500 flex px-3 py-2 mx-2 text-white rounded hover:bg-red-700"
+                      >
+                        <FaEyeSlash className="mr-1" />
+                      </button>
+                    </div>
                   </div>
                 )
             )

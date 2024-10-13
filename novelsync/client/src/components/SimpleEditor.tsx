@@ -19,7 +19,7 @@ import ListItem from "@tiptap/extension-list-item";
 import { storiesRepo, Story, Chapter } from "./StoriesRepo";
 
 const limit = 5000;
-import { Book } from "lucide-react";
+import { Book, Loader } from "lucide-react";
 
 import EditorHeader from "./EditorHeader";
 import { useAI } from "../contexts/AIContext";
@@ -28,12 +28,14 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { useEditorContext } from "../contexts/EditorContext";
 import AIPartners from "./AIPartners";
 import AITools from "./AITools";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export function SimpleEditor() {
+  const navigate = useNavigate();
   const { storyId } = useParams<{ storyId: string }>();
-  const [rightColumnVisible, setRightColumnVisible] = useState(true);
-  const [aitoolsVisible, setAitoolsVisible] = useState(true);
+
+  const [rightColumnVisible, setRightColumnVisible] = useState(false);
+  const [aitoolsVisible, setAitoolsVisible] = useState(false);
 
   const [selectedText, setSelectedText] = useState("");
 
@@ -44,6 +46,10 @@ export function SimpleEditor() {
   const [storyDescription, setStoryDescription] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
+  const [storyLoading, setStoryLoading] = useState(true);
+  const storyTitleRef = useRef(storyTitle);
+  const storyDescriptionRef = useRef(storyDescription);
+  const chapterTitleRef = useRef(chapterTitle);
 
   const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
   const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
@@ -145,12 +151,12 @@ export function SimpleEditor() {
     content: "",
     onUpdate: ({ editor }) => {
       const content = editor.getHTML();
-
-      debouncedSave(storyTitle, storyDescription, chapterTitle, content);
+      debouncedSave(content);
     },
   }) as Editor;
 
   const loadStory = async (storyId: string) => {
+    setStoryLoading(true);
     const story = await storiesRepo.getStory(storyId);
 
     if (story) {
@@ -163,10 +169,12 @@ export function SimpleEditor() {
         setCurrentChapter(storyChapters[0]);
         setChapterTitle(storyChapters[0].title);
         editor?.commands.setContent(storyChapters[0].content);
+        setStoryLoading(false);
       } else {
         setCurrentChapter(null);
         setChapterTitle("");
         editor?.commands.setContent("");
+        setStoryLoading(false);
       }
     }
   };
@@ -184,17 +192,17 @@ export function SimpleEditor() {
       }
       setSaveStatus("Saving...");
       try {
-        try {
+        const saveChapter = async () => {
           if (currentChapter) {
             // Update existing chapter
-
             await storiesRepo.updateChapter(
               currentStory.id,
               currentChapter.id,
               chapterTitle,
               content
             );
-          } else if (content.trim() !== "" || chapterTitle.trim() !== "") {
+          } else if (content.trim() || chapterTitle.trim()) {
+            // Add new chapter if content or title is not empty
             const newChapterId = await storiesRepo.addChapter(
               currentStory.id,
               chapterTitle
@@ -209,38 +217,49 @@ export function SimpleEditor() {
               currentStory.id,
               newChapterId
             );
+
             if (newChapter) {
               setCurrentChapter(newChapter);
-              setChapters([...chapters, newChapter]);
+              setChapters((prevChapters) => [...prevChapters, newChapter]);
             }
           }
+        };
 
-          await storiesRepo.updateStory(
-            currentStory.id,
-            storyTitle,
-            storyDescription
-          );
+        // Save chapter and story
+        await saveChapter();
+        await storiesRepo.updateStory(
+          currentStory.id,
+          storyTitle,
+          storyDescription
+        );
 
-          setSaveStatus("Saved");
-        } catch (error) {
-          console.error("Error saving:", error);
-          setSaveStatus(
-            error instanceof Error ? error.message : "Error saving"
-          );
-        }
+        setChapters((prevChapters) =>
+          prevChapters.map((chapter) =>
+            chapter.id === currentChapter?.id
+              ? { ...chapter, title: chapterTitle, content }
+              : chapter
+          )
+        );
+
         setSaveStatus("Saved");
       } catch (error) {
         console.error("Error saving:", error);
         setSaveStatus(error instanceof Error ? error.message : "Error saving");
+      } finally {
+        setTimeout(() => setSaveStatus(""), 2000);
       }
-      setTimeout(() => setSaveStatus(""), 2000);
     },
-    [currentStory, currentChapter]
+    [currentStory, currentChapter, chapters]
   );
 
   const debouncedSave = useCallback(
-    debounce((storyTitle, storyDescription, chapterTitle, content: any) => {
-      handleSave(storyTitle, storyDescription, chapterTitle, content);
+    debounce((content) => {
+      handleSave(
+        storyTitleRef.current,
+        storyDescriptionRef.current,
+        chapterTitleRef.current,
+        content
+      );
     }, 2000),
     [handleSave]
   );
@@ -276,10 +295,16 @@ export function SimpleEditor() {
 
   const handlePublish = async () => {
     if (!currentStory) return;
-    await storiesRepo.publishStory(currentStory.id);
-    setSaveStatus("Published");
+    await storiesRepo.handlePublish(currentStory.id);
+    navigate("/stories");
     setTimeout(() => setSaveStatus(""), 2000);
   };
+
+  useEffect(() => {
+    storyTitleRef.current = storyTitle;
+    storyDescriptionRef.current = storyDescription;
+    chapterTitleRef.current = chapterTitle;
+  }, [storyTitle, storyDescription, chapterTitle]);
 
   useEffect(() => {
     if (selectedAI) {
@@ -331,6 +356,14 @@ export function SimpleEditor() {
     }
   };
 
+  const handleChange =
+    (setter: (value: string) => void) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setter(e.target.value);
+      const content = editor.getHTML();
+      debouncedSave(content);
+    };
+
   return (
     <div className="flex p-2 mt-4 justify-center overflow-auto">
       <BubbleMenu
@@ -366,187 +399,183 @@ export function SimpleEditor() {
         </div>
       </BubbleMenu>
 
-      <div className="flex h-screen w-full">
-        <div
-          className={`p-4 bg-amber-50 rounded-lg shadow-lg overflow-y-auto transition-all duration-300 ${
-            rightColumnVisible ? "w-2/3" : "w-full"
-          }`}
-        >
-          <h1 className="mb-4 text-3xl font-bold text-slate-800 italic">
-            Summon your ultimate writing muse by pressing{" "}
-            <span className="underline decoration-wavy text-blue-600">TAB</span>
-          </h1>
-          <input
-            type="text"
-            value={storyTitle}
-            onChange={(e) => setStoryTitle(e.target.value)}
-            placeholder="Story Title"
-            className="w-full p-2 mb-2 border border-gray-700 rounded"
-          />
-          <textarea
-            value={storyDescription}
-            onChange={(e) => setStoryDescription(e.target.value)}
-            placeholder="Story Description"
-            className="w-full p-2 mb-4 border border-gray-700 rounded"
-            rows={3}
-          />
-          <input
-            type="text"
-            value={chapterTitle}
-            onChange={(e) => setChapterTitle(e.target.value)}
-            placeholder="Chapter Title"
-            className="w-full p-2 mb-4 border border-gray-700 rounded"
-          />
-          <div className="bg-white p-4 rounded-lg border border-gray-300">
-            <div className="min-h-[28rem] w-full flex justify-center">
-              <div className="w-full focus:outline-none bg-white selection:bg-blue-100">
-                <EditorContent
-                  onClick={() => editor?.commands.focus()}
-                  className="w-full focus:outline-none bg-white selection:bg-blue-100"
-                  editor={editor}
-                />
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="text-sm text-gray-400">{saveStatus}</div>
+      {storyLoading ? (
+        <div className="text-amber-800">
+          <Loader className="w-12 h-12" />
+        </div>
+      ) : (
+        <div className="flex h-screen w-full">
+          <div
+            className={`p-4 bg-amber-50 rounded-lg shadow-lg overflow-y-auto transition-all duration-300 ${
+              rightColumnVisible ? "w-2/3" : "w-full"
+            }`}
+          >
+            <h1 className="mb-4 text-3xl font-bold text-slate-800 italic">
+              Summon your ultimate writing muse by pressing{" "}
+              <span className="underline decoration-wavy text-blue-600">
+                TAB
+              </span>
+            </h1>
+
+            <div className="text-sm text-gray-400">{saveStatus}</div>
+
+            <input
+              type="text"
+              value={storyTitle}
+              onChange={handleChange(setStoryTitle)}
+              placeholder="Story Title"
+              className="w-full p-2 mb-2 border border-gray-700 rounded"
+            />
+
+            <textarea
+              value={storyDescription}
+              onChange={handleChange(setStoryDescription)}
+              placeholder="Chapter Notes"
+              className="w-full p-2 mb-4 border border-gray-700 rounded"
+              rows={3}
+            />
+
+            <input
+              type="text"
+              value={chapterTitle}
+              onChange={handleChange(setChapterTitle)}
+              placeholder="Chapter Title"
+              className="w-full p-2 mb-4 border border-gray-700 rounded"
+            />
+            <div className="bg-white p-4 rounded-lg border border-gray-300">
+              <div className="min-h-[28rem] w-full flex justify-center">
+                <div className="w-full focus:outline-none bg-white selection:bg-blue-100">
+                  <EditorContent
+                    onClick={() => editor?.commands.focus()}
+                    className="w-full focus:outline-none bg-white selection:bg-blue-100"
+                    editor={editor}
+                  />
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex my-3">
-            <EditorHeader editor={editor} />
-          </div>
-          {/* <button
-            className="w-full p-2 mb-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
-            onClick={() =>
-              handleSave(
-                storyTitle,
-                storyDescription,
-                chapterTitle,
-                editor?.getHTML()
-              )
-            }
-          >
-            Save
-          </button> */}
-
-          {currentStory && (
-            <button
-              className="w-full p-2 mb-2 bg-green-500 text-white rounded hover:bg-green-600"
-              onClick={handlePublish}
-              disabled={currentStory.isPublished}
-            >
-              {currentStory.isPublished ? "Published" : "Publish"}
-            </button>
-          )}
-          <button
-            onClick={handleNewChapter}
-            className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            New Chapter
-          </button>
-        </div>
-
-        {/* AI Tools */}
-        <div
-          className={`transition-all duration-300 bg-amber-100 mx-2 ${
-            aitoolsVisible ? "w-1/3" : "w-24"
-          } flex flex-col`}
-        >
-          <div className="p-2 bg-amber-500 text-white rounded-t-lg hover:bg-amber-600 flex justify-center">
-            {aitoolsVisible ? (
-              <button
-                onClick={toggleAiTools}
-                className="flex items-center h-12 justify-center w-full"
-              >
-                <span className="flex items-center space-x-2">
-                  <span>Hide Tools</span>
-                </span>
-              </button>
-            ) : (
-              <button
-                onClick={toggleAiTools}
-                className="flex items-center h-12 justify-center w-full"
-              >
-                <span className="flex items-center space-x-2">
-                  <span>Show Tools</span>
-                </span>
-              </button>
-            )}
-          </div>
-          {aitoolsVisible && (
-            <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
-              <AIPartners />
-              <AITools text={selectedText} />
+            <div className="flex my-3">
+              <EditorHeader editor={editor} />
             </div>
-          )}
-        </div>
 
-        {/* Chapters */}
-        <div
-          className={`transition-all duration-300 bg-amber-100 mx-2 ${
-            rightColumnVisible ? "w-1/3" : "w-24"
-          } flex flex-col`}
-        >
-          <div className="p-2 bg-amber-500 text-white rounded-t-lg hover:bg-amber-600 flex justify-center">
-            {rightColumnVisible ? (
+            {currentStory && (
               <button
-                onClick={toggleRightColumn}
-                className="flex items-center h-12 justify-center w-full"
+                className="w-full p-2 mb-2 bg-green-500 text-white rounded hover:bg-green-600"
+                onClick={handlePublish}
               >
-                <span className="flex items-center space-x-2">
-                  <span>Hide Chapters</span>
-                </span>
-              </button>
-            ) : (
-              <button
-                onClick={toggleRightColumn}
-                className="flex items-center h-12 justify-center w-full"
-              >
-                <span className="flex items-center space-x-2">
-                  <span>Show Chapters</span>
-                </span>
+                {currentStory.isPublished ? "Unpublish" : "Publish"}
               </button>
             )}
+            <button
+              onClick={handleNewChapter}
+              className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              New Chapter
+            </button>
           </div>
 
-          {rightColumnVisible && (
-            <div className="p-6 rounded-lg ">
-              <h2 className="text-2xl font-bold mb-4 text-amber-800">
-                Editing: {chapterTitle || "Untitled Masterpiece"}
-              </h2>
-              {chapters.length === 0 ? (
-                <p className="text-amber-700 italic">
-                  No chapters added yet. Start your journey!
-                </p>
+          {/* AI Tools */}
+          <div
+            className={`transition-all duration-300 bg-amber-100 mx-2 ${
+              aitoolsVisible ? "w-1/3" : "w-24"
+            } flex flex-col`}
+          >
+            <div className="p-2 bg-amber-500 text-white rounded-t-lg hover:bg-amber-600 flex justify-center">
+              {aitoolsVisible ? (
+                <button
+                  onClick={toggleAiTools}
+                  className="flex items-center h-12 justify-center w-full"
+                >
+                  <span className="flex items-center space-x-2">
+                    <span>Hide Tools</span>
+                  </span>
+                </button>
               ) : (
-                <ul className="space-y-2">
-                  {chapters.map((chapter) => (
-                    <li
-                      key={chapter.id}
-                      className="bg-white rounded-md shadow transition-all hover:shadow-md"
-                    >
-                      <div className="flex items-center justify-between p-3">
-                        <div
-                          className="flex items-center space-x-3 cursor-pointer"
-                          onClick={() => {
-                            setCurrentChapter(chapter);
-                            setChapterTitle(chapter.title);
-                            editor?.commands.setContent(chapter.content);
-                          }}
-                        >
-                          <Book className="w-5 h-5 text-amber-600" />
-                          <span className="font-medium text-amber-900">
-                            {chapter.title}
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <button
+                  onClick={toggleAiTools}
+                  className="flex items-center h-12 justify-center w-full"
+                >
+                  <span className="flex items-center space-x-2">
+                    <span>Show Tools</span>
+                  </span>
+                </button>
               )}
             </div>
-          )}
+            {aitoolsVisible && (
+              <div className="p-6 bg-amber-100 transition-all duration-300 flex-1">
+                <AIPartners />
+                <AITools text={selectedText} />
+              </div>
+            )}
+          </div>
+
+          {/* Chapters */}
+          <div
+            className={`transition-all duration-300 bg-amber-100 mx-2 ${
+              rightColumnVisible ? "w-1/3" : "w-24"
+            } flex flex-col`}
+          >
+            <div className="p-2 bg-amber-500 text-white rounded-t-lg hover:bg-amber-600 flex justify-center">
+              {rightColumnVisible ? (
+                <button
+                  onClick={toggleRightColumn}
+                  className="flex items-center h-12 justify-center w-full"
+                >
+                  <span className="flex items-center space-x-2">
+                    <span>Hide Chapters</span>
+                  </span>
+                </button>
+              ) : (
+                <button
+                  onClick={toggleRightColumn}
+                  className="flex items-center h-12 justify-center w-full"
+                >
+                  <span className="flex items-center space-x-2">
+                    <span>Show Chapters</span>
+                  </span>
+                </button>
+              )}
+            </div>
+
+            {rightColumnVisible && (
+              <div className="p-6 rounded-lg ">
+                <h2 className="text-2xl font-bold mb-4 text-amber-800">
+                  Editing: {chapterTitle || "Untitled Masterpiece"}
+                </h2>
+                {chapters.length === 0 ? (
+                  <p className="text-amber-700 italic">
+                    No chapters added yet. Start your journey!
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {chapters.map((chapter) => (
+                      <li
+                        key={chapter.id}
+                        className="bg-white rounded-md shadow transition-all hover:shadow-md"
+                      >
+                        <div className="flex items-center justify-between p-3">
+                          <div
+                            className="flex items-center space-x-3 cursor-pointer"
+                            onClick={() => {
+                              setCurrentChapter(chapter);
+                              setChapterTitle(chapter.title);
+                              editor?.commands.setContent(chapter.content);
+                            }}
+                          >
+                            <Book className="w-5 h-5 text-amber-600" />
+                            <span className="font-medium text-amber-900">
+                              {chapter?.title || "Untitled Chapter"}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

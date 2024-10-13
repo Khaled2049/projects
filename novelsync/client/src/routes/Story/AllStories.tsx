@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
+import { Search } from "lucide-react";
 
 const AllStories: React.FC = () => {
   const { user, loading: userLoading } = useAuthContext();
@@ -61,7 +62,11 @@ const AllStories: React.FC = () => {
         {user ? (
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
-              <span>Welcome back, {user.username || ""}!</span>
+              {user.username ? (
+                <span>Welcome back, {user.username || ""}!</span>
+              ) : (
+                <span>Welcome Back!</span>
+              )}
               <button
                 onClick={handleNewStory}
                 className="bg-amber-600 text-white px-4 py-2 rounded-full font-sans text-base hover:bg-amber-700 transition-colors duration-200 flex items-center"

@@ -64,21 +64,6 @@ const Navbar = () => {
             Novel Sync
           </Link>
         </div>
-
-        {/* Middle Section - Navigation Links */}
-        <div className="hidden lg:flex flex-1 space-x-6 ml-3">
-          <div className="relative text-gray-600">
-            <input
-              type="search"
-              placeholder="Search..."
-              className="bg-gray-700 text-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none"
-            />
-            <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
-              <Search className="text-white" />
-            </button>
-          </div>
-        </div>
-
         {/* Right Section - Search and User Dropdown */}
         <div className="hidden lg:flex items-center space-x-4">
           <Link
@@ -92,6 +77,12 @@ const Navbar = () => {
             className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
           >
             Stories
+          </Link>
+          <Link
+            to="/book-clubs"
+            className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
+          >
+            Book Clubs
           </Link>
 
           {/* <Link
