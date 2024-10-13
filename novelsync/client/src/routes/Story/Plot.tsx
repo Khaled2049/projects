@@ -1,4 +1,3 @@
-import React from "react";
 import PlotTimeline from "../../components/plot/PlotTimeline";
 
 const Plot: React.FC = () => {

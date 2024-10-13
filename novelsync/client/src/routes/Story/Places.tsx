@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { PlusCircle, X } from "lucide-react";
 
 import AddPlaceModal from "@/components/places/AddPlaceModal";
 
@@ -20,11 +19,11 @@ const places: React.FC = () => {
     loadplaces();
   }, [storyId]);
 
-  const removePlace = async (id: string) => {
-    if (!storyId) return;
-    await placeService.deletePlace(storyId, id);
-    setplaces(places.filter((place) => place.id !== id));
-  };
+  // const removePlace = async (id: string) => {
+  //   if (!storyId) return;
+  //   await placeService.deletePlace(storyId, id);
+  //   setplaces(places.filter((place) => place.id !== id));
+  // };
 
   const loadplaces = async () => {
     if (!storyId) return;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { PlusCircle, X } from "lucide-react";
 import { Character } from "@/types/ICharacter";
 import AddCharacterModal from "@/components/characters/AddCharacterModal";
 import { characterService } from "@/components/characters/CharacterService";
@@ -22,11 +21,11 @@ const Characters: React.FC = () => {
     loadCharacters();
   }, [storyId]);
 
-  const removeCharacter = async (id: string) => {
-    if (!storyId) return;
-    await characterService.deleteCharacter(storyId, id);
-    setCharacters(characters.filter((character) => character.id !== id));
-  };
+  // const removeCharacter = async (id: string) => {
+  //   if (!storyId) return;
+  //   await characterService.deleteCharacter(storyId, id);
+  //   setCharacters(characters.filter((character) => character.id !== id));
+  // };
 
   const loadCharacters = async () => {
     if (!storyId) return;

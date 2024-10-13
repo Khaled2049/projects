@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, ChevronDown, PlusCircle, Trash2, X } from "lucide-react";
+import { Book, ChevronDown, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -54,6 +54,7 @@ const PlotTimeline: React.FC = () => {
         name: "New PlotLine",
         description: "",
         events: [],
+        userId: "",
       },
     ]);
   };
