@@ -43,9 +43,8 @@ const BookClubDetails: React.FC = () => {
                     className="flex items-center text-amber-700 hover:text-amber-900 transition-colors"
                   >
                     <User className="w-5 h-5 mr-2" />
-                    <Link to={`/user/${member}`} className="hover:underline">
-                      {member}
-                    </Link>
+
+                    {member}
                   </li>
                 ))}
               </ul>

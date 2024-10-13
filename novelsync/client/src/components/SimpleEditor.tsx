@@ -32,8 +32,8 @@ import { useParams } from "react-router-dom";
 
 export function SimpleEditor() {
   const { storyId } = useParams<{ storyId: string }>();
-  const [rightColumnVisible, setRightColumnVisible] = useState(true);
-  const [aitoolsVisible, setAitoolsVisible] = useState(true);
+  const [rightColumnVisible, setRightColumnVisible] = useState(false);
+  const [aitoolsVisible, setAitoolsVisible] = useState(false);
 
   const [selectedText, setSelectedText] = useState("");
 
@@ -383,6 +383,7 @@ export function SimpleEditor() {
             placeholder="Story Title"
             className="w-full p-2 mb-2 border border-gray-700 rounded"
           />
+
           <textarea
             value={storyDescription}
             onChange={(e) => setStoryDescription(e.target.value)}
@@ -414,19 +415,6 @@ export function SimpleEditor() {
           <div className="flex my-3">
             <EditorHeader editor={editor} />
           </div>
-          {/* <button
-            className="w-full p-2 mb-2 rounded bg-green-600 hover:bg-green-700 transition-colors"
-            onClick={() =>
-              handleSave(
-                storyTitle,
-                storyDescription,
-                chapterTitle,
-                editor?.getHTML()
-              )
-            }
-          >
-            Save
-          </button> */}
 
           {currentStory && (
             <button
@@ -535,7 +523,7 @@ export function SimpleEditor() {
                         >
                           <Book className="w-5 h-5 text-amber-600" />
                           <span className="font-medium text-amber-900">
-                            {chapter.title}
+                            {chapter?.title || "Untitled Chapter"}
                           </span>
                         </div>
                       </div>

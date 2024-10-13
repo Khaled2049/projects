@@ -18,7 +18,7 @@ export interface Chapter {
   content: string;
   order: number;
   wordCount: number;
-  creator: string;
+  userId: string;
 }
 
 export interface Story {
@@ -201,6 +201,11 @@ class StoriesRepo {
     return newStoryRef.id;
   }
 
+  async deleteStory(storyId: string): Promise<void> {
+    const storyRef = doc(this.storiesCollection, storyId);
+    await deleteDoc(storyRef);
+  }
+
   async updateStory(
     storyId: string,
     title: string,
@@ -234,7 +239,7 @@ class StoriesRepo {
         content: "",
         order: story.chapterCount,
         wordCount: 0,
-        creator: story.userId,
+        userId: story.userId,
       };
 
       await setDoc(newChapterRef, newChapter);

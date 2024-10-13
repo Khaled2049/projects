@@ -5,5 +5,5 @@ export interface Character {
   backstory: string;
   affiliations?: string;
   notes?: string;
-  creator: string;
+  userId: string;
 }

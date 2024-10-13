@@ -71,7 +71,7 @@ const CreateBookClub = ({
     const clubWithDefaults = {
       ...newClub,
       id: uuidv4(),
-      members: [user.uid],
+      members: [user.username],
       activity: "New",
       image: "/api/placeholder/400/250",
       creatorId: user.uid,
@@ -92,8 +92,8 @@ const CreateBookClub = ({
   };
 
   return (
-    <div className="bg-amber-50 min-h-screen p-6">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+    <div className="bg-amber-50 ">
+      <div className="max-w-2xl mx-auto rounded-lg  p-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-serif font-bold text-amber-800 flex items-center">
             <Book className="mr-3" size={32} />

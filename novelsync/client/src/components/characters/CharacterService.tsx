@@ -46,7 +46,7 @@ class CharacterService {
       const newCharacter: Character = {
         ...character,
         id: newCharacterRef.id,
-        creator: story.data().userId,
+        userId: story.data().userId,
       };
 
       await setDoc(newCharacterRef, newCharacter);
