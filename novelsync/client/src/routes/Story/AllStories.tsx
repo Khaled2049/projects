@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
+import { Search } from "lucide-react";
 
 const AllStories: React.FC = () => {
   const { user, loading: userLoading } = useAuthContext();

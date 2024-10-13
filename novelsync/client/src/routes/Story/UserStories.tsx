@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "../../contexts/AuthContext";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaEyeSlash, FaTrash } from "react-icons/fa";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
 
 const UserStories = () => {
@@ -40,6 +40,12 @@ const UserStories = () => {
     if (!user) return;
     const storyList = await storiesRepo.getUserStories(user?.uid);
     setStories(storyList);
+  };
+
+  const unPublishStory = async (storyId: string) => {
+    if (!user) return;
+    await storiesRepo.handlePublish(storyId);
+    await loadStories();
   };
 
   if (loading) {
@@ -100,12 +106,21 @@ const UserStories = () => {
                     <h3 className="font-serif text-xl text-amber-900 mb-2">
                       {story.title}
                     </h3>
-                    <button
-                      onClick={() => editStory(story.id)}
-                      className="bg-green-500 flex px-3 py-2 text-white rounded hover:bg-green-700"
-                    >
-                      <FaEdit className="mr-1" /> Edit
-                    </button>
+                    <div className="flex">
+                      <button
+                        onClick={() => editStory(story.id)}
+                        className="bg-green-500 flex px-3 py-2 text-white rounded hover:bg-green-700"
+                      >
+                        <FaEdit className="mr-1" /> Edit
+                      </button>
+                      {/* Unpublish button */}
+                      <button
+                        onClick={() => unPublishStory(story.id)}
+                        className="bg-red-500 flex px-3 py-2 mx-2 text-white rounded hover:bg-red-700"
+                      >
+                        <FaEyeSlash className="mr-1" />
+                      </button>
+                    </div>
                   </div>
                 )
             )
