@@ -5,10 +5,9 @@ import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
-import { Search } from "lucide-react";
 
 const AllStories: React.FC = () => {
-  const { user, loading: userLoading } = useAuthContext();
+  const { user } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -62,8 +61,8 @@ const AllStories: React.FC = () => {
         {user ? (
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mb-8">
             <h1 className="text-3xl font-serif text-amber-900 mb-4 flex items-center justify-between">
-              {user.username ? (
-                <span>Welcome back, {user.username || ""}!</span>
+              {user.displayName ? (
+                <span>Welcome back, {user.displayName || ""}!</span>
               ) : (
                 <span>Welcome Back!</span>
               )}

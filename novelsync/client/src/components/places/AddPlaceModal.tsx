@@ -18,6 +18,7 @@ const AddPlaceModal = ({
     description: "",
     notes: "",
     storyId,
+    userId: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

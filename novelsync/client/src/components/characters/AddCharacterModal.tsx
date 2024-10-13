@@ -19,6 +19,7 @@ const AddCharacterModal = ({
     backstory: "",
     affiliations: "",
     notes: "",
+    userId: "",
   });
 
   const handleChange = (

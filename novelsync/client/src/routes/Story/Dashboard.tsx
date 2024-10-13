@@ -20,7 +20,7 @@ import {
   Feather,
   TrendingUp,
 } from "lucide-react";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 
 const Dashboard = () => {
   useEffect(() => {
@@ -45,8 +45,14 @@ const Dashboard = () => {
   ];
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  interface StatCardProps {
+    icon: ReactNode; // Icon can be any valid React node (JSX)
+    title: string; // Title should be a string
+    value: number | string; // Value can be either number or string
+    trend: number; // Trend is a number (positive/negative for up/down arrow)
+  }
 
-  const StatCard = ({ icon, title, value, trend }) => (
+  const StatCard: React.FC<StatCardProps> = ({ icon, title, value, trend }) => (
     <div className="bg-white p-4 rounded-lg shadow-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
@@ -129,7 +135,7 @@ const Dashboard = () => {
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
               >
-                {genreData.map((entry, index) => (
+                {genreData.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}

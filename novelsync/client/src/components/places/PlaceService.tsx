@@ -46,7 +46,7 @@ class PlaceService {
       };
 
       await setDoc(newplaceRef, newplace);
-      console.log(`place ${newplace.name} added successfully`);
+
       return newplace.id;
     } catch (error) {
       console.error("Error adding place:", error);
@@ -68,8 +68,6 @@ class PlaceService {
         ...placeData,
         ...place,
       });
-
-      console.log(`place ${place.name} updated successfully`);
     } catch (error) {
       console.error("Error updating place:", error);
       throw error;
@@ -81,7 +79,6 @@ class PlaceService {
       const storyRef = doc(this.storiesCollection, storyId);
       const placeRef = doc(collection(storyRef, "places"), placeId);
       await deleteDoc(placeRef);
-      console.log(`place with ID ${placeId} deleted successfully`);
     } catch (error) {
       console.error("Error deleting place:", error);
       throw error;

@@ -150,7 +150,6 @@ class StoriesRepo {
   }
 
   async incrementViewCount(storyId: string): Promise<void> {
-    console.log("Incrementing view count for story:", storyId);
     const storyRef = doc(firestore, "stories", storyId);
 
     try {
@@ -163,7 +162,6 @@ class StoriesRepo {
   }
 
   async incrementLikeCount(storyId: string): Promise<void> {
-    console.log("Incrementing like count for story:", storyId);
     const storyRef = doc(firestore, "stories", storyId);
 
     try {
@@ -368,12 +366,6 @@ class StoriesRepo {
         isPublished: !story.isPublished,
         updatedAt: new Date(),
       });
-
-      console.log(
-        `Story ${storyId} successfully ${
-          story.isPublished ? "unpublished" : "published"
-        }`
-      );
     } catch (error) {
       console.error(`Failed to update story ${storyId}:`, error);
       throw error; // Re-throw if you need to propagate the error

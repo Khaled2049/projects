@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, ChevronDown, PlusCircle, Trash2, X } from "lucide-react";
+import { Book, ChevronDown, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -54,13 +54,12 @@ const PlotTimeline: React.FC = () => {
         name: "New PlotLine",
         description: "",
         events: [],
+        userId: "",
       },
     ]);
   };
 
   const addEvent = async (plotLineId: string) => {
-    console.log("Adding event to plotline:", plotLineId);
-
     const newEvent: PlotEvent = {
       id: new Date().getTime().toString(),
       name: "New Event",
@@ -167,8 +166,6 @@ const PlotTimeline: React.FC = () => {
   };
 
   const addPlotLineFromTemplate = async (template: TemplateData) => {
-    console.log("Adding plotline from template:", template);
-
     if (!storyId) {
       console.error("No storyId provided");
       return;
@@ -190,10 +187,6 @@ const PlotTimeline: React.FC = () => {
 
       // Add all events concurrently
       await Promise.all(eventPromises);
-
-      console.log(
-        `Successfully added plot "${template.name}" with ${template.events.length} events`
-      );
 
       // Reload the plots
       loadPlots();
