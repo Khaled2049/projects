@@ -45,6 +45,10 @@ export function SimpleEditor() {
   const [chapterTitle, setChapterTitle] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
 
+  const storyTitleRef = useRef(storyTitle);
+  const storyDescriptionRef = useRef(storyDescription);
+  const chapterTitleRef = useRef(chapterTitle);
+
   const toggleAiTools = () => setAitoolsVisible(!aitoolsVisible);
   const toggleRightColumn = () => setRightColumnVisible(!rightColumnVisible);
   const { suggestion, setsuggestion } = useEditorContext();
@@ -145,8 +149,7 @@ export function SimpleEditor() {
     content: "",
     onUpdate: ({ editor }) => {
       const content = editor.getHTML();
-
-      debouncedSave(storyTitle, storyDescription, chapterTitle, content);
+      debouncedSave(content);
     },
   }) as Editor;
 
@@ -184,17 +187,17 @@ export function SimpleEditor() {
       }
       setSaveStatus("Saving...");
       try {
-        try {
+        const saveChapter = async () => {
           if (currentChapter) {
             // Update existing chapter
-
             await storiesRepo.updateChapter(
               currentStory.id,
               currentChapter.id,
               chapterTitle,
               content
             );
-          } else if (content.trim() !== "" || chapterTitle.trim() !== "") {
+          } else if (content.trim() || chapterTitle.trim()) {
+            // Add new chapter if content or title is not empty
             const newChapterId = await storiesRepo.addChapter(
               currentStory.id,
               chapterTitle
@@ -209,38 +212,49 @@ export function SimpleEditor() {
               currentStory.id,
               newChapterId
             );
+
             if (newChapter) {
               setCurrentChapter(newChapter);
-              setChapters([...chapters, newChapter]);
+              setChapters((prevChapters) => [...prevChapters, newChapter]);
             }
           }
+        };
 
-          await storiesRepo.updateStory(
-            currentStory.id,
-            storyTitle,
-            storyDescription
-          );
+        // Save chapter and story
+        await saveChapter();
+        await storiesRepo.updateStory(
+          currentStory.id,
+          storyTitle,
+          storyDescription
+        );
 
-          setSaveStatus("Saved");
-        } catch (error) {
-          console.error("Error saving:", error);
-          setSaveStatus(
-            error instanceof Error ? error.message : "Error saving"
-          );
-        }
+        setChapters((prevChapters) =>
+          prevChapters.map((chapter) =>
+            chapter.id === currentChapter?.id
+              ? { ...chapter, title: chapterTitle, content }
+              : chapter
+          )
+        );
+
         setSaveStatus("Saved");
       } catch (error) {
         console.error("Error saving:", error);
         setSaveStatus(error instanceof Error ? error.message : "Error saving");
+      } finally {
+        setTimeout(() => setSaveStatus(""), 2000);
       }
-      setTimeout(() => setSaveStatus(""), 2000);
     },
-    [currentStory, currentChapter]
+    [currentStory, currentChapter, chapters]
   );
 
   const debouncedSave = useCallback(
-    debounce((storyTitle, storyDescription, chapterTitle, content: any) => {
-      handleSave(storyTitle, storyDescription, chapterTitle, content);
+    debounce((content) => {
+      handleSave(
+        storyTitleRef.current,
+        storyDescriptionRef.current,
+        chapterTitleRef.current,
+        content
+      );
     }, 2000),
     [handleSave]
   );
@@ -276,10 +290,16 @@ export function SimpleEditor() {
 
   const handlePublish = async () => {
     if (!currentStory) return;
-    await storiesRepo.publishStory(currentStory.id);
-    setSaveStatus("Published");
+    await storiesRepo.handlePublish(currentStory.id);
+
     setTimeout(() => setSaveStatus(""), 2000);
   };
+
+  useEffect(() => {
+    storyTitleRef.current = storyTitle;
+    storyDescriptionRef.current = storyDescription;
+    chapterTitleRef.current = chapterTitle;
+  }, [storyTitle, storyDescription, chapterTitle]);
 
   useEffect(() => {
     if (selectedAI) {
@@ -331,6 +351,14 @@ export function SimpleEditor() {
     }
   };
 
+  const handleChange =
+    (setter: (value: string) => void) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setter(e.target.value);
+      const content = editor.getHTML();
+      debouncedSave(content);
+    };
+
   return (
     <div className="flex p-2 mt-4 justify-center overflow-auto">
       <BubbleMenu
@@ -376,25 +404,29 @@ export function SimpleEditor() {
             Summon your ultimate writing muse by pressing{" "}
             <span className="underline decoration-wavy text-blue-600">TAB</span>
           </h1>
+          <div className="mt-2 flex items-center justify-between">
+            <div className="text-sm text-gray-400">{saveStatus}</div>
+          </div>
           <input
             type="text"
             value={storyTitle}
-            onChange={(e) => setStoryTitle(e.target.value)}
+            onChange={handleChange(setStoryTitle)}
             placeholder="Story Title"
             className="w-full p-2 mb-2 border border-gray-700 rounded"
           />
 
           <textarea
             value={storyDescription}
-            onChange={(e) => setStoryDescription(e.target.value)}
-            placeholder="Story Description"
+            onChange={handleChange(setStoryDescription)}
+            placeholder="Chapter Notes"
             className="w-full p-2 mb-4 border border-gray-700 rounded"
             rows={3}
           />
+
           <input
             type="text"
             value={chapterTitle}
-            onChange={(e) => setChapterTitle(e.target.value)}
+            onChange={handleChange(setChapterTitle)}
             placeholder="Chapter Title"
             className="w-full p-2 mb-4 border border-gray-700 rounded"
           />
@@ -406,9 +438,6 @@ export function SimpleEditor() {
                   className="w-full focus:outline-none bg-white selection:bg-blue-100"
                   editor={editor}
                 />
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="text-sm text-gray-400">{saveStatus}</div>
-                </div>
               </div>
             </div>
           </div>
@@ -420,9 +449,8 @@ export function SimpleEditor() {
             <button
               className="w-full p-2 mb-2 bg-green-500 text-white rounded hover:bg-green-600"
               onClick={handlePublish}
-              disabled={currentStory.isPublished}
             >
-              {currentStory.isPublished ? "Published" : "Publish"}
+              {currentStory.isPublished ? "Unpublish" : "Publish"}
             </button>
           )}
           <button

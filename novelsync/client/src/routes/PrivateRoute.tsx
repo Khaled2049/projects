@@ -23,8 +23,7 @@ const PrivateRoute = () => {
 
       if (story) {
         // Check if the story creator ID matches the logged-in user
-        console.log("Story inside private route:", story.userId);
-        console.log("User inside private route:", user.uid);
+
         if (story.userId === user.uid) {
           setIsAuthorized(true);
         } else {
