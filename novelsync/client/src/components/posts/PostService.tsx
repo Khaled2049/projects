@@ -45,7 +45,6 @@ class PostsService {
   }
 
   async addPost(userId: string, post: Omit<IPost, "id">): Promise<string> {
-    console.log("adding post", post);
     try {
       const postsRef = doc(this.usersCollection, userId);
       const postsCollection = collection(postsRef, "posts");
@@ -60,7 +59,6 @@ class PostsService {
       };
 
       await setDoc(newPostRef, newPost);
-      console.log(`Post ${newPost.content} added successfully`);
 
       // Add post to allPosts collection
       await setDoc(doc(this.allPostsCollection, newPostRef.id), newPost);

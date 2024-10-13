@@ -54,7 +54,6 @@ const AllStories: React.FC = () => {
       navigate(`/story/${story.id}`);
     }
   };
-  console.log("user", user);
 
   return (
     <div className="bg-amber-50 min-h-screen py-8 relative ">

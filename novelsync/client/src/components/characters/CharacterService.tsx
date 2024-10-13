@@ -50,7 +50,7 @@ class CharacterService {
       };
 
       await setDoc(newCharacterRef, newCharacter);
-      console.log(`Character ${newCharacter.name} added successfully`);
+
       return newCharacter.id;
     } catch (error) {
       console.error("Error adding character:", error);
@@ -75,8 +75,6 @@ class CharacterService {
         ...characterData,
         ...character,
       });
-
-      console.log(`Character ${character.name} updated successfully`);
     } catch (error) {
       console.error("Error updating character:", error);
       throw error;
@@ -88,7 +86,6 @@ class CharacterService {
       const storyRef = doc(this.storiesCollection, storyId);
       const characterRef = doc(collection(storyRef, "characters"), characterId);
       await deleteDoc(characterRef);
-      console.log(`Character with ID ${characterId} deleted successfully`);
     } catch (error) {
       console.error("Error deleting character:", error);
       throw error;

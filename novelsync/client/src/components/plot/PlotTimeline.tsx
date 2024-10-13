@@ -60,8 +60,6 @@ const PlotTimeline: React.FC = () => {
   };
 
   const addEvent = async (plotLineId: string) => {
-    console.log("Adding event to plotline:", plotLineId);
-
     const newEvent: PlotEvent = {
       id: new Date().getTime().toString(),
       name: "New Event",
@@ -168,8 +166,6 @@ const PlotTimeline: React.FC = () => {
   };
 
   const addPlotLineFromTemplate = async (template: TemplateData) => {
-    console.log("Adding plotline from template:", template);
-
     if (!storyId) {
       console.error("No storyId provided");
       return;
@@ -191,10 +187,6 @@ const PlotTimeline: React.FC = () => {
 
       // Add all events concurrently
       await Promise.all(eventPromises);
-
-      console.log(
-        `Successfully added plot "${template.name}" with ${template.events.length} events`
-      );
 
       // Reload the plots
       loadPlots();
