@@ -9,7 +9,6 @@ export interface PlotLine {
   name: string;
   description: string;
   events: PlotEvent[];
-  userId: string;
 }
 
 export interface TemplateItem {

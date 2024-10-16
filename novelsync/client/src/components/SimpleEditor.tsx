@@ -329,7 +329,7 @@ export function SimpleEditor() {
   };
 
   const applyChanges = (newText: string) => {
-    editor.chain().focus().setContent(newText, false).run();
+    editor.chain().focus().insertContent(newText).run();
   };
 
   const handleAction = async (actionType: string) => {
@@ -425,6 +425,7 @@ export function SimpleEditor() {
               onChange={handleChange(setStoryTitle)}
               placeholder="Story Title"
               className="w-full p-2 mb-2 border border-gray-700 rounded"
+              maxLength={80}
             />
 
             <textarea
@@ -433,6 +434,7 @@ export function SimpleEditor() {
               placeholder="Chapter Notes"
               className="w-full p-2 mb-4 border border-gray-700 rounded"
               rows={3}
+              maxLength={80}
             />
 
             <input
@@ -441,6 +443,7 @@ export function SimpleEditor() {
               onChange={handleChange(setChapterTitle)}
               placeholder="Chapter Title"
               className="w-full p-2 mb-4 border border-gray-700 rounded"
+              maxLength={80}
             />
             <div className="bg-white p-4 rounded-lg border border-gray-300">
               <div className="min-h-[28rem] w-full flex justify-center">

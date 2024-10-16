@@ -97,7 +97,7 @@ const HomePage = () => {
           {/* Featured Novels Section */}
           <div className="mb-16">
             <h2 className="text-3xl font-serif font-bold mb-8 text-center">
-              Featured Novels
+              Featured Stories
             </h2>
             <div className="max-w-xl mx-auto border border-amber-400">
               <Carousel

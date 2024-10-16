@@ -54,7 +54,6 @@ const PlotTimeline: React.FC = () => {
         name: "New PlotLine",
         description: "",
         events: [],
-        userId: "",
       },
     ]);
   };

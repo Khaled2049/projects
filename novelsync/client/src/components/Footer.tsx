@@ -1,4 +1,4 @@
-import { FaEnvelope, FaGithub } from "react-icons/fa";
+import { FaEnvelope } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   return (
@@ -8,13 +8,13 @@ const Footer: React.FC = () => {
           <a href="khaledhossain.not@gmail.com">
             <FaEnvelope className="text-2xl hover:text-green-400 transition-colors duration-300" />
           </a>
-          <a
+          {/* <a
             href="https://github.com/Khaled2049"
             target="_blank"
             rel="noopener noreferrer"
           >
             <FaGithub className="text-2xl hover:text-gray-400 transition-colors duration-300" />
-          </a>
+          </a> */}
         </div>
         <p className="text-center text-sm">
           {new Date().getFullYear()} Khaled Hossain
