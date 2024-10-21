@@ -15,6 +15,7 @@ import { EventEditModal } from "./EventEditModal";
 import { PlotEvent, PlotLine, TemplateData } from "@/types/IPlot";
 import { plotService } from "./PlotService";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const PlotTimeline: React.FC = () => {
   const [plotLines, setPlotLines] = useState<PlotLine[]>([]);
@@ -195,6 +196,31 @@ const PlotTimeline: React.FC = () => {
     }
   };
 
+  const generateText = async () => {
+    if (!storyId) {
+      console.error("No storyId provided");
+      return;
+    }
+
+    try {
+      // Make the GET request to the specified endpoint
+      const response = await axios.get(
+        `http://127.0.0.1:5001/novelsync-f82ec/us-central1/createContext`,
+        {
+          params: {
+            storyId: storyId,
+          },
+        }
+      );
+
+      // Extract the generated text from the response
+      const generatedText = response.data.generatedText;
+      console.log("Generated text:", generatedText);
+    } catch (error) {
+      console.error("Error generating plot text:", error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex space-x-4 mb-4">
@@ -311,6 +337,14 @@ const PlotTimeline: React.FC = () => {
         editingEvent={editingEvent}
         setEditingEvent={setEditingEvent}
       />
+      <div className="flex">
+        <button
+          onClick={generateText}
+          className="mb-4 py-2 px-4 rounded-sm bg-amber-900 text-white flex items-center justify-center hover:bg-amber-700 transition duration-300"
+        >
+          Generate Plot Ideas
+        </button>
+      </div>
     </div>
   );
 };
