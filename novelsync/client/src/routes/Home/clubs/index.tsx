@@ -2,13 +2,11 @@ import { Link } from "react-router-dom";
 import { useBookClub } from "../../../contexts/BookClubContext";
 import { useEffect } from "react";
 
-const Clubs = () => {
-  const { bookClubs, getBookClubs } = useBookClub();
+interface ClubsProps {
+  bookClubs: any[];
+}
 
-  useEffect(() => {
-    getBookClubs();
-  }, [getBookClubs]);
-
+const Clubs = ({ bookClubs }: ClubsProps) => {
   return (
     <div className="w-full lg:w-1/4 bg-amber-50 p-4 overflow-y-auto">
       <h2 className="text-2xl font-serif font-bold mb-4 text-amber-900">

@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
 import RandomTopic from "../../components/RandomTopic";
 import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
+import StoryMetadataModal from "@/components/StoryMetadataModal";
 
 const AllStories: React.FC = () => {
   const { user } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [stories, setStories] = useState<StoryMetadata[]>([]);
   const storiesPerPage = 9;
   const indexOfLastNovel = currentPage * storiesPerPage;
@@ -28,17 +29,13 @@ const AllStories: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleNewStory = async () => {
+  const handleNewStory = () => {
     if (user) {
-      const newStoryId = await storiesRepo.createStory(
-        "New Story",
-        "",
-        user.uid
-      );
-      navigate(`/create/${newStoryId}`);
+      setIsModalOpen(true);
     } else {
-      // Handle the case where the user is not authenticated
       console.error("User not authenticated");
+      // Handle the case where the user is not authenticated
+      // Maybe show a login prompt or redirect to login page
     }
   };
 
@@ -73,6 +70,13 @@ const AllStories: React.FC = () => {
                 Start a New Story
                 <FaArrowRight className="ml-2" />
               </button>
+              {user && (
+                <StoryMetadataModal
+                  isOpen={isModalOpen}
+                  onClose={() => setIsModalOpen(false)}
+                  userId={user.uid}
+                />
+              )}
             </h1>
           </div>
         ) : (

@@ -6,26 +6,36 @@ import { IUser } from "../../types/IUser";
 import { AiOutlineLoading3Quarters, AiOutlinePlus } from "react-icons/ai";
 import Posts from "./posts";
 import Clubs from "./clubs";
+import { useBookClub } from "@/contexts/BookClubContext";
 
 const Home: React.FC = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [following, setFollowing] = useState([] as string[]);
-
+  const [clubs, setClubs] = useState<any>([]);
   const [loading, setLoading] = useState<string | null>(null);
 
   const { fetchUsersOrderedByLastLogin, user, followUser, unfollowUser } =
     useAuthContext();
 
+  const { getBookClubs } = useBookClub();
+
   useEffect(() => {
-    fetchUsersOrderedByLastLogin(5).then((users) => {
-      setUsers(users);
-      setFollowing(
-        users
-          .filter((author) => author.followers.includes(user?.uid || ""))
-          .map((author) => author.uid)
-      );
-    });
-  }, [fetchUsersOrderedByLastLogin, user?.uid]);
+    const fetchUsers = async () => {
+      try {
+        // Call the fetch function with the limit (e.g., 5)
+        const fetchedUsers = await fetchUsersOrderedByLastLogin(5);
+        const fetchedBookClubs = await getBookClubs();
+        console.log("Fetched Book Clubs", fetchedBookClubs);
+        setClubs(fetchedBookClubs);
+        setUsers(fetchedUsers); // Set the fetched users to state
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    // Call the fetch function when the component mounts
+    fetchUsers();
+  }, [fetchUsersOrderedByLastLogin]);
 
   const handleFollow = async (uid: string) => {
     setLoading(uid); // Set loading state
@@ -137,7 +147,7 @@ const Home: React.FC = () => {
 
       <Posts />
 
-      <Clubs />
+      {clubs ? <Clubs bookClubs={clubs} /> : "loading..."}
     </div>
   );
 };

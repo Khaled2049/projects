@@ -118,6 +118,12 @@ const Navbar = () => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg z-50">
                   <Link
+                    to="/profile"
+                    className="block px-4 py-2 hover:bg-gray-200"
+                  >
+                    View Profile
+                  </Link>
+                  <Link
                     to="/user-stories"
                     className="block px-4 py-2 hover:bg-gray-200"
                   >
@@ -158,6 +164,9 @@ const Navbar = () => {
       <div
         className={`lg:hidden ${isMobileMenuOpen ? "block" : "hidden"} mt-4`}
       >
+        <Link to="/profile" className="block px-4 py-2 hover:bg-gray-200">
+          View Profile
+        </Link>
         <Link
           to="/"
           className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded mb-2"

@@ -48,6 +48,7 @@ export interface StoryMetadata {
 }
 
 const WORD_LIMIT = 5000;
+const CHAPTER_LIMIT = 50;
 
 class StoriesRepo {
   private storiesCollection = collection(firestore, "stories");
@@ -176,12 +177,18 @@ class StoriesRepo {
   async createStory(
     title: string,
     description: string,
-    userId: string
+    userId: string,
+    metadata: {
+      category: string;
+      tags: string[];
+      targetAudience: string;
+      language: string;
+      copyright: string;
+      coverImageUrl: string;
+    }
   ): Promise<string> {
     const newStoryRef = doc(this.storiesCollection);
-
     const author = await this.getUserInfo(userId);
-
     const newStory: Story = {
       id: newStoryRef.id,
       title,
@@ -194,16 +201,15 @@ class StoriesRepo {
       author,
       views: 0,
       likes: 0,
+      ...metadata,
     };
     await setDoc(newStoryRef, newStory);
-
     try {
       await this.addChapter(newStoryRef.id, "Chapter 1");
     } catch (error) {
       console.error("Error adding first chapter:", error);
       throw error;
     }
-
     return newStoryRef.id;
   }
 
@@ -237,6 +243,12 @@ class StoriesRepo {
 
       const story = await this.getStory(storyId);
       if (!story) throw new Error("Story not found");
+
+      if (story.chapterCount >= CHAPTER_LIMIT) {
+        throw new Error(
+          `Chapter limit reached. Current chapter count: ${story.chapterCount}`
+        );
+      }
 
       const newChapterRef = doc(chaptersCollection);
       const newChapter: Chapter = {
