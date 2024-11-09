@@ -25,7 +25,7 @@ const Home: React.FC = () => {
           .map((author) => author.uid)
       );
     });
-  }, [fetchUsersOrderedByLastLogin, user?.uid]);
+  }, [user?.uid]);
 
   const handleFollow = async (uid: string) => {
     setLoading(uid); // Set loading state

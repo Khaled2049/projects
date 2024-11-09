@@ -22,8 +22,8 @@ export const firestore = getFirestore(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
 
-if (import.meta.env.MODE === "development") {
-  console.log("Using Firebase Emulators");
-  connectFirestoreEmulator(firestore, "localhost", 8080);
-  connectFunctionsEmulator(functions, "localhost", 5001);
-}
+// if (import.meta.env.MODE === "development") {
+//   console.log("Using Firebase Emulators");
+//   connectFirestoreEmulator(firestore, "localhost", 8080);
+//   connectFunctionsEmulator(functions, "localhost", 5001);
+// }
