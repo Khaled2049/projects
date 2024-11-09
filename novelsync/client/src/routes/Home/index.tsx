@@ -38,7 +38,7 @@ const Home: React.FC = () => {
 
     // Call the fetch function when the component mounts
     fetchUsers();
-  }, [fetchUsersOrderedByLastLogin]);
+  }, [user?.uid]);
 
   const handleFollow = async (uid: string) => {
     setLoading(uid); // Set loading state
