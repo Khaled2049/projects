@@ -45,7 +45,20 @@ const Suggestions = () => {
     if (!user) {
       throw new Error("User not authenticated");
     }
-    const newStoryId = await storiesRepo.createStory("New Story", "", user.uid);
+    const metaData = {
+      category: "",
+      tags: [],
+      targetAudience: "",
+      language: "en",
+      copyright: "",
+      coverImageUrl: "",
+    };
+    const newStoryId = await storiesRepo.createStory(
+      "New Story",
+      "",
+      user.uid,
+      metaData
+    );
     setsuggestion(suggestion);
     setDesire("");
     navigate(`/create/${newStoryId}`);

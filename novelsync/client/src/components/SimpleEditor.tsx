@@ -16,7 +16,7 @@ import BulletList from "@tiptap/extension-bullet-list";
 import { Extension } from "@tiptap/core";
 import { AITextGenerator } from "./AITextGenerator";
 import ListItem from "@tiptap/extension-list-item";
-import { storiesRepo, Story, Chapter } from "./StoriesRepo";
+import { storiesRepo } from "./StoriesRepo";
 
 const limit = 5000;
 import { Book, Loader } from "lucide-react";
@@ -29,6 +29,7 @@ import { useEditorContext } from "../contexts/EditorContext";
 import AIPartners from "./AIPartners";
 import AITools from "./AITools";
 import { useNavigate, useParams } from "react-router-dom";
+import { Chapter, Story } from "@/types/IStory";
 
 export function SimpleEditor() {
   const navigate = useNavigate();

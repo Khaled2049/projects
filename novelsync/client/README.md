@@ -14,3 +14,5 @@ NovelSync is a novel-writing platform built to help authors create novels with t
 - Set timer so that you can focus
 
 ### I'm working on adding edit and autosave functionalities and much more!
+
+# command to deploy? firebase deploy --only hosting

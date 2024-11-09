@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "../../contexts/AuthContext";
 import { FaEdit, FaEyeSlash, FaTrash } from "react-icons/fa";
-import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
+import { storiesRepo } from "../../components/StoriesRepo";
+import { StoryMetadata } from "@/types/IStory";
 
 const UserStories = () => {
   const { user } = useAuthContext();

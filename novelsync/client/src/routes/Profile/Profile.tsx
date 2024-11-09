@@ -6,7 +6,6 @@ import { BookOpen, Edit, ImageIcon, PenTool, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Textarea } from "@/components/ui/textarea";
-import Posts from "../Home/posts";
 
 const UserProfile = () => {
   const { user } = useAuthContext();

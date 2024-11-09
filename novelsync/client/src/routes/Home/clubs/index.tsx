@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { useBookClub } from "../../../contexts/BookClubContext";
-import { useEffect } from "react";
 
 interface ClubsProps {
   bookClubs: any[];
