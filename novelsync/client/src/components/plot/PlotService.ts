@@ -29,7 +29,6 @@ class PlotService {
         name: plotName,
         description: "",
         events: [],
-        userId: story.userId,
       };
 
       await setDoc(newPlotRef, newPlot);

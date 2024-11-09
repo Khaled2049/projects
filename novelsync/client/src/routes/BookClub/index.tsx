@@ -21,7 +21,7 @@ const BookClubs = () => {
 
   useEffect(() => {
     getBookClubs();
-  }, [getBookClubs]);
+  }, []);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);

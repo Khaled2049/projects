@@ -17,6 +17,7 @@ import {
   Places,
   CreateStory,
   Dashboard,
+  Profile,
 } from "./routes/index";
 import { AuthProvider } from "./contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "/sign-up",
         element: <Signup />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
       {
         path: "/create/:storyId",

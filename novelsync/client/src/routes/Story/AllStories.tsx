@@ -3,14 +3,22 @@ import { FaArrowRight, FaEye, FaThumbsUp } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Suggestions from "../../components/Suggestions";
-import RandomTopic from "../../components/RandomTopic";
-import { storiesRepo, StoryMetadata } from "../../components/StoriesRepo";
+import { storiesRepo } from "../../components/StoriesRepo";
+import StoryMetadataModal from "@/components/StoryMetadataModal";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { StoryMetadata } from "@/types/IStory";
 
 const AllStories: React.FC = () => {
   const { user } = useAuthContext();
 
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [stories, setStories] = useState<StoryMetadata[]>([]);
   const storiesPerPage = 9;
   const indexOfLastNovel = currentPage * storiesPerPage;
@@ -28,17 +36,13 @@ const AllStories: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleNewStory = async () => {
+  const handleNewStory = () => {
     if (user) {
-      const newStoryId = await storiesRepo.createStory(
-        "New Story",
-        "",
-        user.uid
-      );
-      navigate(`/create/${newStoryId}`);
+      setIsModalOpen(true);
     } else {
-      // Handle the case where the user is not authenticated
       console.error("User not authenticated");
+      // Handle the case where the user is not authenticated
+      // Maybe show a login prompt or redirect to login page
     }
   };
 
@@ -73,6 +77,13 @@ const AllStories: React.FC = () => {
                 Start a New Story
                 <FaArrowRight className="ml-2" />
               </button>
+              {user && (
+                <StoryMetadataModal
+                  isOpen={isModalOpen}
+                  onClose={() => setIsModalOpen(false)}
+                  userId={user.uid}
+                />
+              )}
             </h1>
           </div>
         ) : (
@@ -92,7 +103,6 @@ const AllStories: React.FC = () => {
 
         <div className="flex flex-wrap mx-4">
           <div className="w-full lg:w-1/4 px-4 border-r-2 border-amber-700 space-y-4">
-            <RandomTopic />
             <Suggestions />
           </div>
 
@@ -101,29 +111,58 @@ const AllStories: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentStories.map((story) => (
-                <div
-                  onClick={() => handleStoryClick(story)}
+                <Card
                   key={story.id}
-                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+                  onClick={() => handleStoryClick(story)}
+                  className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                 >
-                  <h3 className="font-serif text-xl text-amber-900 mb-2">
-                    {story.title}
-                  </h3>
-                  <p className="text-gray-600 mb-1">By {story.author}</p>
-                  <p className="text-gray-500 text-sm mb-4">
-                    Last Updated:{" "}
-                    {new Date(story.updatedAt).toLocaleDateString()}
-                  </p>
+                  <CardHeader>
+                    <CardTitle className="font-serif text-xl text-amber-900 text-left">
+                      {story.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex items-start">
+                    {/* Story Cover Thumbnail */}
+                    {story.coverImageUrl ? (
+                      <img
+                        src={story.coverImageUrl}
+                        alt={`${story.title} cover`}
+                        className="w-24 h-32 object-cover rounded-md mr-4 border border-amber-200"
+                      />
+                    ) : null}
 
-                  <div className="flex items-center mt-4 text-gray-600 text-sm">
-                    <div className="flex items-center mr-2">
+                    <div>
+                      <h3 className="text-lg mb-2">Description</h3>
+
+                      <p className="text-gray-600 mb-1">{story.description}</p>
+                      <p className="text-gray-600 mb-1">By {story.author}</p>
+                      <p className="text-gray-500 text-sm mb-4">
+                        Last Updated:{" "}
+                        {new Date(story.updatedAt).toLocaleDateString()}
+                      </p>
+                      {story.tags && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {story.tags.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex items-center gap-2 text-gray-600 text-lg">
+                    <div className="flex items-center">
                       <FaEye className="mr-1" /> {story.views}
                     </div>
-                    <div className="flex items-center mr-2">
+                    <div className="flex items-center">
                       <FaThumbsUp className="mr-1" /> {story.likes}
                     </div>
-                  </div>
-                </div>
+                  </CardFooter>
+                </Card>
               ))}
             </div>
 

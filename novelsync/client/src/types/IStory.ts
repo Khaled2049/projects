@@ -1,40 +1,40 @@
-import { IUser } from "./IUser";
-
 export interface Chapter {
-  chapterId: string;
+  id: string;
   title: string;
   content: string;
+  order: number;
+  wordCount: number;
+  userId: string;
 }
 
 export interface Story {
-  storyId: string;
+  id: string;
   title: string;
-  chapters: Chapter[];
+  description: string;
+  userId: string;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  chapterCount: number;
   author: string;
-  lastUpdated: string;
   views: number;
   likes: number;
+  coverImageUrl?: string;
+  tags?: string[];
 }
-export interface Draft {
-  draftId: string;
+
+export interface StoryMetadata {
+  id: string;
   title: string;
-  chapters: Chapter[];
+  description: string;
+  chapterCount: number;
+  isPublished: boolean;
+  updatedAt: Date;
   author: string;
-  lastUpdated: string;
-}
-
-export interface CreateStoryParams {
-  storyId: string;
-  user: IUser | null;
-  title: string;
-  chapters: Chapter[];
-}
-
-export interface CreateDraftParams {
-  draftId: string;
-  user: IUser | null;
-  title: string;
-  chapters: Chapter[];
+  views: number;
+  likes: number;
+  coverImageUrl?: string;
+  tags?: string[];
 }
 
 export interface ILikes {

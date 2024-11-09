@@ -12,42 +12,10 @@ import {
   where,
 } from "firebase/firestore";
 import { firestore } from "../config/firebase";
-export interface Chapter {
-  id: string;
-  title: string;
-  content: string;
-  order: number;
-  wordCount: number;
-  userId: string;
-}
-
-export interface Story {
-  id: string;
-  title: string;
-  description: string;
-  userId: string;
-  isPublished: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  chapterCount: number;
-  author: string;
-  views: number;
-  likes: number;
-}
-
-export interface StoryMetadata {
-  id: string;
-  title: string;
-  description: string;
-  chapterCount: number;
-  isPublished: boolean;
-  updatedAt: Date;
-  author: string;
-  views: number;
-  likes: number;
-}
+import { Chapter, Story, StoryMetadata } from "@/types/IStory";
 
 const WORD_LIMIT = 5000;
+const CHAPTER_LIMIT = 50;
 
 class StoriesRepo {
   private storiesCollection = collection(firestore, "stories");
@@ -67,6 +35,7 @@ class StoriesRepo {
         author: data.author,
         views: data.views,
         likes: data.likes,
+        coverImageUrl: data.coverImageUrl || "",
       };
     });
   }
@@ -90,6 +59,8 @@ class StoriesRepo {
         author: data.author,
         views: data.views,
         likes: data.likes,
+        coverImageUrl: data.coverImageUrl || "",
+        tags: data.tags || [],
       };
     });
   }
@@ -113,6 +84,8 @@ class StoriesRepo {
         author: data.author,
         views: data.views,
         likes: data.likes,
+        coverImageUrl: data.coverImageUrl || "",
+        tags: data.tags || [],
       };
     });
   }
@@ -128,6 +101,8 @@ class StoriesRepo {
           ...data,
           createdAt: data.createdAt.toDate(),
           updatedAt: data.updatedAt.toDate(),
+          coverImageUrl: data.coverImageUrl || "",
+          tags: data.tags || [],
         } as Story;
       }
     } catch (error) {
@@ -176,12 +151,18 @@ class StoriesRepo {
   async createStory(
     title: string,
     description: string,
-    userId: string
+    userId: string,
+    metadata: {
+      category: string;
+      tags: string[];
+      targetAudience: string;
+      language: string;
+      copyright: string;
+      coverImageUrl: string;
+    }
   ): Promise<string> {
     const newStoryRef = doc(this.storiesCollection);
-
     const author = await this.getUserInfo(userId);
-
     const newStory: Story = {
       id: newStoryRef.id,
       title,
@@ -194,16 +175,15 @@ class StoriesRepo {
       author,
       views: 0,
       likes: 0,
+      ...metadata,
     };
     await setDoc(newStoryRef, newStory);
-
     try {
       await this.addChapter(newStoryRef.id, "Chapter 1");
     } catch (error) {
       console.error("Error adding first chapter:", error);
       throw error;
     }
-
     return newStoryRef.id;
   }
 
@@ -237,6 +217,12 @@ class StoriesRepo {
 
       const story = await this.getStory(storyId);
       if (!story) throw new Error("Story not found");
+
+      if (story.chapterCount >= CHAPTER_LIMIT) {
+        throw new Error(
+          `Chapter limit reached. Current chapter count: ${story.chapterCount}`
+        );
+      }
 
       const newChapterRef = doc(chaptersCollection);
       const newChapter: Chapter = {

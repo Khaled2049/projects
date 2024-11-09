@@ -22,7 +22,7 @@ interface BookClubContextProps {
   deleteBookClub: (id: string) => Promise<void>;
   joinBookClub: (clubId: string, userName: string) => Promise<void>;
   leaveBookClub: (clubId: string, userId: string) => Promise<void>;
-  getBookClubs: () => Promise<void>;
+  getBookClubs: () => Promise<IClub[] | undefined>;
 }
 
 const BookClubContext = createContext<BookClubContextProps | undefined>(
@@ -62,7 +62,7 @@ export const BookClubProvider: React.FC<{ children: ReactNode }> = ({
       const bookClubsData = bookClubsSnapshot.docs.map(
         (doc) => doc.data() as IClub
       );
-      setBookClubs(bookClubsData);
+      return bookClubsData;
     } catch (error) {
       console.error("Error getting book clubs:", error);
     }
