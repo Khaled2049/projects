@@ -94,7 +94,7 @@ const StoryMetadataModal: React.FC<StoryMetadataModalProps> = ({
         <DialogHeader>
           <DialogTitle>Create New Story</DialogTitle>
         </DialogHeader>
-        <div className="flex-grow overflow-y-auto pr-4 -mr-4">
+        <div className="flex-grow overflow-y-auto px-4 -mr-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
@@ -151,12 +151,14 @@ const StoryMetadataModal: React.FC<StoryMetadataModalProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="copyright">Copyright</Label>
-              <Input
-                id="copyright"
-                value={copyright}
-                onChange={(e) => setCopyright(e.target.value)}
-              />
+              <Select value={copyright} onValueChange={setCopyright}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Copyright" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CC0">Creative Commons Zero</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="coverImage">Cover Image</Label>

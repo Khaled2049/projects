@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { Chapter, storiesRepo } from "../../components/StoriesRepo";
+import { storiesRepo } from "../../components/StoriesRepo";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Chapter } from "@/types/IStory";
 
 const StoryDetail: React.FC = () => {
   const [story, setStory] = useState<any>(null);
@@ -107,6 +108,14 @@ const StoryDetail: React.FC = () => {
                   toggleTheme={toggleTheme}
                 />
               </div>
+
+              {story.coverImageUrl && (
+                <img
+                  src={story?.coverImageUrl}
+                  alt={`${story.title} cover`}
+                  className="w-full h-64 object-cover rounded-md mb-4"
+                />
+              )}
               <h1
                 className={`text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-center ${
                   isDarkMode ? "text-amber-400" : "text-amber-900"
@@ -128,6 +137,7 @@ const StoryDetail: React.FC = () => {
               >
                 Last updated: {new Date(story.updatedAt).toLocaleDateString()}
               </p>
+
               <div
                 className={`prose prose-lg max-w-none p-4 md:p-6 rounded-md leading-relaxed ${
                   isDarkMode ? "prose-invert" : ""

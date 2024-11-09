@@ -70,7 +70,7 @@ const Navbar = () => {
             to="/home"
             className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded"
           >
-            Home
+            Community
           </Link>
           <Link
             to="/stories"
@@ -171,7 +171,7 @@ const Navbar = () => {
           to="/"
           className="block px-4 py-2 text-white bg-transparent hover:bg-white hover:text-black transition duration-300 ease-in-out rounded mb-2"
         >
-          Home
+          Community
         </Link>
         <Link
           to="/stories"
